@@ -1,0 +1,27 @@
+Program Installation
+============================================================================
+
+For code compilation a suitable Makefile is provided.
+
+- To create the executable files, type:
+
+make
+
+- To install the executable files (default $(binDir) is ./bin.x86_64), type:
+
+make install
+
+- To delete the excutable files and all the object files from the directory, type:
+
+make clean
+
+- To delete the installed excutable files in $(binDir), type:
+
+make cleanbin
+
+External packages
+============================================================================
+
+For Bowtie, refer to the following link:
+
+  - bowtie           http://bowtie-bio.sourceforge.net/index.shtml

@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# pwm_mscan_wrapper: scan a genome with a PWM (using matrix_scan)
+#  arguments:
+#              matrix-file
+#              p-value
+#              matrix-len
+#              genome-dir
+#              assembly
+#
+#  25.11.2015  Giovanna Ambrosini
+
+ARGS=4         # Script requires 5 arguments.
+E_BADARGS=85   # Wrong number of arguments passed to script.
+
+if [ $# -ne "$ARGS" ]
+then
+  echo "Usage: `basename $0` matrix-file p-value genome-dir assembly[hg19|mm9|..]"
+  exit $E_BADARGS
+fi
+
+if [ -f "$1" ]
+then
+    matrix_file=$1
+else
+    echo "File \"$1\" does not exist."
+    exit $E_BADARGS
+fi
+
+p_value=$2
+genome_dir=$3
+
+# Define path for files chr_NC_gi/chr_hdr (needed for BED-format conversion)
+chrNC_dir=$genome_dir
+
+assembly=$4
+
+# Extract basename from matrix file (without path)
+matrix_name=$(basename "$matrix_file")
+extension="${matrix_name##*.}"
+matrix_name="${matrix_name%.*}"
+
+echo "PWM name: $matrix_name"
+
+echo "========               Calculating PWM score               ========"
+matrix_score=$(matrix_prob.pl -e $p_value -bg "0.29,0.21,0.21,0.29" $matrix_file \
+        | grep SCORE | sed 's/:/\ /'\
+        | awk -F " " '{print $2}')
+
+echo "PWM score: $matrix_score"
+
+# Run matrix_scan pipeline
+
+pwmout_bed=${matrix_name}_co${matrix_score}_matrix_scan.bed
+
+echo "========               matrix_scan-based pipeline          ========"
+echo "cat $genome_dir/$assembly/chrom*.seq | matrix_scan -m $matrix_file -c $matrix_score | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s $assembly -i $chrNC_dir > $pwmout_bed" 
+echo "..."
+cat $genome_dir/$assembly/chrom*.seq | matrix_scan -m $matrix_file -c $matrix_score | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s $assembly -i $chrNC_dir > $pwmout_bed
+
+echo "List of matches (BED format) : $pwmout_bed"

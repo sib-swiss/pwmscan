@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# pwm_bowtie_wrapper: scan a genome with a PWM (using bowtie)
+#  arguments:
+#              matrix-file
+#              p-value
+#              matrix-len
+#              bowtie-dir
+#              genome-idx-file
+#              assembly
+#
+#  25.11.2015  Giovanna Ambrosini
+
+ARGS=6         # Script requires 6 arguments.
+E_BADARGS=85   # Wrong number of arguments passed to script.
+
+if [ $# -ne "$ARGS" ]
+then
+  echo "Usage: `basename $0` matrix-file p-value matrix-len bowtie-dir genome-idx-file assembly[hg19|mm9|..]"
+  exit $E_BADARGS
+fi
+
+chrNC_dir=/home/local/db/genome
+
+if [ -f "$1" ]
+then
+    matrix_file=$1
+else
+    echo "File \"$1\" does not exist."
+    exit $E_BADARGS
+fi
+
+p_value=$2
+matrix_len=$3
+bowtie_dir=$4
+
+if [ -f "$4/$5.1.ebwt" ]
+then
+    genome_idx_file=$5
+else
+    echo "File \"$4/$5.1.ebwt\" does not exist."
+    exit $E_BADARGS
+fi
+
+assembly=$6
+
+# Extract basename from matrix file (without path)
+matrix_name=$(basename "$matrix_file")
+extension="${matrix_name##*.}"
+matrix_name="${matrix_name%.*}"
+
+echo "PWM name: $matrix_name"
+
+echo "========               Calculating PWM score               ========"
+matrix_score=$(matrix_prob.pl -e $p_value -bg "0.29,0.21,0.21,0.29" $matrix_file \
+	| grep SCORE | sed 's/:/\ /'\
+	| awk -F " " '{print $2}')
+
+echo "PWM score: $matrix_score"
+
+echo "========               Generating tag list                 ========"
+tagscore=${matrix_name}_co$matrix_score.dat
+echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore"
+echo "..."
+
+# Generate list of all tags that represent all possible matrix hits
+
+ mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore
+
+# Run Bowtie pipeline
+pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
+
+echo "========               Bowtie-based pipeline               ========"
+echo "awk '{print \">\"\$2\"\n\"\$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len $chrNC_dir > $pwmout_bed" 
+echo "..."
+ awk '{print ">"$2"\n"$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
+
+echo "List of matches (BED format) : $pwmout_bed"
+
+rm $tagscore unmapped.dat

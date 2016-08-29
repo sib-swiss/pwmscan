@@ -122,11 +122,9 @@ Matrix format conversion utilities are the following:
 The jasparconvert.pl and transfacconvert.pl scripts are based on an original implementation
 by William Stafford Noble and Timothy L. Bailey (1999) for MEME.
 
-We also provide three (bash) shell wrapper scripts that embed the entire analysis pipeline
-using one of the three aforementioned methods:
+We also provide two (bash) shell wrapper scripts that embed the entire analysis pipeline:
 
   - pwm_bowtie_wrapper    Scan a genome with a PWM and a p-value using bowtie
-  - pwm_gwi_wrapper       Scan a genome with a PWM and a p-value using fetchGWI
   - pwm_mscan_wrapper     Scan a genome with a PWM and a p-value using matrix_scan
 
 

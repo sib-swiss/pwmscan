@@ -45,7 +45,7 @@
 #define BUF_SIZE 8192
 #define LINE_SIZE 1024
 #define FT_MAX  64
-#define CHR_NB 6
+#define CHR_NB 8
 #define AC_MAX 18
 #define POS_MAX 16
 #define SCORE_MAX 12

@@ -9,12 +9,13 @@ CFLAGS2 = -fPIC -O2 -std=gnu99 -W -Wall
 
 binDir = ./bin.x86_64
 
-PROGS = mba bowtie2bed mscan_bed2sga mscan2bed filterOverlaps matrix_scan
+PROGS = mba bowtie2bed mscan_bed2sga mscan2bed filterOverlaps matrix_scan matrix_prob
 OBJS = hashtable.o
 
 all :  $(PROGS)
 
 MBA_SRC = mba.c
+MATRIX_PROB_SRC = matrix_prob.c
 BOWTIE2BED_SRC = bowtie2bed.c
 MSCAN2BED_SRC = mscan2bed.c
 MSCAN_BED2SGA_SRC = mscan_bed2sga.c
@@ -40,6 +41,9 @@ mba : $(MBA_SRC)
 
 filterOverlaps : $(FILTEROVERLAPS_SRC)
 	$(CC) $(CFLAGS) -o filterOverlaps $(FILTEROVERLAPS_SRC)
+
+matrix_prob : $(MATRIX_PROB_SRC)
+	$(CC) $(CFLAGS) -o matrix_prob $(MATRIX_PROB_SRC)
 
 matrix_scan : $(MATRIX_SCAN_OBJS)
 	$(CC) $(CFLAGS) -o matrix_scan $^

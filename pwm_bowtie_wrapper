@@ -4,19 +4,18 @@
 #  arguments:
 #              matrix-file
 #              p-value
-#              matrix-len
 #              bowtie-dir
 #              genome-idx-file
 #              assembly
 #
 #  25.11.2015  Giovanna Ambrosini
 
-ARGS=6         # Script requires 6 arguments.
+ARGS=5         # Script requires 5 arguments.
 E_BADARGS=85   # Wrong number of arguments passed to script.
 
 if [ $# -ne "$ARGS" ]
 then
-  echo "Usage: `basename $0` matrix-file p-value matrix-len bowtie-dir genome-idx-file assembly[hg19|mm9|..]"
+  echo "Usage: `basename $0` <matrix-file> <p-value> <bowtie-dir> <genome-idx-file> <assembly[hg19|mm9|..]>"
   exit $E_BADARGS
 fi
 
@@ -31,18 +30,17 @@ else
 fi
 
 p_value=$2
-matrix_len=$3
-bowtie_dir=$4
+bowtie_dir=$3
 
-if [ -f "$4/$5.1.ebwt" ]
+if [ -f "$3/$4.1.ebwt" ]
 then
-    genome_idx_file=$5
+    genome_idx_file=$4
 else
-    echo "File \"$4/$5.1.ebwt\" does not exist."
+    echo "File \"$3/$4.1.ebwt\" does not exist."
     exit $E_BADARGS
 fi
 
-assembly=$6
+assembly=$5
 
 # Extract basename from matrix file (without path)
 matrix_name=$(basename "$matrix_file")
@@ -51,8 +49,23 @@ matrix_name="${matrix_name%.*}"
 
 echo "PWM name: $matrix_name"
 
+echo "========               Computing PWM length                ========"
+matrix_len=$(cat $matrix_file | perl -ane 'next if (/^#/ or /^>/); print;' | wc -l)
+
+file_len=$(cat $matrix_file | wc -l)
+
+if [ $file_len -gt $matrix_len ]
+then
+    sed 1d $matrix_file > $matrix_file".tmp"
+    matrix_file=$matrix_file".tmp"
+fi
+
+echo "PWM file: $matrix_file"
+echo "PWM length: $matrix_len"
+echo "PWM file length : $file_len lines"
+
 echo "========               Calculating PWM score               ========"
-matrix_score=$(matrix_prob.pl -e $p_value -bg "0.29,0.21,0.21,0.29" $matrix_file \
+matrix_score=$(matrix_prob -e $p_value --bg "0.29,0.21,0.21,0.29" $matrix_file \
 	| grep SCORE | sed 's/:/\ /'\
 	| awk -F " " '{print $2}')
 
@@ -65,7 +78,7 @@ echo "..."
 
 # Generate list of all tags that represent all possible matrix hits
 
- mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore
+mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore
 
 # Run Bowtie pipeline
 pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
@@ -73,7 +86,7 @@ pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
 echo "========               Bowtie-based pipeline               ========"
 echo "awk '{print \">\"\$2\"\n\"\$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len $chrNC_dir > $pwmout_bed" 
 echo "..."
- awk '{print ">"$2"\n"$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
+awk '{print ">"$2"\n"$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
 
 echo "List of matches (BED format) : $pwmout_bed"
 

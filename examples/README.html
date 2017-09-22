@@ -170,14 +170,11 @@
         <li><b>1) Calculate the matrix score corresponding to p-value=0.00001 (10<sup>-5</sup>)</b></li>
         
         <p class="code">
-            matrix_prob.pl -e 0.00001 -bg "0.29,0.21,0.21,0.29" chen10_ctcf.mat
+            matrix_prob -e 0.00001 --bg "0.29,0.21,0.21,0.29" chen10_ctcf.mat
         </p>
             
         <pre>
-            matrix length : 19
-            after process_mat : max = 48169  offset = 45546
-            set p-value : 0.00001
-            SCORE :   1127  PERC :  96.89%
+           SCORE :   1128  PERC :  96.90%
         </pre>
         <p>
            There are two basic methods to scan the genome with a PWM and a cut-off/p-value: </li>
@@ -186,23 +183,23 @@
                <ul style='list-style-type: circle;'> 
                <li>Given a PWM and a cut-off or p-value, generate all possible matches that represent the PWM with a score greater or equal to the cut-off;
                <li>Map the list of all possible PWM matches to a reference genome ar a set of DNA sequences of interest using a fast string-matching algorithm 
-                   (<font color=firebrick>bowtie</font> or <font color=firebrick>fetchGWI</font>).
+                   (<font color=firebrick>bowtie</font>).
                </ul>
                <li>2- Use <font color=firebrick>matrix_scan</font>, a C program using a conventional search algorithm
             </ul>
-            
+           <p> 
            If you are interested in using the first approach, you should read sections 2) and/or 3), whereas for using the conventional algorithm please refer to section 4).
         <p>    
             <li>
-                <b>2) Generate a list of all tags that represent all possible PWM matches (with minimal score of 1127)</b><p>
+                <b>2) Generate a list of all tags that represent all possible PWM matches (with minimal score of 1128)</b><p>
                 <font color=firebrick>This step is only necessary if fast string-matchig tools, such as bowtie,
                 are used to scan the genome.</font>
             </li>
             
             <p class="code">
-                mba -c 1127 -l 19 chen10_ctcf.mat | sort -k2,2 -nr > chen10_ctcf_co1127.dat<br><br>
+                mba -c 1128 -l 19 chen10_ctcf.mat | sort -k2,2 -nr &gt chen10_ctcf_co1128.dat<br><br>
                 <font color=firebrick># Convert the tag list into FASTA format (for bowtie):</font><br>
-                awk '{print ">"$2"\n"$1}' chen10_ctcf_co1127.dat > chen10_ctcf_co1127_taglist.fa<br>
+                awk '{print "&gt"$2"\n"$1}' chen10_ctcf_co1128.dat &gt chen10_ctcf_co1128_taglist.fa<br>
             </p>
 
             The reason for generating a match list in FASTA format is that we want to carry the match score over to the next steps (see below).
@@ -227,14 +224,14 @@
                     <p>
                         The command to map the list of PWM tags to hg19 is the follwing:
                     <p class="code">
-		            <font color=firebrick># It takes of the order of 30 seconds for a full scan of the hg19 genome assembly. The total number of hits is 144117.</font><br><br> 
-                            bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1127_taglist.fa --un unmapped.dat > chen10_ctcf_co1127_bowtie.out<br>
+		            <font color=firebrick># It takes of the order of 30 seconds for a full scan of the hg19 genome assembly (with the exclusion of the mitochondrial chromosome). The total number of hits is 143597.</font><br><br> 
+                            bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat &gt chen10_ctcf_co1128_bowtie.out<br>
                             <br>                        
-                            bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1127_taglist.fa --un unmapped.dat > chen10_ctcf_co1127_bowtie.out<br>
+                            bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat &gt chen10_ctcf_co1128_bowtie.out<br>
                             <br>
                             <font color=firebrick># Convert the bowtie output to BED via the following command:</font><br>
-                            sort -s -k3,3 -k4,4n chen10_ctcf_co1127_bowtie.out | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1127_bowtie.bed<br>
-                            sort -s -k3,3 -k4,4n chen10_ctcf_co1127_bowtie.out | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1127_bowtie.bed<br>
+                            sort -s -k3,3 -k4,4n chen10_ctcf_co1128_bowtie.out | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH &gt chen10_ctcf_co1128_bowtie.bed<br>
+                            sort -s -k3,3 -k4,4n chen10_ctcf_co1128_bowtie.out | bowtie2bed -s hg19 -l 19 &gt chen10_ctcf_co1128_bowtie.bed<br>
                             <br>
 		            <font color=firebrick># Note: to convert Bowtie output to BED format, we use the chr_hdr file for assembly hg19.<br>
                             # By default, the chr_hdr file is located at chr_NC_PATH/hg19 = /home/local/db/genome/hg19.<br>
@@ -242,21 +239,21 @@
                             # Also note that the bowtie ouput reports the match score in the first field so that it can be easily retrieved.<br>
                             <br>
                             # To run the bowtie-based pipeline, type:</font><br>
-                            bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1127_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | 
-                            bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1127_bowtie.bed<br>
+                            bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | 
+                            bowtie2bed -s hg19 -l 19 -i chr_NC_PATH &gt chen10_ctcf_co1128_bowtie.bed<br>
                             <br>
                             <font color=firebrick># Bowtie can read input files from stdin. You should specify "-" for stdin.<br>
                             # In such case, you can run the entire pipeline as follows:</font><br>
-                            awk '{print ">"$2"\n"$1}' chen10_ctcf_co1127.dat | bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | 
-                            bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1127_bowtie.bed<br>
+                            awk '{print ">"$2"\n"$1}' chen10_ctcf_co1128.dat | bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | 
+                            bowtie2bed -s hg19 -l 19 -i chr_NC_PATH &gt chen10_ctcf_co1128_bowtie.bed<br>
                             <br>
                             <font color=firebrick># Example:</font><br>
-                            bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1127_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | 
-                            bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1127_bowtie.bed<br>
+                            bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | 
+                            bowtie2bed -s hg19 -l 19 &gt chen10_ctcf_co1128_bowtie.bed<br>
                             <br>
                             <font color=firebrick># or</font><br>
-                            awk '{print ">"$2"\n"$1}' chen10_ctcf_co1127.dat | bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | 
-                            sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1127_bowtie.bed<br>                           
+                            awk '{print "&gt"$2"\n"$1}' chen10_ctcf_co1128.dat | bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | 
+                            sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 &gt chen10_ctcf_co1128_bowtie.bed<br>                           
                         </p>
                     </p>
                 </li>
@@ -273,9 +270,9 @@
         <p>    
            # The command to scan the hg19 genome against the chen10 CTCF PWM is the follwing:
         <p>
-           <i>cat GENOME_DIR/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1127 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1127_matrix_scan.out</i>
+           <i>cat GENOME_DIR/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out</i>
         <p>
-           It takes of the order of 3 minutes to scan the entire genome. The total number of hits is 144117 in agreement with the tag mapping methods.<br>
+           It takes of the order of 3 minutes to scan the entire genome. The total number of hits is 143597 (if we exclude the mitochondrial chromosome) in agreement with the tag mapping methods.<br>
            <font color=firebrick>Note that matrix_scan reports the match score in the fifth field of its output.</font><br>
            <font color=firebrick>Also note that <i>matrix_scan</i> parses the sequence FASTA header assuming that the sequence identifier is of the following type:<br>
         <pre>
@@ -286,14 +283,20 @@
         <p>
            <p class="code">
            <font color=firebrick># Example:<br></font>
-           <i>cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1127 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1127_matrix_scan.out</i></font>
+           <i>cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out</i></font>
+        <br>
+           <font color=firebrick># Parallelization of matrix_scan<br></font>
+           <font color=black>To improve performance, we can run matrix_scan in parallel (on each chromosome file) using a simple perl script called matrix_scan_parallel.pl.
+           The above example takes only 30-40 seconds to complete the task, thus competing with the bowtie-based approach.<br>
+           To use matrix_scan_parallel.pl, type the following command:<br> </font>
+           <i>matrix_scan_parallel.pl /home/local/db/genome/hg19/chrom\*.seq chen10_ctcf.mat 1128 | sort -s -k1,1 -k2,2n -k6,6 &gt chen10_ctcf_co1128_matrix_scan.out</i>
         <br>
            <font color=firebrick># Convert the matrix scan output to BED by issuing the following command:</font>
         <br>
-           <i>mscan2bed -s hg19 -i GENOME_DIR chen10_ctcf_co1127_matrix_scan.out > chen10_ctcf_co1127_matrix_scan.bed</i>
+           <i>mscan2bed -s hg19 -i GENOME_DIR chen10_ctcf_co1128_matrix_scan.out > chen10_ctcf_co1128_matrix_scan.bed</i>
         <br>
            <font color=firebrick># Example:<br></font>
-           <i>mscan2bed -s hg19 chen10_ctcf_co1127_matrix_scan.out > chen10_ctcf_co1127_matrix_scan.bed</i></font>
+           <i>mscan2bed -s hg19 chen10_ctcf_co1128_matrix_scan.out > chen10_ctcf_co1128_matrix_scan.bed</i></font>
         <br>
            <font color=firebrick>
            # Note : to convert matrix_scan output to BED format, we use the chr_NC_gi file for assembly hg19.<br>
@@ -302,11 +305,15 @@
         <br>   
            # To run the entire pipeline:
         <br></font>
-           <i>cat GENOME_DIR/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1127 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 -i GENOME_DIR > chen10_ctcf_co1127_matrix_scan.bed</i>
+           <i>cat GENOME_DIR/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 -i GENOME_DIR > chen10_ctcf_co1128_matrix_scan.bed</i>
         <br>
            <font color=firebrick># Example:</font>
         <br>
-           <i>cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1127 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 > chen10_ctcf_co1127_matrix_scan.bed</i></font>
+           <i>cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 > chen10_ctcf_co1128_matrix_scan.bed</i></font>
+        <br>
+           <font color=firebrick># Using parallelization:</font>
+        <br>
+           <i>matrix_scan_parallel.pl /home/local/db/genome/hg19/chrom\*.seq chen10_ctcf.mat 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 &gt chen10_ctcf_co1128_matrix_scan.bed</i>
         <p>
         </p>
            </li></ul>
@@ -317,48 +324,95 @@
         <p>
         <h3> Shell (bash) Wrappers to execute the analysis pipeline</h3>
          <p class="tab">
-         <strong>NOTE: the path for locating the chr_NC_gi/chr_hdr files is hard-coded in the scripts (variable chrNC_dir)</strong>
+         <strong>NOTE: the path for locating the chr_NC_gi/chr_hdr files is hard-coded in the <i>pwm_bowtie_wrapper</i> and <i>pwm_mscan_wrapper</i> scripts (variable chrNC_dir)</strong>
          <p class="tab">
          These shell wrapper scripts have been written to make it easier to run the whole pwmscan pipeline, irrespecitve of what method one chooses.
         <br>
-         They require to specify the matrix file containing the integer PWM, the p-value, the path to the assembly files or indices, and the assembly name (e.g. hg19, hg38, mm9 etc.).
-
+         They require to specify the matrix file containing the integer PWM, the p-value, the path to the assembly or index files, and the UCSC assembly name for the species (e.g. hg19, hg38, mm9 etc.).
+        <br>
+        <br>
+         <strong>A few remarks on the general <i>pwm_scan script</i>.</strong><br>
+         The <i>pwm_scan</i> script scans a genome with a PWM using either bowtie or matrix_scan depending on both the p-value and the matrix length.
+        <br>
+         It basically checks whether the p-value is too high (i.e. the raw score cut-off too low) given the motif lenght to decide on the more suitable search engine.
+        <br>
+         For high p-values and long motifs, the bowtie-based strategy becomes inefficient because the list of tags representing the PWM and the cut-off becomes too large (of the order of half a billion or more).
+        <br>
+         The &ltgenome-root-dir&gt argument is the root directory of the genome files (the bowtie index files, and the FASTA chromosome files used by matrix_scan).
+        <br>
+         &ltgenome-root-dir&gt is supposed to have two sub-directories, bowtie and genome, for storing separately the bowtie indices and the chromosome files respectively.
+        <br>
+         In our examples, <b>&ltgenome-root-dir&gt</b> is set to <b><i>/home/local/db</i></b>.
+        <br>
+         The <b>chrNC_dir</b> variable (used for locating the the chr_NC_gi/chr_hdr files) is set to chrNC_dir=<b>&ltgenome_root_dir&gt/genome</b>.
+        <br>
          <ul style='list-style-type: none;'>
-         <li><b><font color=firebrick>1) Bowtie</b></font>
+         <li><b><font color=firebrick>1) Bowtie (pwm_bowtie_wrapper)</b> script</font>
         <p class="code">
-           # Usage: `basename $0` matrix-file p-value matrix-len bowtie-dir genome-idx-file assembly[hg19|mm9|..]
+           # Usage: `basename $0` &ltmatrix-file&gt &ltp-value&gt &ltbowtie-dir&gt &ltidx-file&gt &ltassembly[hg19|mm9|..]&gt
         <br>
            <font color=firebrick># Example:</font>
         <br>
-           <i>pwm_bowtie_wrapper chen10_ctcf.mat 0.00001 19 /home/local/db/bowtie h_sapiens_hg19 hg19</i></font>
+           <i>pwm_bowtie_wrapper chen10_ctcf.mat 0.00001 /home/local/db/bowtie h_sapiens_hg19 hg19</i></font>
         <br>
-           <font color=firebrick># Output file (BED) : chen10_ctcf_co1127_bowtie.bed</font>
+           <font color=firebrick># Output file (BED) : chen10_ctcf_co1128_bowtie.bed</font>
         <br>
         </p>
 
-        <li><b><font color=firebrick>3) Matrix Scan (matrix_scan)</b></font>
+        <li><b><font color=firebrick>2) Matrix Scan (pwm_mscan_wrapper)</b> script</font>
         <p class="code">
-           # Usage: `basename $0` matrix-file p-value genome-dir assembly[hg19|mm9|..]
+           # Usage: `basename $0` &ltmatrix-file&gt &ltp-value&gt &ltgenome-dir&gt &ltassembly[hg19|mm9|..]&gt &ltparallel [0/1]&gt
         <br>
            <font color=firebrick># Example:</font>
         <br>
-             <i>pwm_mscan_wrapper chen10_ctcf.mat 0.00001 /home/local/db/genome hg19</i></font>
+             <i>pwm_mscan_wrapper chen10_ctcf.mat 0.00001 /home/local/db/genome hg19 1</i></font>
         <br>
-           <font color=firebrick># Output file (BED) : chen10_ctcf_co1127_matrix_scan.bed</font>
+           <font color=firebrick># Output file (BED) : chen10_ctcf_co1128_matrix_scan.bed</font>
 
+       <br>
+        </p>
+
+        <li><b><font color=firebrick>3) PWM Scan (pwm_scan)</b> script</font>
+        <p class="code">
+           # Usage: `basename $0` &ltmatrix-file&gt &ltp-value&gt &ltassembly[hg19|mm9|..]&gt &ltgenome-root-dir [ex:/db]&gt &ltparallel [0/1]&gt
+        <br>
+           <font color=firebrick># Examples:</font>
+        <br>
+             <i>pwm_scan chen10_ctcf.mat 0.00001 hg19 /home/local/db </i></font>
+        <br>
+           <font color=firebrick># Or if we set the <parallel> option:</font>
+        <br>
+             <i>pwm_scan chen10_ctcf.mat 0.00001 hg19 /home/local/db 1</i></font>
+        <br>
+           <font color=firebrick># Output file (BED) : chen10_ctcf_co1128_matrix_scan.bed</font>
+        <br>
+           <font color=firebrick># Try also:</font>
+        <br>
+             <i>pwm_scan chen10_ctcf.mat 0.000001 hg19 /home/local/db 1</i></font>
+             <i>pwm_scan chen10_ctcf.mat 0.000001 hg19 /home/local/db </i></font>
+        <br>
+           <font color=firebrick># Output file (BED) : chen10_ctcf_co1549.bed</font>
+        <br>
+           <font color=firebrick># N.B.</font>
+        <br>
+           <font color=black> If the <parallel> option is specified, matrix_scan is run in parallel by splitting the processing of the entire genome
+           on multiple processes for each chromosome file in parallel.
+        <br>
+           Of course it only works on a multi-core processor machine.</font>
+        <br>
         </p>
         </ul>
 
 
-        <h3> How to build index files for Bowtie</h3>
+        <h3> How to build Bowtie index files</h3>
         <p>
          <ul style='list-style-type: none;'>
         <p>
-          Let's define BOWTIE_DIR as as the directory containing the bowtie indeces.
+          Let's define BOWTIE_DIR as as the directory containing the bowtie indices.
         <p>
           Go to the BOWTIE_DIR directory, and concatenate all chromosome files into a sequence file that includes the entire hg19 genome assembly:
         <p class="code">
-          ls -1 -v DB_DIR/chrom*.seq | xargs cat > h_sapiens_hg19.fa
+          ls -1 -v DB_DIR/chrom*.seq | xargs cat &gt h_sapiens_hg19.fa
         </p>
           You then execute the following command:
         <p class="code">

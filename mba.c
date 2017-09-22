@@ -266,7 +266,12 @@ read_profile(char *iFile, int **p)
   if (options.debug != 0)
     fprintf(stderr, "Processing file %s\n", iFile);
 
-  while ( fscanf(f," %d %d %d %d", &a[0][l], &a[1][l], &a[2][l], &a[3][l]) != EOF ) {
+  int ret;
+  while ( (ret=fscanf(f," %d %d %d %d", &a[0][l], &a[1][l], &a[2][l], &a[3][l])) != EOF ) {
+    if (ret == 0) {
+      fprintf(stderr, "Matrix hasn't the correct format (a PWM without header is required)\n");
+      return 0;
+    }
     if (l == p_len - 1) {
       /* Reallocate Matrix columns */
       for ( int i = 0; i < NUCL; i++) {
@@ -519,7 +524,7 @@ main(int argc, char *argv[])
       return 1;
     }
   }
-  if ((Lmer = read_profile(argv[optind++], profile)) < 0)
+  if ((Lmer = read_profile(argv[optind++], profile)) <= 0)
     return 1;
   if ( Lmer != pLen) {
     fprintf(stderr, "Profile Matrix (len = %d) is inconsistent with given profile Length (%d)\n", 

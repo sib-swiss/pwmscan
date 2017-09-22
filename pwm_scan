@@ -1,0 +1,202 @@
+#!/bin/bash
+
+#  pwm_scan: Scan a genome with a PWM (using either bowtie or matrix_scan)
+#  arguments:
+#              matrix-file
+#              p-value
+#              assembly
+#              genome-root-dir
+#              parallelize matrix_scan
+#
+#  19.09.2017  Giovanna Ambrosini
+#
+#  The program first checks the matrix and strips out the header information.
+#  It then computes the raw score cut-off based on the given p-value.
+#  Depending on both the p-value and the matrix length, it decides on the
+#  search engine to use: 
+#
+#      the Bowtie-based method or the more conventional matrix_scan algotrithm
+# 
+#  If specified (via the <parallel> option), matrix_scan can be run in parallel.
+#  This is only possible if the machine has enough CPU power (multi-core processor).
+#  The <assembly> argument corresponds to the UCSC assembly name (e.g. hg19, mm9).
+#  The <genome-root-dir> is the root directory of the genome files (the bowtie index
+#  files, and the FASTA chromosome files used by matrix_scan).
+#  The <genome-root-dir> is supposed to have two sub-directories, bowtie and genome,
+#  for storing separately the bowtie indices and the chromosome files respectively.
+#  The variable chrNC_dir (used for locating the the chr_NC_gi/chr_hdr files) is set to
+#  chrNC_dir=$genome_dir 
+#
+ARGS=4         # The script requires 4 mandatory arguments.
+E_BADARGS=85   # Wrong number of arguments passed to the script.
+
+if [ $# -lt "$ARGS" ]
+then
+  echo "Usage: `basename $0` <matrix-file> <p-value> <assembly[hg19|mm9|..]> <genome-root-dir [ex:/db]> [<parallel 0/1>]>"
+  exit $E_BADARGS
+fi
+
+# Declare associative array for bowtie index files
+declare -A BOWTIEIDX
+BOWTIEIDX[hg19]=h_sapiens_hg19
+BOWTIEIDX[hg18]=h_sapiens_hg18
+BOWTIEIDX[hg38]=h_sapiens_hg38
+BOWTIEIDX[mm9]=m_musculus_mm9
+BOWTIEIDX[mm10]=m_musculus_mm10
+BOWTIEIDX[bosTau3]=b_taurus_bosTau3
+BOWTIEIDX[bosTau8]=b_taurus_bosTau8
+BOWTIEIDX[canFam2]=c_familiaris_canFam2
+BOWTIEIDX[canFam3]=c_familiaris_canFam3
+BOWTIEIDX[panTro2]=p_troglodytes_panTro2
+BOWTIEIDX[panTro5]=p_troglodytes_panTro5
+BOWTIEIDX[rn5]=r_norvegicus_rn5
+BOWTIEIDX[rn6]=r_norvegicus_rn6
+BOWTIEIDX[dm3]=d_melanogaster_dm3
+BOWTIEIDX[dm6]=d_melanogaster_dm6
+BOWTIEIDX[ce6]=c_elegans_ce6
+BOWTIEIDX[ce10]=c_elegans_ce10
+BOWTIEIDX[ce11]=c_elegans_ce11
+BOWTIEIDX[danRer5]=d_rerio_danRer5
+BOWTIEIDX[danRer7]=d_rerio_danRer7
+BOWTIEIDX[danRer10]=d_rerio_danRer10
+BOWTIEIDX[sacCer2]=s_cerevisiae_sacCer2
+BOWTIEIDX[sacCer3]=s_cerevisiae_sacCer3
+
+#echo ${BOWTIEIDX[$3]} 
+
+genome_idx_file=${BOWTIEIDX[$3]}
+
+parallel=0
+if [ $# == 5 ]
+then
+  parallel=$5
+fi
+
+if [ -f "$1" ]
+then
+    matrix_file=$1
+else
+    echo "File \"$1\" does not exist."
+    exit $E_BADARGS
+fi
+
+p_value=$2
+assembly=$3
+genome_root_dir=$4
+bowtie_dir=$genome_root_dir"/bowtie"
+genome_dir=$genome_root_dir"/genome"
+
+chrNC_dir=$genome_dir
+
+# Extract basename from matrix file (without path)
+matrix_name=$(basename "$matrix_file")
+extension="${matrix_name##*.}"
+matrix_name="${matrix_name%.*}"
+
+echo "PWM name: $matrix_name"
+
+echo "========               Computing PWM length                ========"
+matrix_len=$(cat $matrix_file | perl -ane 'next if (/^#/ or /^>/); print;' | wc -l)
+
+file_len=$(cat $matrix_file | wc -l)
+
+if [ $file_len -gt $matrix_len ]
+then
+    sed 1d $matrix_file > $matrix_file".tmp"
+    matrix_file=$matrix_file".tmp"
+fi
+
+echo "PWM file: $matrix_file"
+echo "PWM length: $matrix_len"
+echo "PWM file length : $file_len lines"
+
+echo "========               Calculating PWM score               ========"
+matrix_score=$(matrix_prob -e $p_value --bg "0.29,0.21,0.21,0.29" $matrix_file \
+	| grep SCORE | sed 's/:/\ /'\
+	| awk -F " " '{print $2}')
+
+echo "PWM score: $matrix_score"
+
+# Decide on search engine strategy
+#
+# Check whether the p-value is too high (i.e. the raw score too low) given the motif lenght.
+# For long motifs and high p-values, the bowtie-based strategy becomes inefficient because
+# the list of tags (representing the matrix with the given cut-off) becomes too large 
+# (of the order of half a billion or more)
+#
+use_matrix_scan=0
+echo "Parallelize: $parallel"
+if [ $parallel -eq 1 ]
+then
+   if [ $matrix_len -gt 13 ] && [ $matrix_len -lt 20 ] 
+   then
+      echo "Matrix len: $matrix_len"
+      ratio=$(echo "1000000/4^$matrix_len" | bc -l)
+   elif [ $matrix_len -ge 20 ]
+   then
+      ratio=$(echo "5000000/4^$matrix_len" | bc -l)
+   elif [ $matrix_len -gt 7 ] && [ $matrix_len -le 13]
+   then
+      ratio=$((400/(4**$matrix_len)))
+   else
+      ratio=$((4/(4**$matrix_len)))
+   fi
+else
+   if [ $matrix_len -gt 13 ] && [ $matrix_len -lt 20 ]
+   then
+      ratio=$(echo "50000000/4^$matrix_len" | bc -l)
+   elif [ $matrix_len -ge 20 ]
+   then
+      ratio=$(echo "100000000/4^$matrix_len" | bc -l)
+   else
+      ratio=$(echo "40000000/4^$matrix_len" | bc -l)
+   fi
+fi
+
+#echo "RATIO: $ratio   P-VALUE: $p_value"
+
+if [ $(echo "$p_value > $ratio" | bc) -eq 1 ]
+then
+   use_matrix_scan=1
+fi
+echo "Use matrix_scan: $use_matrix_scan"
+#exit
+
+if [ $use_matrix_scan -eq 0 ]
+then 
+   echo "========               Generating tag list                 ========"
+   tagscore=${matrix_name}_co$matrix_score.dat
+   echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore"
+   echo "..."
+   # Generate list of all tags that represent all possible matrix hits
+   mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore
+   # Run Bowtie pipeline
+   pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
+   echo "========               Bowtie-based pipeline               ========"
+   echo "awk '{print \">\"\$2\"\n\"\$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len $chrNC_dir > $pwmout_bed" 
+   echo "..."
+   awk '{print ">"$2"\n"$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
+
+   echo "List of matches (BED format) : $pwmout_bed"
+   rm $tagscore unmapped.dat
+else
+   pwmout_bed=${matrix_name}_co${matrix_score}_matrix_scan.bed
+   echo "========               matrix_scan-based pipeline          ========"
+   # Run matrix_scan
+   if [ $parallel == 0 ]
+   then
+      echo "cat $genome_dir/$assembly/chrom*.seq | matrix_scan -m $matrix_file -c $matrix_score | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s $assembly -i $chrNC_dir > $pwmout_bed" 
+      echo "..."
+      cat $genome_dir/$assembly/chrom*.seq | matrix_scan -m $matrix_file -c $matrix_score | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s $assembly -i $chrNC_dir > $pwmout_bed
+   else
+      echo "matrix_scan_parallel.pl $genome_dir/$assembly/chrom\\*.seq $matrix_file $matrix_score | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s $assembly -i $chrNC_dir > $pwmout_bed" 
+      echo "..."
+      matrix_scan_parallel.pl $genome_dir/$assembly/chrom\*.seq $matrix_file $matrix_score | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s $assembly -i $chrNC_dir > $pwmout_bed
+   fi
+   echo "List of matches (BED format) : $pwmout_bed"
+fi
+# Remove temporary PWM file
+if [ $file_len -gt $matrix_len ]
+then
+    rm $matrix_file
+fi

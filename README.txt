@@ -66,23 +66,23 @@ Programs and utilities
 
 The main programs are the following:
 
- - matrix_prob.pl    Compute the cumulative PWM score distribution
+ - matrix_prob       Compute the cumulative PWM score distribution
                      given a background model, and a PWM.
-                     Used for PWM score computation and conversion
+                     Used for PWM score computation and conversion.
 
  - mba               Matrix Branch-and-bound Algorithm (mba) generates a list
                      of all matching sequences given an integer PWM and a cut-off.
-                     MBA is the prior step to both bowtie and fetchGWI searches
+                     MBA is the prior step to both bowtie and fetchGWI searches.
 
- - matrix_scan       Scan a set of sequence files with a PWM and a cut-off value
+ - matrix_scan       Scan a set of sequence files with a PWM and a cut-off value.
 
- - bowtie2bed        Convert output of bowtie into BED format
+ - bowtie2bed        Convert output of bowtie into BED format.
 
- - mscan2bed         Convert output of matrix_scan program into BED format
+ - mscan2bed         Convert output of matrix_scan program into BED format.
 
- - mscan_bed2sga     Convert BED file from PWMScan to SGA format
+ - mscan_bed2sga     Convert BED file from PWMScan to SGA format.
 
- - filterOverlaps    Filter out overlapping matches for BED format
+ - filterOverlaps    Filter out overlapping matches for BED format.
 
  
 The bowtie package is available on SourceForge.net for all UNIX-based platforms:
@@ -105,27 +105,28 @@ SGA is the working format of our ChIP-seq data analysis programs (sourceforge.ne
 
 Matrix format conversion utilities are the following:
 
-  - jasparconvert.pl      Convert a JASPAR matrix file to MEME format (integer log-oods)
+  - jasparconvert.pl      Convert a JASPAR matrix file to MEME format (integer log-oods).
 
-  - transfaconvert.pl    Convert a TRANSFAC matrix file to MEME format (integer log-oods)
+  - transfaconvert.pl     Convert a TRANSFAC matrix file to MEME format (integer log-oods).
 
   - pwmconvert.pl         Convert a real or SSA-formatted Position Weight Matrix (PWM)
-                          to integer plain-text format
+                          to integer plain-text format.
 
   - lpmconvert.pl         Convert a Letter Probability Matrix (LPM) file to a 
-                          Position Weight Matrix (PWM) with integer log-odds weights
+                          Position Weight Matrix (PWM) with integer log-odds weights.
 
   - pfmconvert.pl         Convert a Position Frequency Matrix (PFM) file to a 
                           Position Weight Matrix (PWM) with either integer log-odds
-                          weights or letter probabilities
+                          weights or letter probabilities.
 
 The jasparconvert.pl and transfacconvert.pl scripts are based on an original implementation
-by William Stafford Noble and Timothy L. Bailey (1999) for MEME.
+by William Stafford Noble and Timothy L. Bailey (1999) for MEME (http://meme-suite.org/).
 
-We also provide two (bash) shell wrapper scripts that embed the entire analysis pipeline:
+We also provide three (bash) shell wrapper scripts that embed the entire analysis pipeline:
 
   - pwm_bowtie_wrapper    Scan a genome with a PWM and a p-value using bowtie
   - pwm_mscan_wrapper     Scan a genome with a PWM and a p-value using matrix_scan
+  - pwm_scan              Scan a genome with a PWM and a p-value using either bowtie or matrix_scan
 
 
 Analysis pipeline and application example
@@ -133,23 +134,23 @@ Analysis pipeline and application example
 
 Given a PWM and a p-value, the analyis pipeline includes the follwing steps:
 
-  1) Compute the integer cut-off value, given a PWM and a p-value
+  1) Compute the integer cut-off value, given a PWM and a p-value;
 
-  To use the fast string-matching-based approach, go to step 2) and 3):
+  2) Scan the genome
+     To use the fast string-matching-based approach, go to steps a) and b):
 
-     2) Generate a list of all possible matching sequences, given a PWM and a cut-off value
-        This step is required for fetchGWI and bowtie
+       a) Generate a list of all possible matching sequences, given a PWM and a cut-off value
+          This step is required for Bowtie;
 
-     3) Map the matching sequences to the genome 
+       b) Map the matching sequences to the genome; 
 
-  To use the conventional algorithm execute step 4):  
+     To use the conventional algorithm execute step c):
 
-     4) Scan the genome with the PWM using matrix_scan
+       c) Scan the genome with the PWM using matrix_scan;
  
-  5) Convert the match list to BED format
+  3) Convert the match list to BED format.
 
-
-In the example directory, you can find a complete application example exploiting all three methods.
+In the example directory, you can find a complete application example exploiting both methods.
 
 
 Web Interface
@@ -166,8 +167,8 @@ The Web interface has the following characteristics:
   - Custom PWMs are supplied by copy&paste or file upload
   - Support of various PWM formats: JASPAR, TRANSFAC, plain text
   - Cut-off defined as PWM-score, match percentage, or p-value
-  - Output provided in various formats: BED, SGA, FPS, etc. 
-  - Direct link to UCSC genome browser for visualization of results
-  - Useful links for downstream analysis (ChIP-seq data correlation, motif analysis)
+  - Output provided in various formats: BED, SGA, FPS, etc.
+  - Direct links to the UCSC genome browser for visualization of results
+  - Useful links for downstream analysis (ChIP-seq data correlation, and motif analysis tools)
 
 The Web interface doesn't support upload of user-supplied FASTA sequence files.

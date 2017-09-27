@@ -19,7 +19,7 @@ make clean
 
 make cleanbin
 
-External packages
+External software
 ============================================================================
 
 For Bowtie, refer to the following link:

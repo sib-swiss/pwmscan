@@ -31,9 +31,9 @@ with a PWM:
        using a fast string-matching algorithm (e.g bowtie).
 
  2) use a conventional algorithm that scans DNA sequences with a PWM (matrix_scan).
-    matrix_scan first rescales the scoring matrix so as to have the maximum score
-    set to zero. It then computes the PWM score for each position along the sequence,
-    and drops out as soon as the score is below a re-computed cut-off value.
+    matrix_scan first rescales the scoring matrix so that the maximum score at each
+    position is set to zero. For each position along the sequence, it computes the sum
+    of weights and drops out as soon as the score is below the cut-off value.
     
 The Web interface automatically chooses the most suitable method.
 

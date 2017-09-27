@@ -17,7 +17,7 @@ PWMScan is a software package with a Web interface.
 
 PWMScan can use two alternative search engines:
 
- - bowtie, a fast memory-effcient short read aligner using indexed genomes
+ - bowtie, a fast memory-efficient short read aligner using indexed genomes
  - matrix_scan, a C program using a conventional search algorithm
 
 Basically, two approaches are used to scan large DNA sequences such as genomes
@@ -40,7 +40,7 @@ The Web interface automatically chooses the most suitable method.
 We use integer log likelihoods or integer log-odds as the internal working
 format of PWMs. The PWM has one column for each nucleotide in DNA sequences,
 and it has one row for each position in the pattern. The scores at each 
-position are calculated as integer log likelihoods (log-odds).
+position are calculated as the sum of integer log likelihoods (log-odds).
 
 We provide several tools for matrix format conversion to integer log-odds,
 in particular for JASPAR, TRANSFAC, real PWMs, letter probability matrices (LPMs),
@@ -72,15 +72,15 @@ The main programs are the following:
 
  - mba               Matrix Branch-and-bound Algorithm (mba) generates a list
                      of all matching sequences given an integer PWM and a cut-off.
-                     MBA is the prior step to both bowtie and fetchGWI searches.
+                     MBA is the prior step to using Bowtie.
 
  - matrix_scan       Scan a set of sequence files with a PWM and a cut-off value.
 
- - bowtie2bed        Convert output of bowtie into BED format.
+ - bowtie2bed        Convert the BOWTIE output into BED format.
 
- - mscan2bed         Convert output of matrix_scan program into BED format.
+ - mscan2bed         Convert the matrix_scan output into BED format.
 
- - mscan_bed2sga     Convert BED file from PWMScan to SGA format.
+ - mscan_bed2sga     Convert the BED file from the PWMSCan pipeline into SGA format.
 
  - filterOverlaps    Filter out overlapping matches for BED format.
 
@@ -105,34 +105,31 @@ SGA is the working format of our ChIP-seq data analysis programs (sourceforge.ne
 
 Matrix format conversion utilities are the following:
 
-  - jasparconvert.pl      Convert a JASPAR matrix file to MEME format (integer log-oods).
+  - jasparconvert.pl      Convert a JASPAR matrix file to MEME format (integer log-odds).
 
-  - transfaconvert.pl     Convert a TRANSFAC matrix file to MEME format (integer log-oods).
+  - transfaconvert.pl     Convert a TRANSFAC matrix file to MEME format (integer log-odds).
 
-  - pwmconvert.pl         Convert a real or SSA-formatted Position Weight Matrix (PWM)
-                          to integer plain-text format.
+  - pwmconvert.pl         Convert a real or SSA-formatted PWM to integer plain-text format.
 
-  - lpmconvert.pl         Convert a Letter Probability Matrix (LPM) file to a 
-                          Position Weight Matrix (PWM) with integer log-odds weights.
+  - lpmconvert.pl         Convert a Letter Probability Matrix (LPM) file to an integer PWM. 
 
-  - pfmconvert.pl         Convert a Position Frequency Matrix (PFM) file to a 
-                          Position Weight Matrix (PWM) with either integer log-odds
-                          weights or letter probabilities.
+  - pfmconvert.pl         Convert a Position Frequency Matrix (PFM) file to either a PWM or 
+                          a letter probabilities matrix.
 
-The jasparconvert.pl and transfacconvert.pl scripts are based on an original implementation
+The jasparconvert.pl and transfaconvert.pl scripts are based on an original implementation
 by William Stafford Noble and Timothy L. Bailey (1999) for MEME (http://meme-suite.org/).
 
 We also provide three (bash) shell wrapper scripts that embed the entire analysis pipeline:
 
-  - pwm_bowtie_wrapper    Scan a genome with a PWM and a p-value using bowtie
+  - pwm_scan              Scan a genome with a PWM and a p-value using either Bowtie or matrix_scan
+  - pwm_bowtie_wrapper    Scan a genome with a PWM and a p-value using Bowtie
   - pwm_mscan_wrapper     Scan a genome with a PWM and a p-value using matrix_scan
-  - pwm_scan              Scan a genome with a PWM and a p-value using either bowtie or matrix_scan
 
 
-Analysis pipeline and application example
+PWMScan pipeline and application example
 ============================================================================
 
-Given a PWM and a p-value, the analyis pipeline includes the follwing steps:
+Given a PWM and a p-value, the PWMScan pipeline includes the following steps:
 
   1) Compute the integer cut-off value, given a PWM and a p-value;
 

@@ -182,7 +182,7 @@ The reason for generating a match list in FASTA format is that we want to carry 
     # Bowtie can read input files from stdin. You should specify "-" for stdin.
     In such case, you can run the entire pipeline as follows:
 
-    awk '{print ">"$2"\n"$1}' chen10_ctcf_co1128.dat | bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1128_bowtie.bed
+    mba -c 1128 -l 19 chen10_ctcf.mat | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1128_bowtie.bed
 
     # Example:
 
@@ -190,7 +190,7 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     # Or:
 
-    awk '{print ">"$2"\n"$1}' chen10_ctcf_co1128.dat | bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1128_bowtie.bed
+    mba -c 1128 -l 19 chen10_ctcf.mat | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1128_bowtie.bed
 
 
 4) Using a conventional scanning algorithm (matrix_scan)

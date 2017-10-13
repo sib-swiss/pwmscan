@@ -71,23 +71,14 @@ matrix_score=$(matrix_prob -e $p_value --bg "0.29,0.21,0.21,0.29" $matrix_file \
 
 echo "PWM score: $matrix_score"
 
-echo "========               Generating tag list                 ========"
-tagscore=${matrix_name}_co$matrix_score.dat
-echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore"
-echo "..."
-
-# Generate list of all tags that represent all possible matrix hits
-
-mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore
-
 # Run Bowtie pipeline
 pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
 
 echo "========               Bowtie-based pipeline               ========"
-echo "awk '{print \">\"\$2\"\n\"\$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len $chrNC_dir > $pwmout_bed" 
+echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr | awk '{print \">\"\$2\"\n\"\$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed" 
 echo "..."
-awk '{print ">"$2"\n"$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
+mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
 
 echo "List of matches (BED format) : $pwmout_bed"
 
-rm $tagscore unmapped.dat
+rm unmapped.dat

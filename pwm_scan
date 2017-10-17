@@ -63,8 +63,36 @@ BOWTIEIDX[sacCer2]=s_cerevisiae_sacCer2
 BOWTIEIDX[sacCer3]=s_cerevisiae_sacCer3
 
 #echo ${BOWTIEIDX[$3]} 
-
 genome_idx_file=${BOWTIEIDX[$3]}
+
+# Declare associative array for background base composition
+declare -A BGFREQ
+BGFREQ[hg19]=0.29,0.21,0.21,0.29
+BGFREQ[hg18]=0.29,0.21,0.21,0.29
+BGFREQ[hg38]=0.29,0.21,0.21,0.29
+BGFREQ[mm9]=0.29,0.21,0.21,0.29
+BGFREQ[mm10]=0.29,0.21,0.21,0.29
+BGFREQ[bosTau3]=0.29,0.21,0.21,0.29
+BGFREQ[bosTau8]=0.29,0.21,0.21,0.29
+BGFREQ[canFam2]=0.29,0.21,0.21,0.29
+BGFREQ[canFam3]=0.29,0.21,0.21,0.29
+BGFREQ[panTro2]=0.29,0.21,0.21,0.29
+BGFREQ[panTro5]=0.29,0.21,0.21,0.29
+BGFREQ[rn5]=0.28,0.22,0.22,0.28
+BGFREQ[rn6]=0.28,0.22,0.22,0.28
+BGFREQ[dm3]=0.29,0.21,0.21,0.29
+BGFREQ[dm6]=0.29,0.21,0.21,0.29
+BGFREQ[ce6]=0.32,0.18,0.18,0.32
+BGFREQ[ce10]=0.32,0.18,0.18,0.32
+BGFREQ[ce11]=0.32,0.18,0.18,0.32
+BGFREQ[danRer5]=0.32,0.18,0.18,0.32
+BGFREQ[danRer7]=0.32,0.18,0.18,0.32
+BGFREQ[danRer10]=0.32,0.18,0.18,0.32
+BGFREQ[sacCer2]=0.31,0.19,0.19,0.31
+BGFREQ[sacCer3]=0.31,0.19,0.19,0.31
+
+echo "BG nucleotide composition: ${BGFREQ[$3]}"
+bg_freq=${BGFREQ[$3]}
 
 parallel=0
 if [ $# == 5 ]
@@ -111,7 +139,7 @@ echo "PWM length: $matrix_len"
 echo "PWM file length : $file_len lines"
 
 echo "========               Calculating PWM score               ========"
-matrix_score=$(matrix_prob -e $p_value --bg "0.29,0.21,0.21,0.29" $matrix_file \
+matrix_score=$(matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
 	| grep SCORE | sed 's/:/\ /'\
 	| awk -F " " '{print $2}')
 
@@ -164,21 +192,15 @@ echo "Use matrix_scan: $use_matrix_scan"
 
 if [ $use_matrix_scan -eq 0 ]
 then 
-   echo "========               Generating tag list                 ========"
-   tagscore=${matrix_name}_co$matrix_score.dat
-   echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore"
-   echo "..."
-   # Generate list of all tags that represent all possible matrix hits
-   mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr > $tagscore
    # Run Bowtie pipeline
    pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
    echo "========               Bowtie-based pipeline               ========"
-   echo "awk '{print \">\"\$2\"\n\"\$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len $chrNC_dir > $pwmout_bed" 
+   echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr | awk '{print \">\"\$2\"\n\"\$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len $chrNC_dir > $pwmout_bed" 
    echo "..."
-   awk '{print ">"$2"\n"$1}' $tagscore | bowtie -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
+   mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
 
    echo "List of matches (BED format) : $pwmout_bed"
-   rm $tagscore unmapped.dat
+   rm unmapped.dat
 else
    pwmout_bed=${matrix_name}_co${matrix_score}_matrix_scan.bed
    echo "========               matrix_scan-based pipeline          ========"

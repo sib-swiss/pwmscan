@@ -157,7 +157,7 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat > chen10_ctcf_co1128_bowtie.out
 
-    # It takes of the order of 30 seconds for a full scan of the hg19 genome assembly (with the exclusion of the mitochondrial chromosome). 
+    # It takes of the order of 20 seconds for a full scan of the hg19 genome assembly (with the exclusion of the mitochondrial chromosome). 
       The total number of hits is 143597.
 
     # Example:
@@ -212,17 +212,18 @@ The reason for generating a match list in FASTA format is that we want to carry 
     Ex:
     chr|NC_000004|NC_000004.11 
 
-    # Example:
-    cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out
-
     # Parallelization of matrix_scan
 
-    To improve performance, we can run matrix_scan in parallel (on each chromosome file) using a simple perl script called matrix_scan_parallel.pl.
+    To improve performance, we can run matrix_scan in parallel (on each chromosome file) using a simple perl script called matrix_scan_parallel.pl that dispatches the jobs to available cores. In this way, matrix_scan competes with the bowtie-based approach.
+    
+    # Example:
 
-    The above example takes only 30-40 seconds to complete the task, thus competing with the bowtie-based approach. 
+    cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out
+
     To use matrix_scan_parallel.pl, type the following command:
 
     matrix_scan_parallel.pl /home/local/db/genome/hg19/chrom\*.seq chen10_ctcf.mat 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out  
+    The above example takes only about 20 seconds to complete the task in agreement with Bowtie. 
 
     # Convert the matrix scan output to BED by issuing the following command:
 
@@ -233,7 +234,7 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     # Note : to convert matrix_scan output to BED format, we use the chr_NC_gi file for assembly hg19.
     # By default, the chr_NC_gi is located at chr_NC_PATH/hg19 = /home/local/db/genome/hg19.
-    chr_NC_PATH can be changed by using option -i.
+      chr_NC_PATH can be changed by using the <-i> option.
 
     # To run the entire pipeline:
 
@@ -303,7 +304,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Output file (BED) : chen10_ctcf_co1128_matrix_scan.bed
 
-    # Try also:
+    # Also try the following commands (with p-value=10^6):
 
     pwm_scan chen10_ctcf.mat 0.000001 hg19 /home/local/db 1
     pwm_scan chen10_ctcf.mat 0.000001 hg19 /home/local/db
@@ -311,8 +312,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
     # Output file (BED) : chen10_ctcf_co1549.bed
 
     # N.B. 
-    # If the <parallel> option is specified, matrix_scan is run in parallel by splitting the processing of the entire genome on
-    # multiple processes for each chromosome file in parallel.
+    # If the <parallel> option is specified, matrix_scan is run in parallel by splitting the processing of the entire genome on multiple processes for each chromosome file in parallel.
     # Of course it only works on a multi-core processor machine.
 
 

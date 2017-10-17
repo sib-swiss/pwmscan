@@ -19,6 +19,35 @@ then
   exit $E_BADARGS
 fi
 
+# Declare associative array for background base composition
+declare -A BGFREQ
+BGFREQ[hg19]=0.29,0.21,0.21,0.29
+BGFREQ[hg18]=0.29,0.21,0.21,0.29
+BGFREQ[hg38]=0.29,0.21,0.21,0.29
+BGFREQ[mm9]=0.29,0.21,0.21,0.29
+BGFREQ[mm10]=0.29,0.21,0.21,0.29
+BGFREQ[bosTau3]=0.29,0.21,0.21,0.29
+BGFREQ[bosTau8]=0.29,0.21,0.21,0.29
+BGFREQ[canFam2]=0.29,0.21,0.21,0.29
+BGFREQ[canFam3]=0.29,0.21,0.21,0.29
+BGFREQ[panTro2]=0.29,0.21,0.21,0.29
+BGFREQ[panTro5]=0.29,0.21,0.21,0.29
+BGFREQ[rn5]=0.28,0.22,0.22,0.28
+BGFREQ[rn6]=0.28,0.22,0.22,0.28
+BGFREQ[dm3]=0.29,0.21,0.21,0.29
+BGFREQ[dm6]=0.29,0.21,0.21,0.29
+BGFREQ[ce6]=0.32,0.18,0.18,0.32
+BGFREQ[ce10]=0.32,0.18,0.18,0.32
+BGFREQ[ce11]=0.32,0.18,0.18,0.32
+BGFREQ[danRer5]=0.32,0.18,0.18,0.32
+BGFREQ[danRer7]=0.32,0.18,0.18,0.32
+BGFREQ[danRer10]=0.32,0.18,0.18,0.32
+BGFREQ[sacCer2]=0.31,0.19,0.19,0.31
+BGFREQ[sacCer3]=0.31,0.19,0.19,0.31
+
+echo "BG nucleotide composition: ${BGFREQ[$5]}"
+bg_freq=${BGFREQ[$5]}
+
 chrNC_dir=/home/local/db/genome
 
 if [ -f "$1" ]
@@ -65,7 +94,7 @@ echo "PWM length: $matrix_len"
 echo "PWM file length : $file_len lines"
 
 echo "========               Calculating PWM score               ========"
-matrix_score=$(matrix_prob -e $p_value --bg "0.29,0.21,0.21,0.29" $matrix_file \
+matrix_score=$(matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
 	| grep SCORE | sed 's/:/\ /'\
 	| awk -F " " '{print $2}')
 

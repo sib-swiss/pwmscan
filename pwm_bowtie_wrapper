@@ -7,15 +7,21 @@
 #              bowtie-dir
 #              genome-idx-file
 #              assembly
+#              non-overlapping matches [1/0]
 #
 #  25.11.2015  Giovanna Ambrosini
+#
+#  05.12.2017  Giovanna Ambrosini
+#              Optimize Bowtie pipeline
+#              Use new version of the mba program
+#
 
 ARGS=5         # Script requires 5 arguments.
 E_BADARGS=85   # Wrong number of arguments passed to script.
 
-if [ $# -ne "$ARGS" ]
+if [ $# -lt "$ARGS" ]
 then
-  echo "Usage: `basename $0` <matrix-file> <p-value> <bowtie-dir> <genome-idx-file> <assembly[hg19|mm9|..]>"
+  echo "Usage: `basename $0` <matrix-file> <p-value> <bowtie-dir> <genome-idx-file> <assembly[hg19|mm9|..]> [<non-overlapping matches [1/0]>]"
   exit $E_BADARGS
 fi
 
@@ -50,6 +56,13 @@ bg_freq=${BGFREQ[$5]}
 
 chrNC_dir=/home/local/db/genome
 
+non_overlapping=1
+
+if [ $# == 6 ]
+then
+  non_overlapping=$6
+fi
+
 if [ -f "$1" ]
 then
     matrix_file=$1
@@ -83,12 +96,6 @@ matrix_len=$(cat $matrix_file | perl -ane 'next if (/^#/ or /^>/); print;' | wc 
 
 file_len=$(cat $matrix_file | wc -l)
 
-if [ $file_len -gt $matrix_len ]
-then
-    sed 1d $matrix_file > $matrix_file".tmp"
-    matrix_file=$matrix_file".tmp"
-fi
-
 echo "PWM file: $matrix_file"
 echo "PWM length: $matrix_len"
 echo "PWM file length : $file_len lines"
@@ -100,14 +107,39 @@ matrix_score=$(matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
 
 echo "PWM score: $matrix_score"
 
-# Run Bowtie pipeline
+if [ $non_overlapping == 1 ]
+then
+  echo "Output non-overlapping matches..."
+fi
+
+echo "========               Generating PWM score distribution   ========"
+# Generate the Matrix Score Cumulative Table
+pwmScore_tab=${matrix_name}_co${matrix_score}_scoretab.txt
+matrix_prob --bg "$bg_freq" $matrix_file 2>/dev/null > $pwmScore_tab
+
+echo "PWM distribution score: $pwmScore_tab"
+
+# Run the Bowtie pipeline
 pwmout_bed=${matrix_name}_co${matrix_score}_bowtie.bed
 
 echo "========               Bowtie-based pipeline               ========"
-echo "mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr | awk '{print \">\"\$2\"\n\"\$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed" 
-echo "..."
-mba -c $matrix_score -l $matrix_len $matrix_file | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir > $pwmout_bed
+if [ $non_overlapping == 0 ]
+then
+  echo "mba -c $matrix_score $matrix_file | awk '{print \">\"\$2\"\n\"\$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' > $pwmout_bed" 
+  echo "..."
+  mba -c $matrix_score $matrix_file | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' > $pwmout_bed
+else
+  echo "mba -c $matrix_score $matrix_file | awk '{print \">\"\$2\"\n\"\$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir | filterOverlaps -l$matrix_len  | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' > $pwmout_bed" 
+  echo "..."
+  mba -c $matrix_score $matrix_file | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l $matrix_len -n0 -a $bowtie_dir/$genome_idx_file -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s $assembly -l $matrix_len -i $chrNC_dir | filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' > $pwmout_bed
+fi
 
 echo "List of matches (BED format) : $pwmout_bed"
+nb_hits=`cat $pwmout_bed|wc -l`
+echo "Total number of PWM matches  : $nb_hits"
 
-rm unmapped.dat
+if [ -e unmapped.dat ]
+then
+  rm unmapped.dat
+fi
+rm $pwmScore_tab

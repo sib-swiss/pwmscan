@@ -9,6 +9,10 @@
 # ORIG: transfac2meme.pl
 # DESCRIPTION: Convert a Transfac matrix file to MEME output format.
 
+# Giovanna Ambrosini 18/10/2017 
+# Add pseudo weight fraction to correct frequencies
+# 
+
 use Math::Round;
 
 # Set up global variables. Assume uniform.
@@ -19,7 +23,9 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $b = 0;				# default total pseudocounts
+my $c = 0;				# default total pseudocounts
+my $logscl = 100;
+my $minscore = -10000;
 
 my $usage = "USAGE: transfaconvert [options] <matrix file>
 
@@ -27,10 +33,10 @@ my $usage = "USAGE: transfaconvert [options] <matrix file>
            -skip <transfac ID> (may be repeated)
            -ids <file containing list of transfac IDs>
 	   -bg <background file>	set of f_a
-	   -b <total pseudocounts>	add <b> times f_a to each freq
-					default: $b
+           -c <pseudo weight>           add an arbitrary pseudo weight fraction <c> to each freq
+                                        default: $c
            -m <low value score>         set low value score
-                                        default: -10000
+                                        default: $minscore
            -n <log scaling factor>      set log scaling factor (int)
                                         default: 100
            -noheader                    write raw matrix (without header)
@@ -40,7 +46,7 @@ my $usage = "USAGE: transfaconvert [options] <matrix file>
                                         <p> select letter-probability matrix format for written output
                                         default format: original TRANSFAC frequency matrix
   
-  Convert a Transfac matrix file to MEME output format (i.e. integer log likelihoods). 
+  Convert a Transfac matrix file to MEME output format (i.e. integer log likelihoods or letter-probability matrix). 
   N.B. Dollar signs in TRANSFAC IDs are converted to underscores.\n";
 
 
@@ -49,9 +55,6 @@ my $letprob = 0;
 my $defout  = 0;
 my $out_file = "";
 my $ofile = 0;
-
-my $logscl = 100;
-my $minscore = -10000;
 
 # Process command line arguments.
 if (scalar(@ARGV) == 0) {
@@ -71,8 +74,8 @@ while (scalar(@ARGV) > 1) {
     $id_list = shift(@ARGV);
   } elsif ($next_arg eq "-bg") {
     $bg_file = shift(@ARGV);
-  } elsif ($next_arg eq "-b") {
-    $b = shift(@ARGV);
+  } elsif ($next_arg eq "-c") {
+    $c = shift(@ARGV);
   } elsif ($next_arg eq "-m") {
     $minscore = shift(@ARGV);
   } elsif ($next_arg eq "-n") {
@@ -238,19 +241,33 @@ while ($line = <MF>) {
     }
     print "XX\n";
     print "\n";
-    # Convert the motif to frequencies.
+    # If $c != 0, add pseudocount fraction $c
     for ($i_motif = 0; $i_motif < $width; $i_motif++) {
       # motif columns may have different counts
       $num_seqs = 0;
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	$num_seqs += $motif{$i_base, $i_motif};
+        $num_seqs += $motif{$i_base, $i_motif};
       }
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	$motif{$i_base, $i_motif} = 
-          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
-          ($num_seqs + $b);
+         $motif{$i_base, $i_motif} =
+         ($motif{$i_base, $i_motif} + ($bg{$bases[$i_base]} * $num_seqs * $c) ) /
+         ($num_seqs * (1 + $c));
       }
     }
+    # Convert the motif to frequencies.
+#   Old stuff
+#    for ($i_motif = 0; $i_motif < $width; $i_motif++) {
+#      # motif columns may have different counts
+#      $num_seqs = 0;
+#      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+#	$num_seqs += $motif{$i_base, $i_motif};
+#      }
+#      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+#	$motif{$i_base, $i_motif} = 
+#          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
+#          ($num_seqs + $b);
+#      }
+#    }
 
     ###### Decide whether to print the motif.
 

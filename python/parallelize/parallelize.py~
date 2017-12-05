@@ -1,0 +1,186 @@
+import optparse
+import subprocess
+import multiprocessing
+from Parallel import IWorker
+
+
+def check_options(options_obj):
+    """
+    Checks the presence of some values in the option fetch from the command 
+    line. Raise a RuntimeError if an expected value cannot be found.
+    :param options_obj: the return value of parser.parse_args()
+    :return: nothing
+    """
+    options_dict = vars(options_obj)
+    if options_dict["info_file"] is None:
+        raise RuntimeError("Option error! No information file was given (-i)!")
+    # this should never be triggered as there is a default value
+    elif options_dict["script"] is None:
+        raise RuntimeError("Option error! No script was given (-s)!")
+
+
+def fill_queue(file_info, queue, script, n_proc):
+    """
+    Creates argument tuples to run worker_task() through a IWorker instance and put 
+    them in the given queue such that IWorker can access them.
+    Specifically, run_worker() requires two arguments : the address of the script to 
+    execute and a tuple of argument necessary to execute the script. Thus each tuple 
+    put in the queue will contain i) the script location <script> and ii) a tuple of 
+    argument created from one line of <file_info> and necessary to execute <script>. 
+    For instance, if one tuple in the queue is ("bar/foo.sh", ("opt1", "opt2")) 
+    the system call will be "bar/foo.sh opt1 opt2".
+    Eventually, the queue will contain <n_line> tuples and <n_proc> poison pills where 
+    <n_line> is the number of line <file_info> and <n_proc> the number of processes 
+    which will be run in parellel.
+    
+    CAUTION : the number of poison pill should be at least the number of processes run in 
+    parallel! If less than this, some processes will run endlessly.
+    
+    :param file_info: the path to a tsv file containing, on each line, a complete set of 
+    argument to run the script.
+    :param queue: the queue to fill which will later be used by IWorkers.
+    :param script: the path to the script which will be executed.
+    :param n_proc: the number of processes which will be run in parallel.
+    :return: 
+    """
+    # read argument tuples from the given file and store them in the queue
+    with open(file_info, "rt") as f:
+        for line in f:
+            line = line.rstrip()
+            value = (script, tuple(line.split('\t')))
+            queue.put(value)
+
+    # put some poison pills in the queue
+    for _ in xrange(0, n_proc, 1):
+        queue.put(IWorker.IWorker.get_poison_pill())
+
+
+def worker_task(script_sh, opt_tuple):
+    """
+    Execute a system call to run the given script with all the options 
+    given in the <opt_tuple> tuple. For instance if <script> is 'bar/foo.sh' 
+    and <opt_tuple> is (opt1, opt2, opt3), this function will call 
+    'bar/foo.sh opt1 opt2 opt3'.
+    :param script_sh: the script to execute.
+    :param opt_tuple: the options to execute the script.
+    :return: nothing
+    """
+    command = "%s" % script_sh
+    for opt in opt_tuple:
+        command += " %s" % opt
+    try:
+        subprocess.check_call(command, shell=True)
+    except subprocess.CalledProcessError as e:
+        raise e
+
+
+def worker_simulation(queue):
+
+    while not queue.empty():
+        arg_tuple = queue.get()
+        if arg_tuple == IWorker.IWorker.get_poison_pill():
+            continue
+        else:
+            command = arg_tuple[0]
+            opt = " ".join(arg_tuple[1])
+            print "%s %s" % (command, opt)
+
+
+def main(info_file, script, n_proc, simulate, debug):
+    """
+    The main part.
+    :param info_file: 
+    :param script: 
+    :param n_proc: 
+    :param simulate:
+    :param debug:
+    :return: 
+    """
+    # set up things for parallel workers
+    lock_print = multiprocessing.Lock()
+    queue_tasks = multiprocessing.Queue()
+    list_processes = [IWorker.IWorker(queue_in=queue_tasks, target=worker_task, lock=lock_print, debug=debug)
+                      for _ in xrange(0, n_proc, 1)]
+
+    # fill the queue with argument tuples and with poison pills for the workers
+    fill_queue(info_file, queue_tasks, script, n_proc)
+
+    # only simulate the execution
+    if simulate:
+        worker_simulation(queue_tasks)
+    # run the workers
+    else:
+        # start workers
+        for process in list_processes:
+            process.start()
+        # join workers
+        for process in list_processes:
+            process.join()
+
+    return 0
+
+
+if __name__ == "__main__":
+    # parses options
+    parser = optparse.OptionParser(version="v1.0",
+                                   description="This program allows to distribute a repetive work "
+                                               "executed by a given script (or program), called  each time"
+                                               "with a different set of arguments on several CPU cores. "
+                                               "(using separated processes)."
+                                               "The script arguments should be anonymous (i.g. the script "
+                                               "should be run executable using myscript.sh arg1 arg2) "
+                                               "and a list of arguments written in a tab separated file. The "
+                                               "file format should be the following : each row is expected "
+                                               "to contain a complet list of arguments to run the script once."
+                                               "The script will be executed as many times as there are lines in "
+                                               "the files, and every time with a set of argument corresponding to"
+                                               "one line in the file. For instance, if the file contains a line"
+                                               "'0.001\tgreen\tmyfile.dat' then the following command will be "
+                                               "executed 'myscript.sh 0.001 green myfile.dat'."
+                                               "This program should in ANY CASE  be used to execute program"
+                                               "coming from an untrusted source and care should be taken to "
+                                               "avoid that two simultaneous/subsequent script runs write the "
+                                               "same file.",
+                                   epilog="Written by Romain Groux, May 2017")
+    parser.add_option("-i", "--infofile",
+                      dest="info_file",
+                      type="string",
+                      default=None,
+                      help="A tsv file containing a list of valid arguments on each row to run the script.",
+                      metavar="file")
+    parser.add_option("-p", "--processes",
+                      dest="n_proc",
+                      type="int",
+                      default=1,
+                      help="the number of processes to run in parallel, by default 1.",
+                      metavar="n")
+    parser.add_option("-s", "--script",
+                      dest="script",
+                      type="string",
+                      default=None,
+                      help="the script containing all the processing steps to perform on each individual file.",
+                      metavar="script")
+    parser.add_option("--simulate",
+                      dest="simulate",
+                      action="store_true",
+                      default=False,
+                      help="Simulates the run and only prints the commands which would have been otherwise executed.")
+    parser.add_option("--debug",
+                      dest="debug",
+                      action="store_true",
+                      default=False,
+                      help="Enables debug verbosity.")
+
+    (options, args) = parser.parse_args()
+    check_options(options)
+
+    info_file = options.info_file
+    script = options.script
+    n_proc = options.n_proc
+    simulate = options.simulate
+    debug = options.debug
+
+    # runs the job
+    code = main(info_file, script, n_proc, simulate, debug)
+
+    exit(code)

@@ -8,6 +8,10 @@
 # Created in 1999
 # ORIG: transfac2meme.pl
 
+# Giovanna Ambrosini 18/10/2017 
+# Add pseudo weight fraction to correct frequencies
+# 
+
 use Math::Round;
 
 # Set up global variables. Assume uniform.
@@ -18,16 +22,18 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $b = 0;				# default total pseudocounts
+my $c = 0;				# default pseudocount fraction
+my $logscl = 100;
+my $minscore = -10000;
 
 my $usage = "USAGE: jasparconvert [options] <matrix file>
 
   Options: -species <name>              not used yet
 	   -bg <background file>	set of f_a
-	   -b <total pseudocounts>	add <b> times f_a to each freq
-					default: $b
+	   -c <pseudo weight>	        add an arbitrary pseudo weight fraction <c> to each freq
+					default: $c
            -m <low value score>         set low value score
-                                        default: -10000
+                                        default: $minscore
            -n <log scaling factor>      set log scaling factor (int)
                                         default: 100
            -noheader                    write raw matrix (without header)
@@ -37,7 +43,7 @@ my $usage = "USAGE: jasparconvert [options] <matrix file>
 	                                <p> select letter-probability matrix format for written output
                                         default format: original JASPAR frequency matrix
 
-  Convert a JASPAR matrix file to MEME format (i.e. integer log likelihoods).
+  Convert a JASPAR matrix file to MEME format (i.e. integer log likelihoods or letter-probability matrix).
   \n";
 
 my $logodds = 0;
@@ -45,9 +51,6 @@ my $letprob = 0;
 my $defout  = 0;
 my $out_file = "";
 my $ofile = 0;
-
-my $logscl = 100;
-my $minscore = -10000;
 
 # Process command line arguments.
 if (scalar(@ARGV) == 0) {
@@ -62,8 +65,8 @@ while (scalar(@ARGV) > 1) {
     $species = shift(@ARGV);
   } elsif ($next_arg eq "-bg") {
     $bg_file = shift(@ARGV);
-  } elsif ($next_arg eq "-b") {
-    $b = shift(@ARGV);
+  } elsif ($next_arg eq "-c") {
+    $c = shift(@ARGV);
   } elsif ($next_arg eq "-m") {
     $minscore = shift(@ARGV);
   } elsif ($next_arg eq "-n") {
@@ -226,19 +229,32 @@ while ($line = <MF>) {
     }
     print "\n";
     # Convert the motif to frequencies.
+    # If $c != 0, add pseudocount fraction $c
     for ($i_motif = 0; $i_motif < $width; $i_motif++) {
       # motif columns may have different counts
       $num_seqs = 0;
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	$num_seqs += $motif{$i_base, $i_motif};
+        $num_seqs += $motif{$i_base, $i_motif};
       }
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	$motif{$i_base, $i_motif} = 
-          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
-          ($num_seqs + $b);
+         $motif{$i_base, $i_motif} =
+         ($motif{$i_base, $i_motif} + ($bg{$bases[$i_base]} * $num_seqs * $c) ) /
+         ($num_seqs * (1 + $c));
       }
     }
-
+#   Old stuff
+#   for ($i_motif = 0; $i_motif < $width; $i_motif++) {
+#     # motif columns may have different counts
+#     $num_seqs = 0;
+#     for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+#       $num_seqs += $motif{$i_base, $i_motif};
+#     }
+#     for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+#	$motif{$i_base, $i_motif} = 
+#          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
+#          ($num_seqs + $b);
+#     }
+#   }
     ###### Decide whether to print the motif.
 
     # If no criteria are given, then print it.
@@ -277,7 +293,7 @@ while ($line = <MF>) {
           if ($motif{$i_base, $i_motif}) { #log2
 	    printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
           } else {
-              printf("%7d ", $minscore);
+            printf("%7d ", $minscore);
           }
 	}
         if ($logodds) {

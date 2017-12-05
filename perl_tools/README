@@ -7,10 +7,3 @@ Matrix (File) format conversion utilities
 - lpmconvert.pl            Convert a Letter Probability Matrix (LPM) file to a PWM with integer log-odds weights
 - pfmconvert.pl            Convert a Position Frequency Matrix (PFM) file to a PWM with either integer log-odds weights
                            or letter probabilities
-
-
-PWM utilities
--------------
-
-- matrix_scan_parallel.pl  Run the matrix_scan program in parallel by splitting the processing task on several chromosome files
-                           It requires a multi-core processor.

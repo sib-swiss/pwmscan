@@ -3,6 +3,12 @@
 # CREATE DATE: 3/07/2014
 # AUTHOR: Giovanna Ambrosini 
 #
+#
+# Part of the code is based on an implemetation by
+# William Stafford Noble and Timothy L. Bailey
+# Created in 1999
+# ORIG: transfac2meme.pl
+#
 # DESCRIPTION: Convert a Letter Probability Matrix (LPM) file to a Position Weihgt Matrix (PWM) with log odds weights.
 
 use Math::Round;
@@ -15,19 +21,19 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $b = 0.0001;				# default pseudo-weight
+#my $c = 0.0001;			# default pseudo-weight
+my $c = 0;				# default pseudo-weight
 my $logscl = 100;
-my $minscore_flag = 0;
-my $minscore = 0;
+my $minscore = -10000;
 
 my $usage = "USAGE: lpmconvert [options] <matrix file>
 
   Options: 
 	   -bg <background file>	set of f_a
-	   -b <global pseudo-weight>	add pseudo-weight <b> distributed according to residue priors
-					default: $b
+	   -c <pseudo weight>		add pseudo weight fraction <c> distributed according to residue priors
+					default: $c
            -m <low value score>         set lowest value score (if set, default pseudo-weight=0)
-                                        default: lowest value score is not set
+                                        default: $minscore
            -n <log scaling factor>      set log scaling factor (int)
                                         default: 100
            -noheader                    write raw matrix (without header)
@@ -54,12 +60,10 @@ while (scalar(@ARGV) > 1) {
   $next_arg = shift(@ARGV);
   if ($next_arg eq "-bg") {
     $bg_file = shift(@ARGV);
-  } elsif ($next_arg eq "-b") {
-    $b = shift(@ARGV);
+  } elsif ($next_arg eq "-c") {
+    $c = shift(@ARGV);
   } elsif ($next_arg eq "-m") {
     $minscore = shift(@ARGV);
-    $minscore_flag = 1;
-    $b = 0;
   } elsif ($next_arg eq "-n") {
     $logscl = shift(@ARGV);
   } elsif ($next_arg eq "-noheader") {
@@ -203,27 +207,24 @@ while ($line = <MF>) {
     for ($i_motif = 0; $i_motif < $len; $i_motif++) {
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
         if ($ofile) {
-          if ($minscore_flag) {
+          if ($c > 0) {
+            printf(OF "%7d ", round((log( ($motif{$i_base, $i_motif} + $bg{$bases[$i_base]} * $c) / ($bg{$bases[$i_base]} * (1 + $c)) )/log(2.0))*$logscl) );
+          } else {
             if ($motif{$i_base, $i_motif} > 0) {
-              printf(OF "%7d ", round((log( ($motif{$i_base, $i_motif} + $bg{$bases[$i_base]} * $b) / ($bg{$bases[$i_base]} * (1 + $b)) )/log(2.0))*$logscl) );
+              printf(OF "%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
             } else {
               printf(OF "%7d ", $minscore);
             }
-          } else {
-            printf(OF "%7d ", round((log( ($motif{$i_base, $i_motif} + $bg{$bases[$i_base]} * $b) / ($bg{$bases[$i_base]} * (1 + $b)) )/log(2.0))*$logscl) );
-            #printf(OF "%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} + $b)/log(2.0))*$logscl) );
           }
         }
-        if ($minscore_flag) {
+        if ($c > 0) {
+            printf("%7d ", round((log( ($motif{$i_base, $i_motif} + $bg{$bases[$i_base]} * $c) / ($bg{$bases[$i_base]} * (1 + $c)) )/log(2.0))*$logscl) );
+        } else {
           if ($motif{$i_base, $i_motif} > 0) {
-            printf("%7d ", round((log( ($motif{$i_base, $i_motif} + $bg{$bases[$i_base]} * $b) / ($bg{$bases[$i_base]} * (1 + $b)) )/log(2.0))*$logscl) );
-            #printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} + $b)/log(2.0))*$logscl) );
+            printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
           } else {
             printf("%7d ", $minscore);
           }
-        } else {
-          printf("%7d ", round((log( ($motif{$i_base, $i_motif} + $bg{$bases[$i_base]} * $b) / ($bg{$bases[$i_base]} * (1 + $b)) )/log(2.0))*$logscl) );
-          #printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} + $b)/log(2.0))*$logscl) );
         }
       }
       if ($ofile) {

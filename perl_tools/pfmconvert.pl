@@ -3,6 +3,11 @@
 # CREATE DATE: 3/07/2014
 # AUTHOR: Giovanna Ambrosini 
 #
+# Part of the code is based on an implemetation by
+# William Stafford Noble and Timothy L. Bailey
+# Created in 1999
+# ORIG: transfac2meme.pl
+
 # DESCRIPTION: Convert a Position Frequency Matrix (PFM) file to a Position Weihgt Matrix (PWM) with log odds weights.
 
 use Scalar::Util::Numeric qw(isnum isint isfloat);
@@ -16,23 +21,20 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $b = 0;				# default total pseudocounts
-my $f = 0;				# default pseudocount fraction
+
+#my $c = 0.0001;			# default pseudocount fraction
+my $c = 0;				# default pseudocount fraction
 my $logscl = 100;
-my $minscore_flag = 0;
-my $minscore = 0;
+my $minscore = -10000;
 
 my $usage = "USAGE: pfmconvert [options] <matrix file>
 
   Options: 
 	   -bg <background file>	set of f_a
-	   -b <total pseudocounts>	add <b> times f_a to each freq
-					default: $b
-           -f <pseudocount fraction>    add <f> fraction of the sum of all 4
-                                        nucleotide freqs to each freq
-					default: $f
+           -c <pseudo weight>           add an arbitrary pseudo weight fraction <c> to each freq
+					default: $c
            -m <low value score>         set lowest value score
-                                        default: lowest value score is not set
+                                        default: -10000
            -mswap                       by default colums represent nucleotides A,C,G,T
                                         if set matrix raws represent nucleotides A,C,G,T
            -n <log scaling factor>      set log scaling factor (int)
@@ -67,13 +69,10 @@ while (scalar(@ARGV) > 1) {
   $next_arg = shift(@ARGV);
   if ($next_arg eq "-bg") {
     $bg_file = shift(@ARGV);
-  } elsif ($next_arg eq "-b") {
-    $b = shift(@ARGV);
-  } elsif ($next_arg eq "-f") {
-    $f = shift(@ARGV);
+  } elsif ($next_arg eq "-c") {
+    $c = shift(@ARGV);
   } elsif ($next_arg eq "-m") {
     $minscore = shift(@ARGV);
-    $minscore_flag = 1;
   } elsif ($next_arg eq "-mswap") {
     $m_swap = 1;
   } elsif ($next_arg eq "-n") {
@@ -84,10 +83,10 @@ while (scalar(@ARGV) > 1) {
     $out_file = shift(@ARGV);
     $ofile = 1;
   } elsif ($next_arg eq "-w") {
-    my $f = shift(@ARGV);
-    if ($f eq "l") {
+    my $format = shift(@ARGV);
+    if ($format eq "l") {
       $logodds = 1;
-    } elsif ($f eq "p") {
+    } elsif ($format eq "p") {
       $logodds = 0;
       $letprob = 1;
     }
@@ -248,31 +247,17 @@ while ($line = <MF>) {
     }
     print "\n";
     # Convert the motif to frequencies.
-    if ($f) { # add pseudocount fraction $f
-      for ($i_motif = 0; $i_motif < $len; $i_motif++) {
-        # motif columns may have different counts
-        $num_seqs = 0;
-        for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-  	  $num_seqs += $motif{$i_base, $i_motif};
-        }
-        for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	  $motif{$i_base, $i_motif} = 
-            ($motif{$i_base, $i_motif} + ($bg{$bases[$i_base]} * $num_seqs * $f) ) / 
-            ($num_seqs * (1 + $f));
-        }
+    # If $c != 0, add pseudocount fraction $c
+    for ($i_motif = 0; $i_motif < $len; $i_motif++) {
+      # motif columns may have different counts
+      $num_seqs = 0;
+      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+        $num_seqs += $motif{$i_base, $i_motif};
       }
-    } else { #add absolute pseudocounts $b
-      for ($i_motif = 0; $i_motif < $len; $i_motif++) {
-        # motif columns may have different counts
-        $num_seqs = 0;
-        for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-  	  $num_seqs += $motif{$i_base, $i_motif};
-        }
-        for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	  $motif{$i_base, $i_motif} = 
-            ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
-            ($num_seqs + $b);
-        }
+      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+         $motif{$i_base, $i_motif} = 
+         ($motif{$i_base, $i_motif} + ($bg{$bases[$i_base]} * $num_seqs * $c) ) / 
+         ($num_seqs * (1 + $c));
       }
     }
     # Print the Letter-probability matrix (PSFM)
@@ -310,24 +295,16 @@ while ($line = <MF>) {
     for ($i_motif = 0; $i_motif < $len; $i_motif++) {
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
         if ($ofile and $logodds) {
-          if ($minscore_flag) {
-            if ($motif{$i_base, $i_motif} > 0) {
-              printf(OF "%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
-            } else {
-              printf(OF "%7d ", $minscore);
-            }
-          } else {
+          if ($motif{$i_base, $i_motif} > 0) {
             printf(OF "%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
+          } else {
+            printf(OF "%7d ", $minscore);
           }
         }
-        if ($minscore_flag) {
-          if ($motif{$i_base, $i_motif} > 0) {
-            printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
-          } else {
-            printf("%7d ", $minscore);
-          }
-        } else {
+        if ($motif{$i_base, $i_motif} > 0) {
           printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
+        } else {
+          printf("%7d ", $minscore);
         }
       }
       if ($ofile and $logodds) {

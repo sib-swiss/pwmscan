@@ -1,0 +1,37 @@
+AC   M00223
+XX
+ID   V$STAT_01
+XX
+DT   29.11.1995 (created); ewi.
+DT   11.03.2003 (updated); dtc.
+CO   Copyright (C), Biobase GmbH.
+XX
+NA   STATx
+XX
+DE   signal transducers and activators of transcription
+XX
+BF   T01575 STAT1alpha; Species: mouse, Mus musculus.
+BF   T01492 STAT1alpha; Species: human, Homo sapiens.
+BF   T01573 STAT1beta; Species: human, Homo sapiens.
+XX
+PO      A      C      G      T
+01      0      0      0     14      T
+02      0      0      0     14      T
+03      2     12      0      0      C
+04      0     12      0      2      C
+05      0      9      2      3      C
+06      4      2      8      0      G
+07      0      0      8      6      K
+08     13      1      0      0      A
+09     14      0      0      0      A
+XX
+BA   14 genomic sequences of 14 different genes
+XX
+CC   compiled sequences
+XX
+RN   [1]; RE0003481.
+RX   PUBMED: 7774815.
+RA   Horvath C. M., Wen Z., Darnell jr J. E.
+RT   A STAT protein domain that determines DNA sequence recognition suggests a novel DNA-binding domain
+RL   Genes Dev. 9:984-994 (1995).
+XX

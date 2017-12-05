@@ -8,6 +8,21 @@ Important remarks:
 
 The PWMScan programs rely on a few rules to make output conversion to BED format easier, namely FASTA header and file naming conventions.
 
+The final output format is BEDdetail, which is an extension of BED format that is used to enhance the track display page.
+For PWMScan, we use BEDdetail format to include the name of the PWM as well as the p-value associated to the motifs identified by PWMSCan.
+
+BEDdetail format provides the following obligatory fields:
+
+1) Chromosome name (e.g. chr1, chrX, etc.)
+2) Starting position of the match
+3) Ending position of the match
+4) Matching nucleotide sequence
+5) Integer score of PWM match
+6) Strand (+, -)
+7) PWM name
+8) P-value of the match
+
+
 FASTA headers
 -----------------------------------------------
 
@@ -122,13 +137,23 @@ There are two basic methods to scan the genome with a PWM and a cut-off/p-value:
 If you are interested in using the first approach, you should read sections 2) and 3), whereas for using the conventional algorithm please refer to section 4). 
 
 
-2) Generate a list of all tags that represent all possible PWM matches 
+2) Generate the PWM Score Cumulative Distribution 
+------------------------------------------------------------------------------
+
+The cumulative score distribution is used to assign a p-value to a match score.
+
+The matrix_prob program is used to compute the cumulative score distribution:
+
+matrix_prob --bg "0.29,0.21,0.21,0.29" chen10_ctcf.mat > chen10_ctcf_co1128_scoretab.txt
+
+
+3) Generate a list of all tags that represent all possible PWM matches 
    (with minimal score of 1128)
 ------------------------------------------------------------------------------
 
-This step is only necessary if fast string-matchig tools are used to scan the genome.
+This step is only necessary if fast string-matchig tools (such as Bowtie) are used to scan the genome.
 
-mba -c 1128 -l 19 chen10_ctcf.mat | sort -k2,2 -nr > chen10_ctcf_co1128.dat
+mba -c 1128 -l 19 chen10_ctcf.mat > chen10_ctcf_co1128.dat
 
 Remove the score column:
 
@@ -141,9 +166,9 @@ awk '{print ">"$2"\n"$1}' chen10_ctcf_co1128.dat > chen10_ctcf_co1128_taglist.fa
 The reason for generating a match list in FASTA format is that we want to carry the match score over to the next steps (see below).
 
 
-3) Map the tags representing the PWM to hg19
+4) Map the tags representing the PWM to hg19
 ------------------------------------------------------------------------------
- PWMScan uses Bowtie as the search engine:
+ PWMScan uses Bowtie to map all matching tags to the hg19 genome assembly.
 
     1- Bowtie
 
@@ -157,18 +182,18 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat > chen10_ctcf_co1128_bowtie.out
 
-    # It takes of the order of 20 seconds for a full scan of the hg19 genome assembly (with the exclusion of the mitochondrial chromosome). 
+    # It takes of the order of 12-15 seconds for a full scan of the hg19 genome assembly (with the exclusion of the mitochondrial chromosome). 
       The total number of hits is 143597.
 
     # Example:
-    bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat > chen10_ctcf_co1128_bowtie.out
+    bowtie --threads 4 -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat > chen10_ctcf_co1128_bowtie.out
 
-    # Convert the bowtie output to BED via the following command:
+    # Convert the bowtie output to BEDdetail via the following command:
 
-    sort -s -k3,3 -k4,4n chen10_ctcf_co1128_bowtie.out | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1128_bowtie.bed
+    sort -s -k3,3 -k4,4n chen10_ctcf_co1128_bowtie.out | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_bowtie.bed
 
-    # Example:
-    sort -s -k3,3 -k4,4n chen10_ctcf_co1128_bowtie.out | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1128_bowtie.bed
+    # Example (use default chr_NC_PATH):
+    sort -s -k3,3 -k4,4n chen10_ctcf_co1128_bowtie.out | bowtie2bed -s hg19 -l 19 | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_bowtie.bed
 
     # Note: to convert Bowtie output to BED format, we use the chr_hdr file for assembly hg19.
     # By default, the chr_hdr file is located at chr_NC_PATH/hg19 = /home/local/db/genome/hg19.
@@ -177,23 +202,19 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     # To run the bowtie-based pipeline, type:
 
-    bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1128_bowtie.bed
+    bowtie --threads 4 -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_bowtie.bed
 
     # Bowtie can read input files from stdin. You should specify "-" for stdin.
     In such case, you can run the entire pipeline as follows:
 
-    mba -c 1128 -l 19 chen10_ctcf.mat | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH > chen10_ctcf_co1128_bowtie.bed
+    mba -c 1128 -l 19 chen10_ctcf.mat | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l 19 -n0 -a BOWTIE_DIR/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 -i chr_NC_PATH | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_bowtie.bed
 
     # Example:
 
-    bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f chen10_ctcf_co1128_taglist.fa --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1128_bowtie.bed
-
-    # Or:
-
-    mba -c 1128 -l 19 chen10_ctcf.mat | sort -k2,2 -nr | awk '{print ">"$2"\n"$1}' | bowtie -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 > chen10_ctcf_co1128_bowtie.bed
+    mba -c 1128 -l 19 chen10_ctcf.mat | awk '{print ">"$2"\n"$1}' | bowtie --threads 4 -l 19 -n0 -a /home/local/db/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | bowtie2bed -s hg19 -l 19 | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_bowtie.bed
 
 
-4) Using a conventional scanning algorithm (matrix_scan)
+5) Using matrix_scan
 ------------------------------------------------------------------------------
     # Let's define GENOME_DIR/hg19 as the directory containing all hg19 chromosomes in FASTA files
 
@@ -214,23 +235,24 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     # Parallelization of matrix_scan
 
-    To improve performance, we can run matrix_scan in parallel (on each chromosome file) using a simple perl script called matrix_scan_parallel.pl that dispatches the jobs to available cores. In this way, matrix_scan competes with the bowtie-based approach.
+    To improve performance, we can run matrix_scan in parallel (on each chromosome file) using a simple python script called matrix_scan_parallel.py that dispatches the jobs to available CPU-cores. In this way, matrix_scan competes with the bowtie-based approach.
     
     # Example:
 
     cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out
 
-    To use matrix_scan_parallel.pl, type the following command:
+    To use matrix_scan_parallel.py, type the following command:
 
-    matrix_scan_parallel.pl /home/local/db/genome/hg19/chrom\*.seq chen10_ctcf.mat 1128 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out  
-    The above example takes only about 20 seconds to complete the task in agreement with Bowtie. 
+    python /local/bin/matrix_scan_parallel.py -m chen10_ctcf.mat -f "$(ls /home/local/db/genome/hg19/chrom*.seq|grep -v chromMt)" -c 1128 -p 15 | sort -s -k1,1 -k2,2n -k6,6 > chen10_ctcf_co1128_matrix_scan.out  
 
-    # Convert the matrix scan output to BED by issuing the following command:
+    The -p option is used to set the maximum number of parallel processes for execution of matrix_scan. The above example takes only about 15 seconds to complete the task in agreement with Bowtie. 
 
-    mscan2bed -s hg19 -i GENOME_DIR chen10_ctcf_co1128_matrix_scan.out > chen10_ctcf_co1128_matrix_scan.bed
+    # Convert the matrix scan output to BEDdetail by issuing the following command:
+
+    mscan2bed -s hg19 -i GENOME_DIR chen10_ctcf_co1128_matrix_scan.out | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_matrix_scan.bed
 
     # Example:
-    mscan2bed -s hg19 chen10_ctcf_co1128_matrix_scan.out > chen10_ctcf_co1128_matrix_scan.bed
+    mscan2bed -s hg19 chen10_ctcf_co1128_matrix_scan.out | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_matrix_scan.bed
 
     # Note : to convert matrix_scan output to BED format, we use the chr_NC_gi file for assembly hg19.
     # By default, the chr_NC_gi is located at chr_NC_PATH/hg19 = /home/local/db/genome/hg19.
@@ -238,26 +260,33 @@ The reason for generating a match list in FASTA format is that we want to carry 
 
     # To run the entire pipeline:
 
-    cat GENOME_DIR/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 -i GENOME_DIR > chen10_ctcf_co1128_matrix_scan.bed
+    cat GENOME_DIR/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 -i GENOME_DIR | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_matrix_scan.bed
 
     # Example:
 
-    cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 > chen10_ctcf_co1128_matrix_scan.bed 
+    cat /home/local/db/genome/hg19/chrom*.seq | matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_matrix_scan.bed 
 
     # Using parallelization:
 
-    matrix_scan_parallel.pl /home/local/db/genome/hg19/chrom\*.seq chen10_ctcf.mat 1128 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 > chen10_ctcf_co1128_matrix_scan.bed
+    python /local/bin/matrix_scan_parallel.py -m chen10_ctcf.mat -f "$(ls /home/local/db/genome/hg19/chrom*.seq|grep -v chromMt)" -c 1128 -p 15 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 | awk 'BEGIN { while((getline line < "chen10_ctcf_co1128_scoretab.txt") > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' > chen10_ctcf_co1128_matrix_scan.bed
 
 
 Shell (bash) Wrappers to execute the analysis pipeline
 ==============================================================================
- NOTE: the path for locating the chr_NC_gi/chr_hdr files is hard-coded in the 'pwm_bowtie_wrapper' and 'pwm_mscan_wrapper' scripts 
-       (variable chrNC_dir)
+ NOTE: The path for locating the chr_NC_gi/chr_hdr files is hard-coded in the 'pwm_bowtie_wrapper' and 'pwm_mscan_wrapper' scripts 
+       (variable chrNC_dir).
+       The path to the matrix_scan_parallel.py script is defined by the bin_dir varaible.
 
  These shell wrapper scripts have been written to make it easier to run the whole pwmscan pipeline, irrespecitve of what method one chooses.
  They require to specify the matrix file containing the integer PWM, the p-value, the path to the assembly or index files, and the UCSC assembly name for the species (e.g. hg19, hg38, mm9 etc.).
+ Optional parameters are the <non-overlapping matches> and <parallelize matrix_scan> flags that are by default set to 1.
+
+ The output file is a match list in BEDdetail format.
+
+------------------------------------------------------------------------------
 
  A few remarks on the general pwm_scan script.
+
     # The pwm_scan script scans a genome with a PWM using either bowtie or matrix_scan depending on both the p-value and the matrix length.
     # It basically checks whether the p-value is too high (i.e. the raw score cut-off too low) given the motif lenght to decide on the more suitable search engine.
     # For high p-values and long motifs, the bowtie-based strategy becomes inefficient because the list of tags representing the
@@ -268,52 +297,103 @@ Shell (bash) Wrappers to execute the analysis pipeline
     # 
     # In our examples, <genome-root-dir> is set to /home/local/db.
     # The chrNC_dir variable (used for locating the the chr_NC_gi/chr_hdr files) is set to chrNC_dir=<genome-root-dir>/genome.
+    # The bin_dir varaible (used for locating the matrix_scan_parallel.py script) is set to /home/local/bin.
  
+------------------------------------------------------------------------------
+
     1) Bowtie wrapper script
 
-    # Usage: `basename $0` <matrix-file> <p-value> <bowtie-dir> <idx-file> <assembly[hg19|mm9|..]>
+    # Usage: pwm_bowtie_wrapper <matrix-file> <p-value> <bowtie-dir> <genome-idx-file> <assembly[hg19|mm9|..]> [<non-overlapping matches [1/0]>]
 
     # Example:
 
-    pwm_bowtie_wrapper chen10_ctcf.mat 0.00001 /home/local/db/bowtie h_sapiens_hg19 hg19
+    pwm_bowtie_wrapper chen10_ctcf.mat 0.00001 /home/local/db/bowtie h_sapiens_hg19 hg19 0
 
     # Output file (BED) : chen10_ctcf_co1128_bowtie.bed
+------------------------------------------------------------------------------
 
     2) Matrix Scan (matrix_scan) wrapper script
 
-    # Usage: `basename $0` <matrix-file> <p-value> <genome-dir> <assembly[hg19|mm9|..]> <parallel [0/1]>
+    # Usage: pwm_mscan_wrapper <matrix-file> <p-value> <genome-dir> <assembly[hg19|mm9|..]> [<non-overlapping matches [1/0]>] [<parallel [1/0]>] 
 
     # Example:
 
-    pwm_mscan_wrapper chen10_ctcf.mat 0.00001 /home/local/db/genome hg19 1
+    pwm_mscan_wrapper chen10_ctcf.mat 0.00001 /home/local/db/genome hg19 0 1
 
     # Output file (BED) : chen10_ctcf_co1128_matrix_scan.bed
+------------------------------------------------------------------------------
 
     3) PWM Scan (pwm_scan) wrapper script
 
-    # Usage: `basename $0` <matrix-file> <p-value> <assembly[hg19|mm9|..]> <genome-root-dir [ex:/db]> [<parallel 0/1>]>
-
+    # Usage: pwm_scan <matrix-file> <p-value> <assembly[hg19|mm9|..]> <genome-root-dir [ex:/db]> [<non-overlapping matches [1/0]>] [<parallel [1/0>]>]
 
     # Examples:
 
-    pwm_scan chen10_ctcf.mat 0.00001  hg19 /home/local/db
+    pwm_scan chen10_ctcf.mat 0.00001  hg19 /home/local/db 0 0
 
     # Or if we set the <parallel> option:
 
-    pwm_scan chen10_ctcf.mat 0.00001  hg19 /home/local/db 1
+    pwm_scan chen10_ctcf.mat 0.00001  hg19 /home/local/db 0 1
 
     # Output file (BED) : chen10_ctcf_co1128_matrix_scan.bed
 
     # Also try the following commands (with p-value=10^6):
 
-    pwm_scan chen10_ctcf.mat 0.000001 hg19 /home/local/db 1
     pwm_scan chen10_ctcf.mat 0.000001 hg19 /home/local/db
+    pwm_scan stat1.mat 0.000001 hg19 /home/local/db
 
-    # Output file (BED) : chen10_ctcf_co1549.bed
+    # Output file (BED) : chen10_ctcf_co1549_bowtie.bed
+    # Output file (BED) : stat1_co1731_bowtie.bed
 
     # N.B. 
-    # If the <parallel> option is specified, matrix_scan is run in parallel by splitting the processing of the entire genome on multiple processes for each chromosome file in parallel.
+    # If the <parallel> option is set (default), matrix_scan is run in parallel by splitting the processing of the entire genome on multiple processes for each chromosome file in parallel.
     # Of course it only works on a multi-core processor machine.
+
+
+Shell (bash) Wrapper for matrix conversion
+==============================================================================
+
+    The pwm_convert bash script is used to convert JASPAR, TRANSFAC, PFM, LPM and real PWM formats to integer log-odds format.
+
+    # Usage: pwm_convert <matrix-file> -f=<format [jaspar|transfac|lpm|pfm|real]>
+
+      OPTIONS:
+              -h                  show help message
+              -b=<bg-freq-file>   bg nucleotide composition file
+              -c=<pseudo-cnt>     pseudo-count fraction [def=0]
+              -m=<minscore>       minimal score value [def=-10000]
+              -n=<log-scaling>    log scaling factor [def=100]
+              -s=<mult>           matrix multiplication factor (for real PWMs) [def=100]
+
+              Convert JASPAR, TRANSFAC, PFM, LPM and real PWM formats to integer log likelihoods (log-odds) format.
+
+     By default, the prior background nucleotide frequencies are set to 0.25.
+
+     # Examples
+
+     # Convert JASPAR to log-odds:
+    
+     pwm_convert stat1_jaspar.mat -f=jaspar  2>/dev/null
+
+     # If we want to use different backgroung nucleotide frequencies:
+
+     pwm_convert stat1_jaspar.mat -f=jaspar -b=bg_probs_2.txt 2>/dev/null
+   
+     # Where the bg_probs_2.txt file includes the prior bg frequencies, defined as follows:
+
+       A  0.29
+       C  0.21
+       G  0.21
+       T  0.29
+
+     # Convert TRANSFAC to log-odds:
+
+     pwm_convert statx_transfac.mat -f=transfac -c=0.0000001 2>/dev/null
+
+     # Convert PFM (Position Frequency Matrix) to to log-odds:
+
+     pwm_convert stat1_pfm.mat -f=pfm 2>/dev/null 
+------------------------------------------------------------------------------
 
 
 How to build Bowtie index files

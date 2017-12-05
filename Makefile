@@ -4,12 +4,12 @@
 CC = gcc
 LDFLAGS = -fPIC -lm
 
-CFLAGS = -O2 -std=gnu99 -W -Wall -pedantic
-CFLAGS2 = -fPIC -O2 -std=gnu99 -W -Wall
+CFLAGS = -O3 -std=gnu99 -W -Wall -pedantic
+CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall
 
 binDir = ./bin.x86_64
 
-PROGS = mba bowtie2bed mscan_bed2sga mscan2bed filterOverlaps matrix_scan matrix_prob
+PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob
 OBJS = hashtable.o
 
 all :  $(PROGS)
@@ -21,8 +21,7 @@ MSCAN2BED_SRC = mscan2bed.c
 MSCAN_BED2SGA_SRC = mscan_bed2sga.c
 FILTEROVERLAPS_SRC = filterOverlaps.c
 
-MATRIX_SCAN_SRC = main.c io.c matrix.c sequence.c misc.c errors.c help_messages.c
-MATRIX_SCAN_OBJS = main.o io.o matrix.o sequence.o misc.o errors.o help_messages.o
+MATRIX_SCAN_SRC =  matrix_scan.c
 
 bowtie2bed : $(BOWTIE2BED_SRC) $(OBJS)
 	$(CC) $(LDFLAGS) -o bowtie2bed $^
@@ -36,38 +35,17 @@ mscan_bed2sga : $(MSCAN_BED2SGA_SRC) $(OBJS)
 %.o : %.c
 	$(CC) $(CFLAGS2) -o $@ -c $^
 
+filterOverlaps : $(FILTEROVERLAPS_SRC)
+	$(CC) $(CFLAGS) -o filterOverlaps $^
+
 mba : $(MBA_SRC)
 	$(CC) $(CFLAGS) -o mba $(MBA_SRC)
 
-filterOverlaps : $(FILTEROVERLAPS_SRC)
-	$(CC) $(CFLAGS) -o filterOverlaps $(FILTEROVERLAPS_SRC)
-
 matrix_prob : $(MATRIX_PROB_SRC)
-	$(CC) $(CFLAGS) -o matrix_prob $(MATRIX_PROB_SRC)
+	$(CC) $(CFLAGS) -o matrix_prob $^
 
-matrix_scan : $(MATRIX_SCAN_OBJS)
+matrix_scan : $(MATRIX_SCAN_SRC)
 	$(CC) $(CFLAGS) -o matrix_scan $^
-
-main.o: main.c io.c matrix.c sequence.c misc.c errors.c help_messages.c
-	$(CC) $(CFLAGS) -c $(MATRIX_SCAN_SRC)
-
-help_messages_o: help_message.c
-	$(CC) $(CFLAGS) -c help_messages.c
-
-errors.o: errors.c
-	$(CC) $(CFLAGS) -c errors.c
-
-misc.o: misc.c
-	$(CC) $(CFLAGS) -c misc.c
-
-sequence.o: sequence.c
-	$(CC) $(CFLAGS) -c sequence.c
-
-matrix.o: matrix.c
-	$(CC) $(CFLAGS) -c matrix.c
-
-io.o: io.c
-	$(CC) $(CFLAGS) -c io.c
 
 install:
 	mv $(PROGS) $(binDir)

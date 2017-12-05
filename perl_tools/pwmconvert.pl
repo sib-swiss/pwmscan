@@ -1,8 +1,13 @@
 #!/usr/local/bin/perl -w
-# FILE: ssaconvert
-# CREATE DATE: 10/07/2013
+# FILE: pwmconvert
+# CREATE DATE: 10/07/2015
 # AUTHOR: Giovanna Ambrosini 
 #
+# Part of the code is based on an implemetation by
+# William Stafford Noble and Timothy L. Bailey
+# Created in 1999
+# ORIG: transfac2meme.pl
+
 # DESCRIPTION: Convert a SSA-formatted or plain-text PWM to an integer PWM.
 
 use List::Util qw[min max sum];
@@ -17,22 +22,18 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $b = 0;				# default total pseudocounts
 
 my $usage = "USAGE: pwmconvert [options] <matrix file>
 
   Options: 
-	   -bg <background file>	set of f_a
-	   -b <total pseudocounts>	add <b> times f_a to each freq
-					default: $b
            -c                           check format : check whether PWM scores are Real or Integer 
                                         and print out the corresponding Real/Integer flag
-           -n <scaling factor>          set scaling factor (int) for real SSA format only
-                                        default: 10000
+           -n <scaling factor>          set scaling factor (int) for real format only
+                                        If not set, the program estimates its value 
            -noheader                    write raw matrix (without header)
            -o <outfile>                 output file name
                                         default: no output file
-           -raw                         input SSA PWM matrix has only raw score columns
+           -ssa                         input PWM matrix is in SSA-like format 
 
   Convert a real or SSA-formatted Position Weight Matrix (PWM) to integer plain-text format. 
   Optionally, the program performs a check to see whether the matrix scores are Real or Integer
@@ -42,9 +43,10 @@ my $usage = "USAGE: pwmconvert [options] <matrix file>
 
 my $out_file = "";
 my $ofile = 0;
-my $inp_raw_flag = 0;
+my $inp_ssa_flag = 0;
 my $check_flag = 0;
-my $scale = 10000;
+my $scale = 1;
+my $setscale_flag = 0;
 # Process command line arguments.
 if (scalar(@ARGV) == 0) {
   printf(STDERR $usage);
@@ -55,55 +57,28 @@ my $id_list = "";
 my $header = 1;
 while (scalar(@ARGV) > 1) {
   $next_arg = shift(@ARGV);
-  if ($next_arg eq "-bg") {
-    $bg_file = shift(@ARGV);
-  } elsif ($next_arg eq "-b") {
-    $b = shift(@ARGV);
-  } elsif ($next_arg eq "-c") {
+  if ($next_arg eq "-c") {
     $check_flag = 1;
   } elsif ($next_arg eq "-n") {
     $scale = shift(@ARGV);
+    if ($scale ne "") {
+       $setscale_flag = 1; 
+    } else {
+       $scale = 1;
+    }
   } elsif ($next_arg eq "-noheader") {
     $header = 0;
   } elsif ($next_arg eq "-o") {
     $out_file = shift(@ARGV);
     $ofile = 1;
-  } elsif ($next_arg eq "-raw") {
-    $inp_raw_flag = 1;
+  } elsif ($next_arg eq "-ssa") {
+    $inp_ssa_flag = 1;
   } else {
     print(STDERR "Illegal argument ($next_arg)\n");
     exit(1);
   }
 }
 ($matrix_file) = @ARGV;
-
-# read the background file
-if (defined($bg_file)) {
-  open($bg_file, "<$bg_file") || die("Can't open $bg_file.\n");
-  $total_bg = 0;
-  while (<$bg_file>) {
-    next if (/^#/);			# skip comments
-    ($a, $f) = split;
-    if ($a eq "A" || $a eq "a") {
-      $bg{"A"} = $f; 
-      $total_bg += $f;
-    } elsif ($a eq "C" || $a eq "c") {
-      $bg{"C"} = $f; 
-      $total_bg += $f;
-    } elsif ($a eq "G" || $a eq "g") {
-      $bg{"G"} = $f; 
-      $total_bg += $f;
-    } elsif ($a eq "T" || $a eq "t") {
-      $bg{"T"} = $f; 
-      $total_bg += $f;
-    }
-  }
-  # make sure they sum to 1
-  foreach $key (keys %bg) {
-    $bg{$key} /= $total_bg;
-    #printf STDERR "$key $bg{$key}\n";
-  }
-}  # background file
 
 # Open the matrix file for reading.
 open(MF, "<$matrix_file") || die("Can't open $matrix_file.\n");
@@ -135,7 +110,7 @@ my @mat = ();
 my $k = 1;
 my $float_flag = 1;
 while ($line = <MF>) {
-  if ($inp_raw_flag) {
+  if (!$inp_ssa_flag) {
     # Matrix has only position score columns for each base
     print STDERR "RAW PWM format.\n"; 
     $i_motif = 0;
@@ -210,7 +185,7 @@ while ($line = <MF>) {
       exit (0);
     }
     # Estimate scaling factor
-    if ($float_flag) {
+    if ($float_flag and ($setscale_flag == 0)) {
       for ($k=1; $k<=$width; $k++) {
         $min=min(@{$mat[$k]});
         $tmp_max=max(@{$mat[$k]});
@@ -226,8 +201,6 @@ while ($line = <MF>) {
       } elsif ($max > 10000) {
         $scale = 1;
       }
-    } else {
-      $scale = 1;
     }
     # Convert the motif to integer scores and print it.
     $print_it = 1;
@@ -348,10 +321,23 @@ while ($line = <MF>) {
         }
         exit (0);
       }
-      if ($float_flag) {
-        $scale = 10000;
-      } else {
-        $scale = 1;
+      #print "Estimate scaling factor...\n";
+      #print "Scale = $scale\n";
+      #print "Float Flag = $float_flag\n";
+      if ($float_flag and ($setscale_flag == 0)) {
+        for ($k=1; $k<=$width; $k++) {
+          $min=min(@{$mat[$k]});
+          $tmp_max=max(@{$mat[$k]});
+          $max += $tmp_max-$min;
+        }
+        #print "MAX range : $max\n";
+        if ($max <= 50 ) {
+          $scale = 100;
+        } elsif ($max <= 1000) {
+          $scale = 10;
+        } elsif ($max > 1000) {
+          $scale = 1;
+        }
       }
       # Convert the motif to integer scores and print it.
       $print_it = 1;

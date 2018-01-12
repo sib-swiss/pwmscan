@@ -298,7 +298,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
  The pwmlib_scan script scans a genome with a collection of PWMs coming from a database.
  Accepted motif database formats are the MEME libraries as well as the motif libraries (both log-odds and letter-probability formats) provided by the PWMScan Web interface.
 
-    NOTE: The path to all the PWMScan executables and scripts is defined by the bin_dir variable and is hard-coded in all bash scripts, and is changed upon installation via the Makefile, so that all installed scripts in bin_dir have the correct binary pathname .
+    NOTE: The path to all the PWMScan binaries and scripts is defined by the bin_dir variable and is hard-coded in all bash scripts, and is changed upon installation via the Makefile, so that all installed scripts in bin_dir have the correct binary pathname .
 
 
 ------------------------------------------------------------------------------

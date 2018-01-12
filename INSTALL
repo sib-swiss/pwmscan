@@ -3,26 +3,26 @@ Program Installation
 
 For code compilation a suitable Makefile is provided.
 
-- To create the executable files, please type:
+- To create the binary files, please type:
 
 make
 
-- To install all the executables and scripts in $(binDir)=$(PWD)/bin, please type:
+- To install all the binaries and scripts in $(binDir)=$(PWD)/bin, please type:
 
 make install
 
-- To delete the compiled excutable and object files from the current directory, please type:
+- To delete the compiled binary and object files from the current directory, please type:
 
 make clean
 
-- To delete the installed excutables and scripts in $(binDir), please type:
+- To delete the installed binaries and scripts in $(binDir), please type:
 
 make cleanbin
 
 NB - The $(binDir) variable is by default set to 
      binDir = $(PWD)/bin
 
-     binDir defines the path to all executables and scripts used by PWMScan.
+     binDir defines the path to all binaries and scripts used by PWMScan.
      Make install changes the bin_dir variable of the installed bash wrapper scripts 
      (pwm_scan, pwmlib_scan, pwm_mscan_wrapper, pwm_bowtie_wrapper, and pwm_convert)
      as well as the matrix_scan_parallel.py python script to point to binDir.  

@@ -302,7 +302,7 @@ sequence files for a given assembly are stored in the corresponding sub-director
  
 More details are given in the README file in the genomedb sub-directory.
 
-NB - The path to both the PWMScan executables and scripts is defined by the bin_dir variable:
+NB - The path to both the PWMScan binaries and scripts is defined by the bin_dir variable:
 
   bin_dir=/home/local/bin
 

@@ -1,0 +1,73 @@
+GENOME ROOT DIRECTORY
+============================================================================
+This directory represents the root directory of the genome data.
+
+It hosts both the genome sequence files and the tables that are necessary to 
+convert the PWMScan output to BED format.
+
+The genome root directory includes two main sub-directory types:
+
+   /bowtie
+   /<assembly> (e.g. /hg19)
+
+The bowtie directory includes the Bowtie index files for each genome assembly.
+The assembly directory hosts the chromosome files in FASTA format for a given 
+assembly. By convention, we use UCSC assembly names (e.g. hg38, hg19, mm9, etc.).
+
+As an example, we provide the chromosome files of the human genome assembly hg19.
+These files are gzipped, to gunzip them, please do the following:
+
+   cd hg19
+   gunzip chrom*.seq.gz
+
+The original FASTA files have been downloaded from NCBI at:
+
+   https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.13/
+
+The FASTA header has been reformatted to comply to the following so-called 2-pipe rule:
+
+   >chr|NC_000001|NC_000001.10 some text on the genome assembly 
+
+by running the Perl script normHeaders in /hg19.
+
+The relevant part for most PWMScan programs and scripts is the sequence identifier:
+
+   >chr|NC_000001|NC_000001.10
+  
+which includes the chr string followed by a pipe delimiter, plus the NBI identifier
+concatenated with a second pipe, and finally the full chromosome NCBI identifier.
+
+To generate the Bowtie index file for the hg19 genome, you can proceed as follows:
+
+   cd bowtie
+   ls -1 -v ../hg19/chrom*.seq | xargs cat > h_sapiens_hg19.fa
+   bowtie-build -f h_sapiens_hg19.fa h_sapiens_hg19
+
+It is important to remark that, by convention, the Bowtie index file name starts with
+the species name (in lower case letters, e.g.: h_sapiens), followed by an underscore 
+and the UCSC assembly name (e.g. hg19).
+If one wants to change the naming convention for the Bowtie files, one has to change 
+the BOWTIEIDX tables defined in the pwm_scan and pwm_bowtie_wrapper scripts. 
+
+The genome root directory also includes assembly tables that are used to convert the
+PWMSCan output to BED format. We provide conversion tables for several common model
+organisms such as human, mouse, fruit fly, worm, zebrafish, yeast, arabidopsis, and more.
+
+For each genome assembly, we provide a table for NCBI RefSeq identifier to chromosome 
+number conversion (genomes_chr_NC_gi.tar.gz) as well as a table for FASTA sequence 
+identifier to chromosome number conversion (genomes_chr_hdr.tar.gz).
+The chr_NC_gi files have been downloaded from NCBI whereas the chr_hdr files have been 
+locally generated.
+These tables are used to convert match lists to BED format. 
+In particular, the chr_NC_gi table is used by the conversion program mscan2bed (for matrix_scan)
+whereas the chr_hdr table is used by the bowtie2bed program to convert the Bowtie output to BED.
+
+The chr_hdr table can be changed to adapt to other FASTA header format rules.
+It is important to remark that the matrix_scan program assumes by default the 2 pipe-delimited
+FASTA header format.
+This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan.
+
+To extract the assembly tables, please do the following:
+
+   tar -xvzf genomes_chr_NC_gi.tar.gz
+   tar -xvzf genomes_chr_hdr.tar.gz

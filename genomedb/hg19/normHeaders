@@ -1,0 +1,2 @@
+sed -i 's/^>gi|\([^|]*\)|ref|\([^.]*\).\([0-9]*\)| \(.*\) chromosome \([^,]*\),/>chr|\2|\2.\3 Chromosome \5; [\4] gi:\1/' chrom*.seq
+sed -i 's/^>gi|\([^|]*\)|ref|\([^.]*\).\([0-9]*\)| \(.*\) mitochondrion,/>chr|\2|\2.\3 Chromosome Mt; [\4] mitochondrion gi:\1/' chromMt.seq 

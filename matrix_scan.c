@@ -1378,9 +1378,6 @@ main(int argc, char *argv[])
   for (i = 0; i <= pwmLen; i++)
     free(pwm[i]);
   free(pwm);
-  for (i = 0; i <= pwmLen; i++)
-    free(pwm_r[i]);
-  free(pwm_r);
   /* Free word index arrays (Scores and z link arrays) */
   free(z);
   free(ScoreF);
@@ -1388,6 +1385,9 @@ main(int argc, char *argv[])
   if (!options.forward) {
     free(ScoreR);
     free(Rrv);
+    for (i = 0; i <= pwmLen; i++)
+      free(pwm_r[i]);
+    free(pwm_r);
   }
   return 0;
 }

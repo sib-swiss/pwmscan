@@ -341,6 +341,7 @@
         <br>
            <i>python /local/bin/matrix_scan_parallel.py -m chen10_ctcf.mat -f "$(ls /home/local/db/genome/hg19/chrom*.seq|grep -v chromMt)" -c 1128 -p 15 | sort -s -k1,1 -k2,2n -k6,6 | mscan2bed -s hg19 -i /home/local/db/genome | awk 'BEGIN { while((getline line &lt; "chen10_ctcf_co1128_scoretab.txt") &gt; 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' &gt; chen10_ctcf_co1128_matrix_scan.bed</i>
         <p>
+        <br>
         </p>
            </li></ul>
         
@@ -473,16 +474,14 @@
              -p  &nbsp;&nbsp;Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]<br>
              -v  &nbsp;&nbsp;Verbose mode and keep PWM tmp files<br>
         <br>
-           <font color=firebrick># Examples:</font>
+           <font color=firebrick># Example:</font>
         <br>
+           <font color=firebrick># Scan the mouse genome mm9 with the Isakova 2017 collection (lpm format):</font>
         <br>
-           <font color=firebrick># Scan the human genome hg19 with the JASPAR CORE 2018 vertebrates collection (meme format):</font>
+             <i>pwmlib_scan -l ../pwmlibs/isakova2017_mouse_matrix_probs.mat -g lpm -e 0.00001 -d /home/local/db/genome -s mm9 -p 2&gt;pwmlib_scan_log.txt | sort -s -k1,1 -k2,2n &gt; isakova2017_mouse_mm9_pwmscan.bed</i>
         <br>
-             <i>pwmlib_scan -l JASPAR_CORE_2018_vertebrates.meme -g meme -e 0.0001 -d /home/local/db/genome -s hg19 -w -p 2&gt;pwmlib_scan_log.txt &</i>
+           <font color=firebrick># On a linux multi-core platform with 48 CPU cores, the whole process takes less than a minute for scanning the entire mouse genome with a total of 13 matrices.</font>
         <br>
-           <font color=firebrick># Scan the human genome hg19 with the JASPAR CORE 2018 vertebrates collection (lpm format):</font>
-        <br>
-             <i>pwmlib_scan -l JASPAR_CORE_2018_vert_matrix_probs.mat -g lpm -e 0.0001 -d /home/local/db/genome -s hg19 -w -p 2&gt;pwmlib_scan_log.txt &</i>
         <br>
           </li></ul>
 

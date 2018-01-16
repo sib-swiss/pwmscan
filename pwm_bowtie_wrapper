@@ -18,7 +18,8 @@
 #  The <genome-root-dir> is the root directory of the genome files.
 #
 #  The program writes the output to STDOUT, unless the -w option is specified, in which
-#  case results are written to file.
+#  case results are written to file. BED filenames include the matrix name, the cut-off, 
+#  and, should it be case, the forward scanning flag (fwd).
 #
 #  The <genome-root-dir> is the root directory of the genome files.
 #  The Bowtie index files are lacated in <genome-root-dir>/bowtie.

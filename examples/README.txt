@@ -406,17 +406,13 @@ Shell (bash) Wrappers to execute the analysis pipeline
     (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>).
     Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.
 
-    # Examples:
+    # Example:
 
-    # Scan the human genome hg19 with the JASPAR CORE 2018 vertebrates collection (meme format)
+    # Scan the mouse genome mm9 with the Isakova 2017 collection (lpm format)
 
-    pwmlib_scan -l JASPAR_CORE_2018_vertebrates.meme -g meme -e 0.0001 -d /home/local/db/genome -s hg19 -w -p 2>pwmlib_scan_log.txt & 
+    pwmlib_scan -l ../pwmlibs/isakova2017_mouse_matrix_probs.mat -g lpm -e 0.00001 -d /home/local/db/genome -s mm9 -p 2>pwmlib_scan_log.txt | sort -s -k1,1 -k2,2n > isakova2017_mouse_mm9_pwmscan.bed
 
-    # Scan the human genome hg19 with the JASPAR CORE 2018 vertebrates collection (lpm format)
-
-    pwmlib_scan -l JASPAR_CORE_2018_vert_matrix_probs.mat -g lpm -e 0.0001 -d /home/local/db/genome -s hg19 -w -p 2>pwmlib_scan_log.txt & 
-
-    # On a linux multi-core platform with 48 CPU cores, the whole process takes less than an hour for scanning the entire human genome with a total of 579 matrices.
+    # On a linux multi-core platform with 48 CPU cores, the whole process takes less than a minute for scanning the entire mouse genome with a total of 13 matrices.
 
 
 Shell (bash) Wrapper for matrix conversion

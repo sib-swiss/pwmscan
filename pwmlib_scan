@@ -38,7 +38,8 @@
 #  The variable bin_dir is set to /home/local/bin
 #
 #  The program writes the output to STDOUT, unless the -w option is specified, in which
-#  case results are written to file.
+#  case results are written to file. BED filenames include the matrix name, the cut-off, 
+#  and, should it be case, the forward scanning flag (fwd).
 #
 
 E_BADARGS=85   # Wrong number of arguments passed to the script.
@@ -201,12 +202,12 @@ fi
 
 if [ "$pwm_format" = "logodds" ]
 then
-  less $pwmlib_file | perl -ane 'chomp; if (/^>log-odds matrix (\S+)\s(\S+):/) {$header=$_; $id=$1; $name=$2; $FNAME=$id."_".$name; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
+  less $pwmlib_file | perl -ane 'chomp; if (/^>log-odds matrix (.*):/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
 fi
 
 if [ "$pwm_format" = "lpm" ]
 then
-  less $pwmlib_file | perl -ane 'chomp; if (/^>letter-probability matrix (\S+)\s(\S+):/) {$header=$_; $id=$1; $name=$2; $FNAME=$id."_".$name; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
+  less $pwmlib_file | perl -ane 'chomp; if (/^>letter-probability matrix (.*):/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
 fi
 
 # Loop on PWM files

@@ -39,7 +39,8 @@
 #  The variable bin_dir is set to /home/local/bin
 #
 #  The program writes the output to STDOUT, unless the -w option is specified, in which
-#  case results are written to file.
+#  case results are written to file. BED filenames include the matrix name, the cut-off, 
+#  and, should it be case, the forward scanning flag (fwd).
 #
 #  05.12.2017  Giovanna Ambrosini
 #              Optimize PWMscan pipeline

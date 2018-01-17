@@ -248,7 +248,7 @@ echo "PWM length: $matrix_len" >&2
 echo "PWM file length : $file_len lines" >&2
 
 echo "========               Calculating PWM score               ========" >&2
-matrix_score=$(matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
+matrix_score=$($bin_dir/matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
 	| grep SCORE | sed 's/:/\ /'\
 	| awk -F " " '{print $2}')
 
@@ -269,7 +269,7 @@ fi
 echo "========               Generating PWM score distribution   ========" >&2
 # Generate the Matrix Score Cumulative Table
 pwmScore_tab=${matrix_name}_co${matrix_score}_scoretab.txt
-matrix_prob --bg "$bg_freq" $matrix_file 2>/dev/null > $pwmScore_tab
+$bin_dir/matrix_prob --bg "$bg_freq" $matrix_file 2>/dev/null > $pwmScore_tab
 
 echo "PWM distribution score: $pwmScore_tab" >&2
 

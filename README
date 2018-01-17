@@ -206,7 +206,7 @@ The chr_hdr table can be changed to adapt to other FASTA header format conventio
 It is important to remark that the matrix_scan program assumes by default the 2 pipe-delimited FASTA header rule.
 This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan.
 
-The genome tables can be found in the genomedb sub-directory together with the chromosome sequence files.
+The genome tables can be found in the genomedb sub-directory together with the chromosome sequence files for hg19.
   
 Here is an example for the hg19 assembly:
 

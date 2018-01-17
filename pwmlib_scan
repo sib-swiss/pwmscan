@@ -223,9 +223,9 @@ for f in *mat.tmp; do
       if [ $verbose == 1 ]; then
         echo "New PWM file: $f""2" >&2
         echo "Scanning the $assembly genome with $f""2" >&2
-        echo "Command: pwm_scan -m $f""2 -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
+        echo "Command: $bin_dir/pwm_scan -m $f""2 -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
       fi
-      pwm_scan -m $f"2" -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags 
+      $bin_dir/pwm_scan -m $f"2" -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags 
       if [ $verbose == 0 ]
       then
         rm $f"2"
@@ -234,9 +234,9 @@ for f in *mat.tmp; do
       if [ $verbose == 1 ]
       then
         echo "Scanning the $assembly genome with $f" >&2
-        echo "Command: pwm_scan -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
+        echo "Command: $bin_dir/pwm_scan -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
       fi
-      pwm_scan -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags
+      $bin_dir/pwm_scan -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags
   fi
   if [ $verbose == 0 ]
   then

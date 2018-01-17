@@ -8,6 +8,7 @@ CFLAGS = -O3 -std=gnu99 -W -Wall -pedantic
 CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall
 
 binDir = $(PWD)/bin
+genomeDir = $(PWD)/genomedb
 
 PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob
 SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwmlib_scan pwm_bowtie_wrapper pwm_mscan_wrapper pwm_convert python_tools/matrix_scan_parallel.py python 
@@ -49,19 +50,22 @@ matrix_prob : $(MATRIX_PROB_SRC)
 matrix_scan : $(MATRIX_SCAN_SRC)
 	$(CC) $(CFLAGS) -o matrix_scan $^
 
-install:
+install : $(PROGS) $(SCRIPTS)
 	mv $(PROGS) $(binDir)
 	cp -pr $(SCRIPTS) $(binDir)
-	sed -i 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan
-	sed -i 's@/home/local/bin@$(binDir)@g' $(binDir)/pwmlib_scan
-	sed -i 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_mscan_wrapper
-	sed -i 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_bowtie_wrapper
-	sed -i 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_convert
-	sed -i 's@/home/local/bin@$(binDir)@g' $(binDir)/matrix_scan_parallel.py
-	sed -i 's@/home/local@$(binDir)@g' $(binDir)/matrix_scan_parallel.py
+	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan
+	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwmlib_scan
+	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_mscan_wrapper
+	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_bowtie_wrapper
+	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_convert
+	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/matrix_scan_parallel.py
+	sed -i -e 's@/home/local@$(binDir)@g' $(binDir)/matrix_scan_parallel.py
+
+install-genome :
+	gunzip $(genomeDir)/hg19/chrom*.seq.gz
 
 clean :
-	rm -rf $(OBJS) $(MATRIX_SCAN_OBJS) $(PROGS)
+	rm -rf $(OBJS) $(PROGS)
 
 cleanbin :
 	rm -rf $(binDir)/mba $(binDir)/bowtie2bed $(binDir)/filterOverlaps \

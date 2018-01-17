@@ -27,6 +27,10 @@ NB - The $(binDir) variable is by default set to
      (pwm_scan, pwmlib_scan, pwm_mscan_wrapper, pwm_bowtie_wrapper, and pwm_convert)
      as well as the matrix_scan_parallel.py python script to point to binDir.  
 
+- To unzip the genome files in $(PWD)/genomedb (the genome root directory) for assembly hg19:
+
+make install-genome
+
 
 Genome Files
 ============================================================================
@@ -36,6 +40,10 @@ and they are named chrom*.seq.
 Their header is reformatted in order to comply to the following convention:
 
 >chr|NC_000001|NC_000001.10 some text
+
+The chromosome FASTA files for the human genome assembly hg19 can be found in:
+
+    $(PWD)/genomedb/hg19
 
 Bowtie index files are generated from the chromosome sequence files using the
 bowtie-build command.

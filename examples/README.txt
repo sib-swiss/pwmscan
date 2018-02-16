@@ -317,12 +317,13 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwm_bowtie_wrapper -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.5
+    - version 1.1.6
     where options are:
-         -f  Scan sequences in forward direction [def=bidirectional]
-         -o  Allow for overlapping matches [def=non-overlapping matches]
-         -w  Write output to file [def=STDOUT]
-         -p  Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
+         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
+                        [def=predefined for some common genome assemblies, else set to uniform]
+         -f             Scan sequences in forward direction [def=bidirectional]
+         -o             Allow for overlapping matches [def=non-overlapping matches]
+         -w             Write output to file [def=STDOUT]
 
     # Example:
 
@@ -336,12 +337,14 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwm_mscan_wrapper -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.5
+    - version 1.1.6
     where options are:
-         -f  Scan sequences in forward direction [def=bidirectional]
-         -o  Allow for overlapping matches [def=non-overlapping matches]
-         -w  Write output to file [def=STDOUT]
-         -p  Distribute matrix_scan on multiple cores [def=non-parallel processing]
+         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
+                        [def=predefined for some common genome assemblies, else set to uniform]
+         -f             Scan sequences in forward direction [def=bidirectional]
+         -o             Allow for overlapping matches [def=non-overlapping matches]
+         -w             Write output to file [def=STDOUT]
+         -p             Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
 
     # Example:
 
@@ -355,12 +358,14 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwm_scan -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.5
+    - version 1.1.6
     where options are:
-         -f  Scan sequences in forward direction [def=bidirectional]
-         -o  Allow for overlapping matches [def=non-overlapping matches]
-         -w  Write output to file [def=STDOUT]
-         -p  Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
+         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
+                        [def=predefined for some common genome assemblies, else set to uniform]
+         -f             Scan sequences in forward direction [def=bidirectional]
+         -o             Allow for overlapping matches [def=non-overlapping matches]
+         -w             Write output to file [def=STDOUT]
+         -p             Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
 
     # Examples:
 
@@ -393,14 +398,16 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwmlib_scan -l <pwmlib-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.5
+    - version 1.1.6
     where options are:
-         -g  PWM format. Accepted formats are : meme, logodds [def], and lpm
-         -f  Scan sequences in forward direction [def=bidirectional]
-         -o  Allow for overlapping matches [def=non-overlapping matches]
-         -w  Write output to file [def=STDOUT]
-         -p  Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
-         -v  Verbose mode and keep PWM tmp files
+         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
+                        [def=predefined for some common genome assemblies, else set to uniform]
+         -g             PWM format [def=logodds]. Accepted formats are : meme, logodds, and lpm
+         -f             Scan sequences in forward direction [def=bidirectional]
+         -o             Allow for overlapping matches [def=non-overlapping matches]
+         -w             Write output to file [def=STDOUT]
+         -p             Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
+         -v             Verbose mode and keep PWM tmp files
 
     Scan a genome assembly with a PWM collection. Accepeted PWM library formats are the MEME format
     (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>).
@@ -461,6 +468,56 @@ Shell (bash) Wrapper for matrix conversion
 ------------------------------------------------------------------------------
 
 
+How to compute the background base composition of a set of DNA sequences
+==============================================================================
+
+    The program seq_extract_bcomp can be used to extract BED regions from a set of FASTA-formatted sequences or, optionally, compute the base composition of a set of DNA sequences. When computing the base composition, the seq_extract_bcomp program can either extract BED-defined regions or use the FASTA input as a whole (if the BED file is not given).
+
+    # Usage: seq_extract_bcomp [options] [-f <bed_file>] [-s <species>] [<] [<fasta_file>|stdin]
+
+      where options are:
+        -d          Print debug information
+        -h          Show this help text
+        -c          Compute base composition [def=on forward strand]
+        -b          Compute base composition on both strand [-c is required]
+        -r          Compute base composition on reverse strand [-c is required]
+        -i <int>    AC index (after how many pipes |) for FASTA header [2]
+        -p <path>   Use <path> to locate the chr_NC_gi file [if BED file is given]
+                    [default is: $HOME/db/genome]
+
+	Extract BED regions from a set of FASTA-formatted sequences.
+	The extracted sequences are written to standard output.
+	Optionally (-c), the program computes and only outputs the base composition,
+	in which case sequences can be extracted directly from the FASTA input or,
+	as for the extraction mode, specified in a BED file. If the BED file is not
+	given, the <species> argument is not required. If base composition mode is set
+	(-c option), the program can optionally compute it on both strands (-b option)
+	for strand-symmetric base composition or on the reverse strand only (-r).
+
+    Here are a few examples of use.
+
+    # Extract STAT1 peak regions (16158 peaks) defined in the BED file Encode_Helas3Stat1_peaks.bed from the human assembly hg19
+
+      cat ../genomedb/hg19/chrom[^Mt]*.seq | seq_extract_bcomp -f Encode_Helas3Stat1_peaks.bed -s hg19 > seq_extract_stat1_peaks.fa
+  
+    # This command takes about 20 seconds.
+
+    # Compute the base composition of the STAT1 peak regions on the forward strand
+
+      seq_extract_bcomp -c seq_extract_stat1_peaks.fa 
+
+      Total Sequence length: 4863558
+      0.2445,0.2547,0.2544,0.2464
+ 
+    # Compute the base composition of the STAT1 peak regions on both strands
+  
+      seq_extract_bcomp -cb seq_extract_stat1_peaks.fa
+
+      Total Sequence length: 4863558
+      0.24,0.26,0.26,0.24
+------------------------------------------------------------------------------
+
+
 How to build Bowtie index files
 ==============================================================================
 
@@ -469,6 +526,10 @@ How to build Bowtie index files
     Go to the BOWTIE_DIR directory, and concatenate all chromosome files into a sequence file that includes the entire hg19 genome assembly:
       
       ls -1 -v ASSEMBLY_DIR/chrom*.seq | xargs cat > h_sapiens_hg19.fa
+
+    Example:
+
+      ls -1 -v ../genomedb/hg19/chrom*.seq | xargs cat > h_sapiens_hg19.fa
 
     You then execute the following command:
 

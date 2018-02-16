@@ -44,7 +44,7 @@
 /*#define BUF_SIZE 4096 */
 #define BUF_SIZE 8192
 #define LINE_SIZE 1024
-#define SEQ_ID  18
+#define SEQ_ID  256
 #define POS_MAX 16
 #define SCORE_MAX 12
 #define TAG_MAX 128
@@ -303,7 +303,7 @@ process_bed(FILE *input, char *iFile)
     	exit(1);
       }
     }
-    /* Check Chromosome BEGINNING, process previous chromosomal region and printout results*/
+    /* Check Chromosome/Sequence BEGINNING, process previous chromosomal region and printout results*/
     if (strcmp(seq_id, seq_id_prev) != 0) {
       filter_regions((int)k); 
       strcpy(seq_id_prev, seq_id);
@@ -319,7 +319,7 @@ process_bed(FILE *input, char *iFile)
     bed_reg.pflag[k] = 1;
     k++;
   } /* End of While */
-  /* Filter overlapping regions for last chromosome */ 
+  /* Filter overlapping regions for last chromosome/sequence */ 
   filter_regions((int)k); 
   if (input != stdin) {
     fclose(input);
@@ -360,8 +360,8 @@ main(int argc, char *argv[])
 	     "  \t\t -d     Produce debug information and check BED file\n"
 	     "  \t\t -h     Show this help text\n"
 	     "  \t\t -l     BED Region length (default is %d)\n"
-	     "\n\tFilters out overlapping matches or regions represented in BED format.\n"
-	     "\n\tIf BED region are fixed size, their length must be set via the -l <len> option.\n"
+	     "\n\tFilters out overlapping matches or regions represented in BED or BED-like format.\n"
+	     "\n\tIf regions are of fixed size, their length must be set via the -l <len> option.\n"
 	     "\tThe BED input file MUST BE sorted by sequence name (or chromosome id), position, and strand.\n"
 	     "\tOne should check the input BED file with the following command:\n"
 	     "\tsort -s -c -k1,1 -k2,2n -k6,6 <BED file>.\n\n"

@@ -10,7 +10,7 @@ CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall
 binDir = $(PWD)/bin
 genomeDir = $(PWD)/genomedb
 
-PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob
+PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp
 SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwmlib_scan pwm_bowtie_wrapper pwm_mscan_wrapper pwm_convert python_tools/matrix_scan_parallel.py python 
 
 OBJS = hashtable.o
@@ -19,9 +19,11 @@ all :  $(PROGS)
 
 MBA_SRC = mba.c
 MATRIX_PROB_SRC = matrix_prob.c
+MATRIX_SCAN_SRC = matrix_scan.c
 BOWTIE2BED_SRC = bowtie2bed.c
 MSCAN2BED_SRC = mscan2bed.c
 MSCAN_BED2SGA_SRC = mscan_bed2sga.c
+SEQ_EXTRACT_BCOMP_SRC = seq_extract_bcomp.c
 FILTEROVERLAPS_SRC = filterOverlaps.c
 
 MATRIX_SCAN_SRC =  matrix_scan.c
@@ -50,6 +52,9 @@ matrix_prob : $(MATRIX_PROB_SRC)
 matrix_scan : $(MATRIX_SCAN_SRC)
 	$(CC) $(CFLAGS) -o matrix_scan $^
 
+seq_extract_bcomp : $(SEQ_EXTRACT_BCOMP_SRC) $(OBJS)
+	$(CC) $(CFLAGS) -o seq_extract_bcomp $^
+
 install : $(PROGS) $(SCRIPTS)
 	mv $(PROGS) $(binDir)
 	cp -pr $(SCRIPTS) $(binDir)
@@ -68,8 +73,8 @@ clean :
 	rm -rf $(OBJS) $(PROGS)
 
 cleanbin :
-	rm -rf $(binDir)/mba $(binDir)/bowtie2bed $(binDir)/filterOverlaps \
-	$(binDir)/mscan2bed $(binDir)/mscan_bed2sga $(binDir)/matrix_scan $(binDir)/matrix_prob \
+	rm -rf $(binDir)/mba $(binDir)/bowtie2bed $(binDir)/filterOverlaps $(binDir)/mscan2bed \
+	$(binDir)/mscan_bed2sga $(binDir)/matrix_scan $(binDir)/matrix_prob $(binDir)/seq_extract_bcomp \
 	$(binDir)/pwm_scan $(binDir)/pwmlib_scan $(binDir)/pwm_mscan_wrapper \
 	$(binDir)/pwm_bowtie_wrapper $(binDir)/pwm_convert $(binDir)/matrix_scan_parallel.py \
 	$(binDir)/python $(binDir)/jasparconvert.pl $(binDir)/lpmconvert.pl $(binDir)/pfmconvert.pl \

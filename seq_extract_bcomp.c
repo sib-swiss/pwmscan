@@ -124,20 +124,22 @@ process_ac()
   int cLen;
 
   if (options.dbPath != NULL) {
-      cLen = (int)strlen(options.dbPath) + 12;
+      cLen = (int)strlen(options.dbPath) + strlen(Species) + 12;
       if ((chrFile = (char*)malloc(cLen * sizeof(char))) == NULL) {
         perror("process_ac: malloc");
         exit(1);
       }
       strcpy(chrFile, options.dbPath);
   } else {
-      cLen = 21 + 12;
+      cLen = 21 + strlen(Species) + 12;
       if ((chrFile = (char*)malloc(cLen * sizeof(char))) == NULL) {
         perror("process_ac: malloc");
         exit(1);
       }
       strcpy(chrFile, "/home/local/db/genome");
   }
+  strcat(chrFile, "/");
+  strcat(chrFile, Species);
   strcat(chrFile, "/chr_NC_gi");
 
   input = fopen(chrFile, "r");
@@ -777,7 +779,7 @@ compute_bcomp_r(FILE *input, const char *iFile)
   char *chr_nb;
   int ac_len;
   int chr;
-  unsigned int bcomp[5];
+  unsigned int bcomp[5] = {0, 0, 0, 0, 0};
   unsigned long tot_len = 0;
 
   if (input == NULL) {
@@ -958,7 +960,7 @@ compute_bcomp(FILE *input, const char *iFile)
   char *chr_nb;
   int ac_len;
   int chr;
-  unsigned int bcomp[5];
+  unsigned int bcomp[5] = {0, 0, 0, 0, 0};
   unsigned long tot_len = 0;
 
   if (input == NULL) {
@@ -1122,7 +1124,7 @@ compute_bcomp(FILE *input, const char *iFile)
   //printf("A:%d , C:%d , G:%d , T:%d , N:%d\n", bcomp[0], bcomp[1], bcomp[2], bcomp[3], bcomp[4]);
   fprintf(stderr, "Total Sequence length: %lu\n", tot_len);
   if (options.both) {
-    double bcomp_at = (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len);;
+    double bcomp_at = (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len);
     double bcomp_cg = (double) 0.5 - bcomp_at;
     printf("%.2f,%.2f,%.2f,%.2f\n", bcomp_at, bcomp_cg, bcomp_cg, bcomp_at); 
   } else {

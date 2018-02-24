@@ -66,6 +66,7 @@ The chr_hdr table can be changed to adapt to other FASTA header format rules.
 It is important to remark that the matrix_scan program assumes by default the 2 pipe-delimited
 FASTA header format.
 This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan.
+One can use the -n 0 option, if the FASTA header has no pipe.
 
 To extract the assembly tables, please do the following:
 

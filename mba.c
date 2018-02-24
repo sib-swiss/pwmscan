@@ -330,6 +330,10 @@ read_profile(char *iFile)
       mval[i++] = *buf++;
     }
     mval[i] = 0;
+    if (strlen(mval) == 0) {
+      fprintf(stderr, "Matrix value for colum 1 (row %d) is missing, please check the matrix format (it should be Integer)\n", l);
+      return(-1);
+    }
     profile[l][0] = atoi(mval);
     while (isspace(*buf))
       buf++;
@@ -343,6 +347,10 @@ read_profile(char *iFile)
       mval[i++] = *buf++;
     }
     mval[i] = 0;
+    if (strlen(mval) == 0) {
+      fprintf(stderr, "Matrix value for colum 2 (row %d) is missing, please check the matrix format (it should be Integer)\n", l);
+      return(-1);
+    }
     profile[l][1] = atoi(mval);
     while (isspace(*buf))
       buf++;
@@ -356,6 +364,10 @@ read_profile(char *iFile)
       mval[i++] = *buf++;
     }
     mval[i] = 0;
+    if (strlen(mval) == 0) {
+      fprintf(stderr, "Matrix value for colum 3 (row %d) is missing, please check the matrix format (it should be Integer)\n", l);
+      return(-1);
+    }
     profile[l][2] = atoi(mval);
     while (isspace(*buf))
       buf++;
@@ -369,6 +381,10 @@ read_profile(char *iFile)
      mval[i++] = *buf++;
     }
     mval[i] = 0;
+    if (strlen(mval) == 0) {
+      fprintf(stderr, "Matrix value for colum (row %d) 4 is missing, please check the matrix format (it should be Integer)\n", l);
+      return(-1);
+    }
     profile[l][3] = atoi(mval);
 #ifdef DEBUG
     fprintf(stderr, "%3d   %7d   %7d   %7d   %7d\n", l, profile[l][0], profile[l][1], profile[l][2], profile[l][3]);

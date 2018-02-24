@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 # FILE: transfaconvert
 # CREATE DATE: 8/31/2013
 # AUTHOR: Giovanna Ambrosini 
@@ -27,7 +27,7 @@ my $c = 0;				# default total pseudocounts
 my $logscl = 100;
 my $minscore = -10000;
 
-my $usage = "USAGE: transfaconvert [options] <matrix file>
+my $usage = "USAGE: transfaconvert.pl [options] <matrix file>
 
   Options: -species <name>
            -skip <transfac ID> (may be repeated)

@@ -64,7 +64,7 @@ bg_freq=""
 display_usage() {
       echo "Usage:"
       echo    "    pwmlib_scan -l <pwmlib> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]"
-      echo    "    - version 1.1.6"
+      echo    "    - version 1.1.7"
       echo    "    where options are:"
       echo    "         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29"
       echo    "                        [def=predefined for some common genome assemblies, else set to uniform]"
@@ -233,13 +233,13 @@ for f in *mat.tmp; do
   fi
   if [[ "$pwm_format" = "meme" || "$pwm_format" = "lpm" ]]
     then
-      lpmconvert.pl -o $f"2" $f 1>/dev/null 2>/dev/null
+      $bin_dir/lpmconvert.pl -o $f"2" $f 1>/dev/null 2>/dev/null
       if [ $verbose == 1 ]; then
         echo "New PWM file: $f""2" >&2
         echo "Scanning the $assembly genome with $f""2" >&2
-        echo "Command: $bin_dir/pwm_scan $bg_comp -m $f""2 -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
+        echo "Command: bash $bin_dir/pwm_scan $bg_comp -m $f""2 -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
       fi
-      $bin_dir/pwm_scan $bg_comp -m $f"2" -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags 
+      bash $bin_dir/pwm_scan $bg_comp -m $f"2" -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags 
       if [ $verbose == 0 ]
       then
         rm $f"2"
@@ -248,9 +248,9 @@ for f in *mat.tmp; do
       if [ $verbose == 1 ]
       then
         echo "Scanning the $assembly genome with $f" >&2
-        echo "Command: $bin_dir/pwm_scan $bg_comp -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
+        echo "Command: bash $bin_dir/pwm_scan $bg_comp -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
       fi
-      $bin_dir/pwm_scan $bg_comp -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags
+      bash $bin_dir/pwm_scan $bg_comp -m $f -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags
   fi
   if [ $verbose == 0 ]
   then

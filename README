@@ -144,6 +144,8 @@ Matrix format conversion utilities are the following:
 
   - pfmconvert.pl         Convert a Position Frequency Matrix (PFM) file into either a PWM or a LPM. 
 
+  - pwm2lpmconvert.pl     Convert a Position Weight Matrix (PWM) to letter probability format (LPM).
+
 The jasparconvert.pl and transfaconvert.pl scripts are based on an original implementation
 by William Stafford Noble and Timothy L. Bailey (1999) for MEME (http://meme-suite.org/).
 
@@ -165,7 +167,8 @@ The PWMScan library collections are available at FTP Site: ftp://ccg.vital-it.ch
 As an example, you find the JASPAR CORE 2018 Collection for vertebrates in the pwmlibs sub-directory,
 provided in the three supported formats: meme, log-odds, and letter probability.
 
-Please, refer to the README files in the examples sub-directory for more details on the wrapper scripts.
+Please, refer to the README files in the examples sub-directory for more details on how to use 
+the programs as well as the wrapper scripts.
 
 For matrix conversion into integer log-odds, we also provide the following bash script:
 
@@ -284,10 +287,9 @@ To check the content, do the following:
   tar -tvzf genomes_chr_NC_gi.tar.gz
   tar -tvzf genomes_chr_hdr.tar.gz
 
-To extract the files, choose a convenient directory (genome_root_dir), and execute the following commands:
+To extract the files, execute the following commands:
 
-  cp genomes_chr_NC_gi.tar.gz genomes_chr_hdr.tar.gz genome_root_dir/
-  cd genome_root_dir
+  cd genomedb
   tar -xvzf genomes_chr_NC_gi.tar.gz
   tar -xvzf genomes_chr_hdr.tar.gz
 
@@ -297,7 +299,12 @@ The default genome root location (variable genome_root_dir) for conversion progr
 
 which corresponds to the root directory of the entire genome assembly data.
 
-This can be changed via the command line option -d <genome-root-dir> in all three PWMScan shell 
+When the PWMScan package is installed, the genome files for hg19 are in the genomedb sub-directory, which is the
+genome root directory used by our application examples:
+
+  genome_root_dir=genomedb 
+
+The genome root directory can be changed via the command line option -d <genome-root-dir> in all three PWMScan bash 
 wrapper scripts (pwm_scan, pwm_mscan_wrapper, and pwm_bowtie_wrapper).
 
 By convention, the Bowtie index files are located in the bowtie sub-directory, whereas the chromosome
@@ -315,6 +322,9 @@ NB - The path to both the PWMScan binaries and scripts is defined by the bin_dir
 This variable is hard-coded in the original bash wrapper scripts, and is changed upon installation
 via the Makefile, so that all installed scripts in bin_dir have the correct binary pathname.
 
+When the PWMScan package is installed, the binary directory for the PWMScan-specific programs is defined as:
+
+  bin_dir=bin
 
 
 PWMScan pipeline and application examples
@@ -331,7 +341,7 @@ Given a PWM and a p-value, the PWMScan pipeline includes the following steps:
 In the examples sub-directory, we describe some application examples exploiting both methods, and
 provide detailed step-by-step instructions on how to execute the PWMScan pipeline (examples/README.txt).
 
-The README file is also available in both text and html format at:
+The README file is available in both text and html format at:
 
   http://ccg.vital-it.ch/pwmtools/README.txt
   http://ccg.vital-it.ch/pwmtools/README.html

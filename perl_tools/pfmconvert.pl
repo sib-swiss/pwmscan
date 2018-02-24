@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 # FILE: pfmconvert
 # CREATE DATE: 3/07/2014
 # AUTHOR: Giovanna Ambrosini 
@@ -27,7 +27,7 @@ my $c = 0;				# default pseudocount fraction
 my $logscl = 100;
 my $minscore = -10000;
 
-my $usage = "USAGE: pfmconvert [options] <matrix file>
+my $usage = "USAGE: pfmconvert.pl [options] <matrix file>
 
   Options: 
 	   -bg <background file>	set of f_a

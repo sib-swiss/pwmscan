@@ -209,14 +209,14 @@ process_ac()
   int cLen;
 
   if (options.db) {
-      cLen = strlen(options.dbPath) + strlen(Species) + 10;
+      cLen = strlen(options.dbPath) + strlen(Species) + 12;
       if ((chrFile = malloc(cLen * sizeof(char))) == NULL) {
         perror("process_ac: malloc");
         exit(1);
       }
       strcpy(chrFile, options.dbPath);
   } else {
-      cLen = 21 + strlen(Species) + 10;
+      cLen = 21 + strlen(Species) + 12;
       if ((chrFile = malloc(cLen * sizeof(char))) == NULL) {
         perror("process_ac: malloc");
         exit(1);

@@ -62,4 +62,4 @@ For Bowtie, refer to the following link:
 
   - bowtie           http://bowtie-bio.sourceforge.net/index.shtml
 
-The Bowtie excutables have to be installed in the $(binDir) directory.
+The Bowtie binaries are installed system-wide.

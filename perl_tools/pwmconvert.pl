@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 # FILE: pwmconvert
 # CREATE DATE: 10/07/2015
 # AUTHOR: Giovanna Ambrosini 
@@ -17,13 +17,8 @@ use Math::Round;
 # Set up global variables. Assume uniform.
 my @bases = ("A", "C", "G", "T");
 my $num_bases = 4;
-my %bg = ();
-$bg{"A"} = 0.25;
-$bg{"C"} = 0.25;
-$bg{"G"} = 0.25;
-$bg{"T"} = 0.25;
 
-my $usage = "USAGE: pwmconvert [options] <matrix file>
+my $usage = "USAGE: pwmconvert.pl [options] <matrix file>
 
   Options: 
            -c                           check format : check whether PWM scores are Real or Integer 
@@ -87,11 +82,9 @@ if ($ofile) {
   open(OF, ">$out_file") || die("Can't open $out_file.\n");
 }
 
-# Print the MEME header.
+# Print the MEME-like header.
 print("ALPHABET= ACGT\n\n");
 print("strands: + -\n\n");
-print("Background letter frequencies (from dataset with add-one prior applied):\n");
-printf("A %f C %f G %f T %f\n\n",  $bg{"A"}, $bg{"C"}, $bg{"G"}, $bg{"T"});
 
 # Read the input file.
 $num_motifs = 0;

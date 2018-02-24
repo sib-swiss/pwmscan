@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 # FILE: jasparconvert
 # CREATE DATE: 8/27/2013
 # AUTHOR: Giovanna Ambrosini 
@@ -26,7 +26,7 @@ my $c = 0;				# default pseudocount fraction
 my $logscl = 100;
 my $minscore = -10000;
 
-my $usage = "USAGE: jasparconvert [options] <matrix file>
+my $usage = "USAGE: jasparconvert.pl [options] <matrix file>
 
   Options: -species <name>              not used yet
 	   -bg <background file>	set of f_a

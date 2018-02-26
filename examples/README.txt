@@ -125,7 +125,7 @@ The genome root directory can be changed via the command line option -d <genome-
 
 The PWM for the CTCF transcription factor that will be used in our example is the chen10_ctcf.mat file in the examples sub-directory. 
 
-At installation, all PWMScan-specific binary files are located in the bin sub-directory, so we define:
+Upon installation, all PWMScan-specific binary files are located in the bin sub-directory, so we define:
 
   bin_dir=../bin
 

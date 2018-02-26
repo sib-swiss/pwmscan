@@ -134,6 +134,11 @@
             M       chr|NC_012920|NC_012920.1       hg19
         </pre>
         
+        <p class="tab">
+      Note that the second field of the <i><font color=blue>chr_hdr</font></i> file corresponds to the chromosome sequence identifier in the FASTA files. Given that the Bowtie indices are generated starting from the chromosome FASTA files, the Bowtie output will include the sequence identifier as specified in the second field of the <i><font color=blue>chr_hdr</font></i> file. To convert to BED format, which uses chromosome numbers, programs such as <i><font color=blue>bowtie2bed</font></i> need to read the <i><font color=blue>chr_hdr </font></i> table.
+        <p class="tab">
+        If Bowtie indices are generated from chromosome FASTA files with different headers (or sequence identifiers), the second field of the <i><font color=blue>chr_hdr</font></i> table has to be changed accordingly.
+
         <h4> 
             <p class="tab">
                 Files and paths
@@ -166,10 +171,7 @@
         <p class="tab">
             <font color=blue>genome_root_dir=<i>../genomedb</i></font><br>
         <p class="tab">
-            which corresponds to the root directory of the entire genome assembly data.<br>
-            The genome root directory used for the following case-studies is the <font color=blue><i>genomedb</i></font> sub-directory, so we define:<br>
-        <p class="tab">
-            <font color=blue>genome_root_dir=<i>../genomedb</i></font><br>
+            which corresponds to the root directory of the entire genome assembly data, and is the genome directory used for the following application examples..<br>
         <p class="tab">
             The genome root directory can be changed via the command option -d  <font color=firebrick>&lt;genome-root-dir&gt;</font> in all bash wrapper scripts (as described below).<br>
         <p class="tab">
@@ -385,7 +387,7 @@ At installation, all PWMScan-specific binary files are located in the bin sub-di
          <li><font color=firebrick><b>1) Bowtie (pwm_bowtie_wrapper)</b> script</font>
         <p class="code">
            # Usage: <br>pwm_bowtie_wrapper -m &lt;matrix-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
-        - version 1.1.7<br>
+        - version 1.1.6<br>
         where options are:<br>
              -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
@@ -410,7 +412,7 @@ At installation, all PWMScan-specific binary files are located in the bin sub-di
         </li><li><font color=firebrick><b>2) Matrix Scan (pwm_mscan_wrapper)</b> script</font>
         <p class="code">
            # Usage:<br> pwm_mscan_wrapper -m &lt;matrix-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
-        - version 1.1.7<br>
+        - version 1.1.6<br>
         where options are:<br>
              -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
@@ -436,7 +438,7 @@ At installation, all PWMScan-specific binary files are located in the bin sub-di
         </li><li><font color=firebrick><b>3) PWM Scan (pwm_scan)</b> script</font>
         <p class="code">
            # Usage:<br> pwm_scan -m &lt;matrix-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
-        - version 1.1.7<br>
+        - version 1.1.6<br>
         where options are:<br>
              -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
@@ -478,7 +480,7 @@ At installation, all PWMScan-specific binary files are located in the bin sub-di
         </li><li><font color=firebrick><b>4) PWMlib Scan (pwmlib_scan)</b> script</font>
         <p class="code">
            # Usage:<br> pwmlib_scan -l &lt;pwmlib-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
-        - version 1.1.7<br>
+        - version 1.1.6<br>
         where options are:<br>
              -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
@@ -552,7 +554,7 @@ At installation, all PWMScan-specific binary files are located in the bin sub-di
 
         <font color=firebrick># Convert PFM (Position Frequency Matrix) to log-odds:</font>
         <br>
-             <i>bash ../bin/pwm_convert pwm_convert stat1_pfm.mat -f=pfm 2&gt;/dev/null</i><br>
+             <i>bash ../bin/pwm_convert stat1_pfm.mat -f=pfm 2&gt;/dev/null</i><br>
         <br>
         </ul>
 

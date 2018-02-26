@@ -95,6 +95,11 @@ X       chr|NC_000023|NC_000023.10      hg19
 Y       chr|NC_000024|NC_000024.9       hg19
 M       chr|NC_012920|NC_012920.1       hg19
 
+
+ Note that the second field of the chr_hdr file corresponds to the chromosome sequence identifier in the FASTA files. Given that the Bowtie indices are generated starting from the chromosome FASTA files, the Bowtie output will include the sequence identifier as specified in the second field of the chr_hdr file. To convert to BED format, which uses chromosome numbers, programs such as bowtie2bed need to read the chr_hdr table.
+ If Bowtie indices are generated from chromosome FASTA files with different headers (or sequence identifiers), the second field of the chr_hdr table has to be changed accordingly.
+
+
 Files and paths
 -----------------------------------------------
  The tar files genomes_chr_NC_gi.tar.gz and genomes_chr_hdr.tar.gz include a list of chr_NC_gi and chr_hdr tables for several common model organisms such as human, mouse, fruit fly, worm, zebrafish, yeast, and more. As mentioned above, this tables are used to convert match lists to BED format.
@@ -112,13 +117,9 @@ To extract the files, execute the following commands:
 
 The default genome root location (variable genome_root_dir) for conversion programs and scripts is the following:
 
-  genome_root_dir=/home/local/db/genome
-
-which corresponds to the root directory of the entire genome assembly data.
-
-The genome root directory used for the following case-studies is the genomedb sub-directory, so we define:
-
   genome_root_dir=../genomedb
+
+which corresponds to the root directory of the genome assembly data, and is the genome directory used for the following application examples.
 
 The genome root directory can be changed via the command line option -d <genome-root-dir> in all bash wrapper scripts (as described below). 
 
@@ -312,7 +313,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwm_bowtie_wrapper -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.7
+    - version 1.1.6
     where options are:
          -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
                         [def=predefined for some common genome assemblies, else set to uniform]
@@ -336,7 +337,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwm_mscan_wrapper -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.7
+    - version 1.1.6
     where options are:
          -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
                         [def=predefined for some common genome assemblies, else set to uniform]
@@ -361,7 +362,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwm_scan -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.7
+    - version 1.1.6
     where options are:
          -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
                         [def=predefined for some common genome assemblies, else set to uniform]
@@ -401,7 +402,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     # Usage:
     pwmlib_scan -l <pwmlib-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.7
+    - version 1.1.6
     where options are:
          -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
                         [def=predefined for some common genome assemblies, else set to uniform]

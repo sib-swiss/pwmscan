@@ -213,7 +213,7 @@ the bowtie2bed program to convert the Bowtie output to BED.
 The chr_hdr table can be changed to adapt to other FASTA header format conventions.
 
 It is important to remark that the matrix_scan program assumes by default the 2 pipe-delimited FASTA header rule.
-This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan.
+This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan (e.g. '-n 0' for no pipe).
 
 The genome tables can be found in the genomedb sub-directory together with the chromosome sequence files for hg19.
   
@@ -275,6 +275,9 @@ chr_hdr
 X       chr|NC_000023|NC_000023.10      hg19
 Y       chr|NC_000024|NC_000024.9       hg19
 M       chr|NC_012920|NC_012920.1       hg19
+
+ Note that the second field of the chr_hdr file corresponds to the chromosome sequence identifier in the FASTA files. Given that the Bowtie indices are generated starting from the chromosome FASTA files, the Bowtie output will include the sequence identifier as specified in the second field of the chr_hdr file. To convert to BED format, which uses chromosome numbers, programs such as bowtie2bed need to read the chr_hdr table.
+
 
 Files and paths
 ---------------------------------------------------------------------------

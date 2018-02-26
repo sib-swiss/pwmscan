@@ -63,3 +63,10 @@ For Bowtie, refer to the following link:
   - bowtie           http://bowtie-bio.sourceforge.net/index.shtml
 
 The Bowtie binaries are installed system-wide.
+
+
+Basic Software requirements
+============================================================================
+
+The GNU C compiler collection, UNIX bash (version >=4), Python (version >= 2.7),
+Perl (version >=5), and Perl modules Math::Round and Scalar::Util::Numeric (CPAN module).

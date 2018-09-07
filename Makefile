@@ -10,7 +10,7 @@ CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall
 binDir = $(PWD)/bin
 genomeDir = $(PWD)/genomedb
 
-PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp
+PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp pwm_scoring
 SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwmlib_scan pwm_bowtie_wrapper pwm_mscan_wrapper pwm_convert python_tools/matrix_scan_parallel.py python 
 
 OBJS = hashtable.o
@@ -24,6 +24,7 @@ BOWTIE2BED_SRC = bowtie2bed.c
 MSCAN2BED_SRC = mscan2bed.c
 MSCAN_BED2SGA_SRC = mscan_bed2sga.c
 SEQ_EXTRACT_BCOMP_SRC = seq_extract_bcomp.c
+PWM_SCORING_SRC = pwm_scoring.c
 FILTEROVERLAPS_SRC = filterOverlaps.c
 
 MATRIX_SCAN_SRC =  matrix_scan.c
@@ -54,6 +55,9 @@ matrix_scan : $(MATRIX_SCAN_SRC)
 
 seq_extract_bcomp : $(SEQ_EXTRACT_BCOMP_SRC) $(OBJS)
 	$(CC) $(CFLAGS) -o seq_extract_bcomp $^
+
+pwm_scoring : $(PWM_SCORING_SRC)
+	$(CC) $(CFLAGS) -o pwm_scoring $^
 
 install : $(PROGS) $(SCRIPTS)
 	mv $(PROGS) $(binDir)

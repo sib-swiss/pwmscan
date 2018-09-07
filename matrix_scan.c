@@ -121,7 +121,7 @@ int Erv = 0;     /* End reverse Core Region                       */
 int *Rfw;        /* Ranked index array (for lateral positions) FW */
 int *Rrv;        /* Ranked index array (for lateral positions) RV */
 
-/* Number of Pipe delimiters in sequence FASTA header  */
+/* Number of Pipe delimiters in the FASTA header after which the seq ID starts */
 int nbPipes = 2;
 
 /* Input process functions  */
@@ -1248,7 +1248,8 @@ main(int argc, char *argv[])
 	    "        -f[--forward]          Scan sequences in forward direction [def=bidirectional]\n"
 	    "        -i[--wordlen] <len>    Length of the words in the word index array [def=%d]\n"
 	    "        -b[--bgcomp]           Background model (residue priors), e.g. : 25,25,25,25\n"
-	    "        -n[--pipes]            Number of pipe delimiters in FASTA header file [def=%d]\n"
+	    "        -n[--pipes]            Number of pipe delimiters in FASTA header after which\n"
+	    "                               The sequence identifier is expected to start [def=%d]\n"
 	    "\n\tScan a DNA sequence file for matches to an INTEGER position weight matrix (PWM).\n"
             "\tThe DNA sequence file must be in FASTA format (<fasta_file>).\n"
             "\tThe matrix format is integer log-odds, where each column represents a nucleotide base\n"

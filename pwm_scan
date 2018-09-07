@@ -285,6 +285,7 @@ matrix_score=$($bin_dir/matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
 	| grep SCORE | sed 's/:/\ /'\
 	| awk -F " " '{print $2}')
 
+echo "$bin_dir/matrix_prob -e $p_value --bg "$bg_freq" $matrix_file | grep SCORE | sed 's/:/\ /' | awk -F " " '{print $2}'" >&2
 echo "PWM score: $matrix_score" >&2
 
 # Decide on search engine strategy

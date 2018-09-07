@@ -112,6 +112,8 @@ The main programs are the following:
                         in which case sequences can be extracted directly from the FASTA
                         input or, as for the extraction mode, specified in a BED file.
 
+ - pwm_scoring		Score a set of nucleotide sequences in FASTA format, based on 
+                        matches to either an integer PWM or a base probability matrix.
  
 The Bowtie software is available on SourceForge.net for all UNIX-based platforms:
 

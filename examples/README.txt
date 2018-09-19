@@ -99,6 +99,62 @@ M       chr|NC_012920|NC_012920.1       hg19
  Note that the second field of the chr_hdr file corresponds to the chromosome sequence identifier in the FASTA files. Given that the Bowtie indices are generated starting from the chromosome FASTA files, the Bowtie output will include the sequence identifier as specified in the second field of the chr_hdr file. To convert to BED format, which uses chromosome numbers, programs such as bowtie2bed need to read the chr_hdr table.
  If Bowtie indices are generated from chromosome FASTA files with different headers (or sequence identifiers), the second field of the chr_hdr table has to be changed accordingly.
 
+Chromosome files downloaded from UCSC are named chr*.fa. If this is the case, the adapted wrapper scripts pwm_scan_ucsc and pwm_mscan_wrapper_ucsc should be used instead of the deafult ones pwm_scan and pwm_mscan_wrapper (see the Wrapper Scripts Section). The pwm_bowtie_wrapper script should in principle work with genome index files built from UCSC genome assemblies, provided the chr_hdr file is changed according to the UCSC chromosome header convention, which is the following:
+
+  >chr1
+
+An example for the mouse genome mm10 downloaded from UCSC would then be the following:
+
+chr_NC_gi
+#Chr    Accession.ver   gi      Assembly
+1       chr1    372099109       mm10
+2       chr2    372099108       mm10
+3       chr3    372099107       mm10
+4       chr4    372099106       mm10
+5       chr5    372099105       mm10
+6       chr6    372099104       mm10
+7       chr7    372099103       mm10
+8       chr8    372099102       mm10
+9       chr9    372099101       mm10
+10      chr10   372099100       mm10
+11      chr11   372099099       mm10
+12      chr12   372099098       mm10
+13      chr13   372099097       mm10
+14      chr14   372099096       mm10
+15      chr15   372099095       mm10
+16      chr16   372099094       mm10
+17      chr17   372099093       mm10
+18      chr18   372099092       mm10
+19      chr19   372099091       mm10
+X       chrX    372099090       mm10
+Y       chrY    372099089       mm10
+M       chrM    34538597        mm10
+
+chr_hdr
+#Chr    Sequence Header  Assembly
+1       chr1             mm10
+2       chr2             mm10
+3       chr3             mm10
+4       chr4             mm10
+5       chr5             mm10
+6       chr6             mm10
+7       chr7             mm10
+8       chr8             mm10
+9       chr9             mm10
+10      chr10            mm10
+11      chr11            mm10
+12      chr12            mm10
+13      chr13            mm10
+14      chr14            mm10
+15      chr15            mm10
+16      chr16            mm10
+17      chr17            mm10
+18      chr18            mm10
+19      chr19            mm10
+X       chrX             mm10
+Y       chrY             mm10
+M       chrM             mm10
+
 
 Files and paths
 -----------------------------------------------
@@ -290,6 +346,8 @@ Shell (bash) Wrappers to execute the analysis pipeline
  The pwm_scan script scans a genome with a PWM using either Bowtie or matrix_scan depending on both the p-value and the matrix length.
  For high p-values and long motifs, the Bowtie-based strategy becomes inefficient and the matrix_scan-based approach is the fastest one. 
  The pwm_bowtie_wrapper script implements the Bowtie-based pipeline whereas the pwm_mscan_wrapper script uses the matrix_scan-based approach.
+
+ The pwm_scan_ucsc and pwm_mscan_wrapper_ucsc scripts are just adaptations of the original ones in order to deal with chromosome files downloaded from UCSC. 
 
  The pwmlib_scan script scans a genome with a collection of PWMs coming from a database.
  Accepted motif database formats are the MEME libraries as well as the motif libraries (both log-odds and letter-probability formats) provided by the PWMScan Web interface.

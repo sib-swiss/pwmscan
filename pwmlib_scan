@@ -55,7 +55,7 @@ non_overlapping=1
 parallel=0
 
 pwmlib_file=""
-pwm_format="logodds";
+pwm_format="logodds"
 p_value=""
 genome_root_dir=""
 assembly=""
@@ -64,7 +64,7 @@ bg_freq=""
 display_usage() {
       echo "Usage:"
       echo    "    pwmlib_scan -l <pwmlib> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]"
-      echo    "    - version 1.1.7"
+      echo    "    - version 1.1.9"
       echo    "    where options are:"
       echo    "         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29"
       echo    "                        [def=predefined for some common genome assemblies, else set to uniform]"
@@ -86,23 +86,20 @@ while getopts ":hfopwvb:l:e:g:d:s:" opt; do
       display_usage
       exit 0
       ;;
-    v )
-      verbose=1
+    b )
+      bg_freq=$OPTARG
       ;;
     f )
       forward=1
+      ;;
+    g )
+      pwm_format=$OPTARG
       ;;
     o )
       non_overlapping=0
       ;;
     p )
       parallel=1
-      ;;
-    b )
-      bg_freq=$OPTARG
-      ;;
-    g )
-      pwm_format=$OPTARG
       ;;
     l )
       pwmlib_file=$OPTARG
@@ -118,6 +115,9 @@ while getopts ":hfopwvb:l:e:g:d:s:" opt; do
       ;;
     w )
       w_flag=1
+      ;;
+    v )
+      verbose=1
       ;;
     :)
       echo "Option -$OPTARG requires an argument." >&2

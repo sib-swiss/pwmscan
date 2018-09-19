@@ -136,26 +136,30 @@ SGA is the working format of our ChIP-seq data analysis programs (sourceforge.ne
 
 Matrix format conversion utilities are the following:
 
-  - jasparconvert.pl      Convert a JASPAR matrix file into MEME format (integer log-odds).
+  - jasparconvert.pl         Convert a JASPAR matrix file into MEME format (integer log-odds).
 
-  - transfaconvert.pl     Convert a TRANSFAC matrix file into MEME format (integer log-odds).
+  - transfaconvert.pl        Convert a TRANSFAC matrix file into MEME format (integer log-odds).
 
-  - pwmconvert.pl         Convert a real or SSA-formatted PWM into integer plain-text format.
+  - pwmconvert.pl            Convert a real or SSA-formatted PWM into integer plain-text format.
 
-  - lpmconvert.pl         Convert a Letter Probability Matrix (LPM) file into an integer PWM. 
+  - lpmconvert.pl            Convert a Letter Probability Matrix (LPM) file into an integer PWM. 
 
-  - pfmconvert.pl         Convert a Position Frequency Matrix (PFM) file into either a PWM or a LPM. 
+  - pfmconvert.pl            Convert a Position Frequency Matrix (PFM) file into either a PWM or a LPM. 
 
-  - pwm2lpmconvert.pl     Convert a Position Weight Matrix (PWM) to letter probability format (LPM).
+  - pwm2lpmconvert.pl        Convert a Position Weight Matrix (PWM) to letter probability format (LPM).
 
 The jasparconvert.pl and transfaconvert.pl scripts are based on an original implementation
 by William Stafford Noble and Timothy L. Bailey (1999) for MEME (http://meme-suite.org/).
 
 We also provide three (bash) shell wrapper scripts that embed the entire analysis pipeline:
 
-  - pwm_scan              Scan a genome with a PWM and a p-value using either Bowtie or matrix_scan
-  - pwm_bowtie_wrapper    Scan a genome with a PWM and a p-value using Bowtie
-  - pwm_mscan_wrapper     Scan a genome with a PWM and a p-value using matrix_scan
+  - pwm_scan                 Scan a genome with a PWM and a p-value using either Bowtie or matrix_scan
+  - pwm_scan_ucsc            Scan a genome with a PWM and a p-value using either Bowtie or matrix_scan
+                             (Adapted script from pwm_mscan_wrapper to deal with UCSC chromosome files chr*.fa) 
+  - pwm_bowtie_wrapper       Scan a genome with a PWM and a p-value using Bowtie
+  - pwm_mscan_wrapper        Scan a genome with a PWM and a p-value using matrix_scan
+  - pwm_mscan_wrapper_ucsc   Scan a genome with a PWM and a p-value using matrix_scan
+                             (Adapted script from pwm_mscan_wrapper to deal with UCSC chromosome files chr*.fa) 
 
   - pwmlib_scan           Scan a genome with a PWM Collection using either Bowtie or matrix_scan
 
@@ -183,7 +187,7 @@ A few conventions about the genome files
 
 PWMScan works with both Bowtie-formatted genome files and chromosome sequences in FASTA format.
 
-Chromosome sequence files are downloaded from NCBI (Genbank) and are called chrom*.seq.
+By default, chromosome sequence files are downloaded from NCBI (RefSeq) and are called chrom*.seq.
 
 Bowtie index files are generated from the chromosome sequence files using the bowtie-build command,
 as follow:
@@ -215,7 +219,8 @@ the bowtie2bed program to convert the Bowtie output to BED.
 The chr_hdr table can be changed to adapt to other FASTA header format conventions.
 
 It is important to remark that the matrix_scan program assumes by default the 2 pipe-delimited FASTA header rule.
-This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan (e.g. '-n 0' for no pipe).
+This behaviour can be changed via the optional argument -n[--pipes] of matrix_scan (e.g. '-n 3' for three pipes).
+If the header does not include pipes, the program takes the header as it is (e.g. it is equivalent to '-n 0').
 
 The genome tables can be found in the genomedb sub-directory together with the chromosome sequence files for hg19.
   
@@ -280,6 +285,62 @@ M       chr|NC_012920|NC_012920.1       hg19
 
  Note that the second field of the chr_hdr file corresponds to the chromosome sequence identifier in the FASTA files. Given that the Bowtie indices are generated starting from the chromosome FASTA files, the Bowtie output will include the sequence identifier as specified in the second field of the chr_hdr file. To convert to BED format, which uses chromosome numbers, programs such as bowtie2bed need to read the chr_hdr table.
 
+Chromosome files downloaded from UCSC are named chr*.fa. If this is the case, the adapted wrapper scripts pwm_scan_ucsc and pwm_mscan_wrapper_ucsc should be used instead of the deafult ones (pwm_scan and pwm_mscan_wrapper). The script pwm_bowtie_wrapper script should in principle work with genome index files built from UCSC genome assemblies, provided the chr_hdr file is changed according to the UCSC chromosome header convention, which is the following:
+
+  >chr1 
+ 
+An example for the mouse genome mm10 downloaded from UCSC would then be the following:
+
+chr_NC_gi
+#Chr    Accession.ver   gi      Assembly
+1       chr1    372099109       mm10
+2       chr2    372099108       mm10
+3       chr3    372099107       mm10
+4       chr4    372099106       mm10
+5       chr5    372099105       mm10
+6       chr6    372099104       mm10
+7       chr7    372099103       mm10
+8       chr8    372099102       mm10
+9       chr9    372099101       mm10
+10      chr10   372099100       mm10
+11      chr11   372099099       mm10
+12      chr12   372099098       mm10
+13      chr13   372099097       mm10
+14      chr14   372099096       mm10
+15      chr15   372099095       mm10
+16      chr16   372099094       mm10
+17      chr17   372099093       mm10
+18      chr18   372099092       mm10
+19      chr19   372099091       mm10
+X       chrX    372099090       mm10
+Y       chrY    372099089       mm10
+M       chrM    34538597        mm10
+
+chr_hdr
+#Chr    Sequence Header  Assembly
+1       chr1             mm10
+2       chr2             mm10
+3       chr3             mm10
+4       chr4             mm10
+5       chr5             mm10
+6       chr6             mm10
+7       chr7             mm10
+8       chr8             mm10
+9       chr9             mm10
+10      chr10            mm10
+11      chr11            mm10
+12      chr12            mm10
+13      chr13            mm10
+14      chr14            mm10
+15      chr15            mm10
+16      chr16            mm10
+17      chr17            mm10
+18      chr18            mm10
+19      chr19            mm10
+X       chrX             mm10
+Y       chrY             mm10
+M       chrM             mm10
+
 
 Files and paths
 ---------------------------------------------------------------------------
@@ -309,8 +370,8 @@ genome root directory used by our application examples:
 
   genome_root_dir=genomedb 
 
-The genome root directory can be changed via the command line option -d <genome-root-dir> in all three PWMScan bash 
-wrapper scripts (pwm_scan, pwm_mscan_wrapper, and pwm_bowtie_wrapper).
+The genome root directory can be changed via the command line option -d <genome-root-dir> in all five PWMScan bash 
+wrapper scripts (pwm_scan, pwm_scan,_ucsc, pwm_mscan_wrapper, pwm_mscan_wrapper_ucsc, and pwm_bowtie_wrapper).
 
 By convention, the Bowtie index files are located in the bowtie sub-directory, whereas the chromosome
 sequence files for a given assembly are stored in the corresponding sub-directory (e.g. hg19), that is:

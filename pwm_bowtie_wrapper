@@ -63,13 +63,14 @@ bg_freq=""
 display_usage() {
       echo "Usage:"
       echo "    pwm_bowtie_wrapper -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]"
-      echo    "    - version 1.1.7"
+      echo    "    - version 1.1.9"
       echo    "    where options are:"
       echo    "         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29"
       echo    "                        [def=predefined for some common genome assemblies, else set to uniform]"
       echo    "         -f             Scan sequences in forward direction [def=bidirectional]"
       echo    "         -o             Allow for overlapping matches [def=non-overlapping matches]"
       echo -e "         -w             Write output to file [def=STDOUT]\n"
+      echo -e "    Scan a genome (chromosome files from NCBI) with a PWM using Bowtie\n"
       echo    "Please report bugs to Giovanna.Ambrosini@epfl.ch"
 }
 # Parse options

@@ -66,7 +66,7 @@ bg_freq=""
 
 display_usage() {
       echo "Usage:"
-      echo    "    pwm_mscan_wrapper -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]"
+      echo    "    pwm_mscan_wrapper_ucsc -m <matrix-file> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]"
       echo    "    - version 1.1.9"
       echo    "    where options are:"
       echo    "         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29"
@@ -75,7 +75,7 @@ display_usage() {
       echo    "         -o             Allow for overlapping matches [def=non-overlapping matches]"
       echo    "         -w             Write output to file [def=STDOUT]"
       echo -e "         -p             Distribute matrix_scan on multiple cores [def=non-parallel processing]\n"
-      echo -e "    Scan a genome (chromosome files from NCBI) with a PWM using matrix_scan.\n"
+      echo -e "    Scan a genome (chromosome files from UCSC) with a PWM using matrix_scan.\n"
       echo "Please report bugs to Giovanna.Ambrosini@epfl.ch"
 }
 # Parse options
@@ -283,24 +283,24 @@ if [ $parallel == 0 ]
 then
   if [ $non_overlapping == 0 ]
   then
-    echo "cat $assembly_dir/chrom[^M]*.seq | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
+    echo "cat $assembly_dir/chr[^M]*.fa | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
     echo "..." >&2
-    cat $assembly_dir/chrom[^M]*.seq | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
+    cat $assembly_dir/chr[^M]*.fa | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
   else
-    echo "cat $assembly_dir/chrom[^M]*.seq | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
+    echo "cat $assembly_dir/chr[^M]*.fa | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
     echo "..." >&2
-    cat $assembly_dir/chrom[^M]*.seq | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
+    cat $assembly_dir/chr[^M]*.fa | $bin_dir/matrix_scan -m $matrix_file -c $matrix_score $fwd_flag $widx_size | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
   fi
 else
   if [ $non_overlapping == 0 ]
   then
-    echo "python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chrom*.seq|grep -v chromMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
+    echo "python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chr*.fa|grep -v chrMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
     echo "..." >&2
-    python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chrom*.seq|grep -v chromMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
+    python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chr*.fa|grep -v chrMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
   else
-    echo "python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chrom*.seq|grep -v chromMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
+    echo "python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chr*.fa|grep -v chrMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
     echo "..." >&2
-    python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chrom*.seq|grep -v chromMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
+    python $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chr*.fa|grep -v chrMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
   fi
 fi
 

@@ -156,12 +156,12 @@ fi
 #
 if [ "$pwm_format" = "logodds" ]
 then
-  less $pwmlib_file | perl -ane 'chomp; if (/^>log-odds matrix (.*):/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
+  less $pwmlib_file | perl -ane 'chomp; if (/^>log-odds matrix (.*):/ or /^>(\S+)/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
 fi
 
 if [ "$pwm_format" = "lpm" ]
 then
-  less $pwmlib_file | perl -ane 'chomp; if (/^>letter-probability matrix (.*):/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
+  less $pwmlib_file | perl -ane 'chomp; if (/^>letter-probability matrix (.*):/ or /^>(\S+)/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
 fi
 
 if [ "$pwm_format" = "meme" ]

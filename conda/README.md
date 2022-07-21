@@ -4,7 +4,7 @@ https://docs.conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-
 
 ## Build locally chiseq in conda
 ```bash
-conda build meta.yaml -c bioconda
+conda build meta.yaml -c sibswiss -c bioconda
 ```
 
 

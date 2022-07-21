@@ -7,8 +7,8 @@ package:
   version: "{{ version }}"
 
 source:
-url: https://gitlab.sib.swiss/EPD/pwmscan/-/archive/master/pwmscan-master.tar.gz
-  sha256: {{ sha256 }}
+  url: https://gitlab.sib.swiss/EPD/pwmscan/-/archive/master/pwmscan-master.tar.gz
+#  sha256: {{ sha256 }}
 
 build:
   number: 0
@@ -27,8 +27,8 @@ requirements:
     - grep
     - gawk
     - sed
-    - bowtie=1.2.2
-    - chipseq=1.5.5
+    - bowtie ==1.2.2
+    - chipseq ==1.5.5
   run:
     - perl
     - perl-math-round
@@ -37,8 +37,8 @@ requirements:
     - grep
     - gawk
     - sed
-    - bowtie=1.2.2
-    - chipseq=1.5.5
+    - bowtie ==1.2.2
+    - chipseq ==1.5.5
 
 test:
   commands:

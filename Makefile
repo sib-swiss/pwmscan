@@ -61,8 +61,8 @@ pwm_scoring : $(PWM_SCORING_SRC)
 
 install : $(PROGS) $(SCRIPTS)
 	mkdir -p $(binDir)/
-	mv $(PROGS) $(binDir)
-	cp -pr $(SCRIPTS) $(binDir)
+	mv -f $(PROGS) $(binDir)
+	cp -pfr $(SCRIPTS) $(binDir)
 	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan
 	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan_ucsc
 	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwmlib_scan

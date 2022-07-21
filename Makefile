@@ -60,6 +60,7 @@ pwm_scoring : $(PWM_SCORING_SRC)
 	$(CC) $(CFLAGS) -o pwm_scoring $^
 
 install : $(PROGS) $(SCRIPTS)
+	mkdir -p $(binDir)/
 	mv $(PROGS) $(binDir)
 	cp -pr $(SCRIPTS) $(binDir)
 	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan

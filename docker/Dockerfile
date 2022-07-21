@@ -87,6 +87,7 @@ RUN echo '# OS update' \
 	&& unzip bowtie-*-linux-x86_64.zip \
 	&& rm -f bowtie-*-linux-x86_64.zip \
 	&& cd bowtie-*-linux-x86_64/ \
+	&& sed -i 's@#!.*python@#!/usr/bin/python2@' bowtie bowtie-build bowtie-inspect \
 	&& install bowtie* scripts/* /usr/local/bin/ \
 	&& cd /usr/local/ \
 	&& rm -Rf bowtie-*-linux-x86_64/ \

@@ -1,0 +1,94 @@
+{% set name = "PWMScan" %}
+{% set version = "1.1.9" %}
+{% set sha256 = "0ecca0d11d0458b6288a432d4be912103431879b8fbf8f5c77bbf228235ec090" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+url: https://gitlab.sib.swiss/EPD/pwmscan/-/archive/master/pwmscan-master.tar.gz
+  sha256: {{ sha256 }}
+
+build:
+  number: 0
+  skip: True  # [win]
+
+requirements:
+  build:
+    - make
+    - {{ compiler('c') }}
+    - sed
+  host:
+    - perl
+    - perl-math-round
+    - perl-scalar-util-numeric
+    - perl-scalar-list-utils
+    - grep
+    - gawk
+    - sed
+    - bowtie=1.2.2
+    - chipseq=1.5.5
+  run:
+    - perl
+    - perl-math-round
+    - perl-scalar-util-numeric
+    - perl-scalar-list-utils
+    - grep
+    - gawk
+    - sed
+    - bowtie=1.2.2
+    - chipseq=1.5.5
+
+test:
+  commands:
+    - bowtie2bed                      -h 2>&1 | grep -i usage
+    - filterOverlaps                  -h 2>&1 | grep -i usage
+    - jasparconvert.pl                   2>&1 | grep -i usage
+    - lpmconvert.pl                      2>&1 | grep -i usage
+    - matrix_prob                     -h 2>&1 | grep -i usage
+    - matrix_scan                     -h 2>&1 | grep -i usage
+    - python2 matrix_scan_parallel.py -h 2>&1 | grep -i usage
+    - mba                             -h 2>&1 | grep -i usage
+    - mscan2bed                       -h 2>&1 | grep -i usage
+    - mscan_bed2sga                   -h 2>&1 | grep -i usage
+    - pfmconvert.pl                      2>&1 | grep -i usage
+    - pwm2lpmconvert.pl                  2>&1 | grep -i usage
+    - pwm_bowtie_wrapper              -h 2>&1 | grep -i usage
+    - pwm_convert                     -h 2>&1 | grep -i usage
+    - pwmconvert.pl                      2>&1 | grep -i usage
+    - pwmlib_scan                     -h 2>&1 | grep -i pwmlib_scan
+    - pwmlib_scan_seq                 -h 2>&1 | grep -i pwmlib_scan_seq
+    - pwm_mscan_wrapper               -h 2>&1 | grep -i pwm_mscan_wrapper
+    - pwm_mscan_wrapper_ucsc          -h 2>&1 | grep -i pwm_mscan_wrapper_ucsc
+    - pwm_scan                        -h 2>&1 | grep -i pwm_scan
+    - pwm_scan_ucsc                   -h 2>&1 | grep -i pwm_scan
+    - pwm_scoring                     -h 2>&1 | grep -i usage
+    - seq_extract_bcomp               -h 2>&1 | grep -i usage
+    - transfaconvert.pl                  2>&1 | grep -i usage
+
+about:
+  home: https://sourceforge.net/projects/pwmscan/
+  license: GPLv3
+  license_family: GPL
+  license_file: COPYING
+  summary: 'A genome-wide Position Weight Matrix (PWM) Scanner'
+  description: |
+    PWMScan is used to scan a position weight matrix (PWM) against a genome or,
+    in general, a large set of DNA sequences. The PWM is the most commonly used
+    mathematical model to describe the DNA binding specificity of a transcription
+    factor (TF). A PWM contains scores for each base at each position of the binding
+    site. The TF binding score for a given k-mer sequence is then obtained by simply
+    adding up the base-specific scores at respective positions of the binding site.
+    PWMScan takes as input a PWM, the background probabilities for the letters of
+    the DNA alphabet, and a threshold score or a p-value. The search is carried out
+    across the entire genome sequence. It can accept PWMs, such as those available
+    in the Transfac or Jaspar databases as well as plain-text PWMs. It computes all
+    occurrences of the PWM in the genome sequence for a given p-value threshold or
+    cut-off. The match list is provided in various genome annotation formats,
+    including BEDdetail, FPS, and SGA.
+  dev_url: https://gitlab.sib.swiss/EPD/pwmscan
+
+extra:
+  container:
+    extended-base: True

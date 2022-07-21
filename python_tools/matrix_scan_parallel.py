@@ -41,8 +41,8 @@ def check_options(options_obj):
 
 if __name__ == "__main__":
 
-    # the dependencies (paths to programs) 
-    python_path = "/usr/bin/python" # the python 2.7 interpreter 
+    # the dependencies (paths to programs)
+    python_path = "/usr/bin/python2" # the python 2.7 interpreter
     parallelize_path = "/home/local/python/parallelize/parallelize.py" # the parall. dispatcher
     matrix_scan_path = "/home/local/bin/matrix_scan" # matrix_scan
     if not os.path.isfile(python_path):

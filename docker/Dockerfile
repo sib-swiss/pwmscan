@@ -31,6 +31,8 @@ cut-off. The match list is provided in various genome annotation formats, \
 including BEDdetail, FPS, and SGA."
 LABEL org.opencontainers.image.created=$BUILD_DATE
 
+#FIXME Does it need bowtie indexes in the container?
+#FIXME Should we define bowtieDir and workDir variables here?
 
 # INSTALLATION
 ENV USER=pwmscan

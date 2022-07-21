@@ -39,7 +39,7 @@ RUN echo '# OS update' \
 	&& export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update  -y \
 	&&        echo '# Install OS requirements' \
-	&& apt-get install -y --no-install-recommends wget ca-certificates make gcc libc6-dev man-db perl libmath-round-perl libscalar-util-numeric-perl libscalar-list-utils-perl \
+	&& apt-get install -y --no-install-recommends wget unzip ca-certificates make gcc libc6-dev man-db perl libmath-round-perl libscalar-util-numeric-perl libscalar-list-utils-perl python2 \
 	&&        echo '# Install PWMScan' \
 	&& cd /usr/local/ \
 	&& wget 'https://gitlab.sib.swiss/EPD/pwmscan/-/archive/master/pwmscan-master.tar.gz' \
@@ -82,7 +82,14 @@ RUN echo '# OS update' \
 	&& rm -Rf chipseq-master/ \
 	&&        echo '# Install PWMScan requirements: bowtie' \
 	&& cd /usr/local/ \
-	&& wget '' \
+	&& echo '#This particular version is used on the https://ccg.epfl.ch/pwmtools/ server. Do not know if more recent versions work' \
+	&& wget 'https://github.com/BenLangmead/bowtie/releases/download/v1.2.2_p1/bowtie-1.2.2-linux-x86_64.zip' \
+	&& unzip bowtie-*-linux-x86_64.zip \
+	&& rm -f bowtie-*-linux-x86_64.zip \
+	&& cd bowtie-*-linux-x86_64/ \
+	&& install bowtie* scripts/* /usr/local/bin/ \
+	&& cd /usr/local/ \
+	&& rm -Rf bowtie-*-linux-x86_64/ \
 	&&        echo '# TEST' \
 	&& matrix_prob --help || true \
 	&& echo \
@@ -91,7 +98,7 @@ RUN echo '# OS update' \
 	&& chipcenter -h || true \
 	&&        echo '# CLEANING' \
 	&& echo '## So try to remove manually useless stuff' \
-	&& apt remove -y *-dev git wget cmake make swig autoconf check gcc g++ gfortran python3* patchelf \
+	&& apt remove -y *-dev git wget cmake make swig autoconf check gcc g++ gfortran python3* patchelf unzip \
 	&& apt autoremove -y \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \

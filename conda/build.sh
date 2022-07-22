@@ -6,11 +6,11 @@ set -x -e
 # jasparconvert.pl lpmconvert.pl pfmconvert.pl pwm2lpmconvert.pl pwmconvert.pl transfaconvert.pl matrix_scan_parallel.py
 
 
-export DESTDIR="${PREFIX}/"
+export DESTDIR="${PREFIX}"
 make clean
 make
 # Fix binDir path
-sed -i 's@^binDir = .*@binDir = /usr/bin@' Makefile
-#Fix Perl bang path
+sed -i 's|^binDir = .*|binDir = \$(DESTDIR)/bin|' Makefile
+# Fix Perl bang path
 sed -i 's@#!.*perl@#!/usr/bin/perl@' perl_tools/*.pl
 make install

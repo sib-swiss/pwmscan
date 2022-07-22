@@ -14,6 +14,7 @@ build:
   number: 0
   skip: True  # [win]
 
+# bowtie 1.2.2 does not come with python2! So add it in requirements
 requirements:
   build:
     - make
@@ -27,6 +28,7 @@ requirements:
     - grep
     - gawk
     - sed
+    - python ==2.7.15
     - bowtie ==1.2.2
     - chipseq ==1.5.5
   run:
@@ -37,6 +39,7 @@ requirements:
     - grep
     - gawk
     - sed
+    - python ==2.7.15
     - bowtie ==1.2.2
     - chipseq ==1.5.5
 

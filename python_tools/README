@@ -1,7 +1,7 @@
 PWM scan utilities
 ------------------
 
-- matrix_scan_parallel.py  Run the matrix_scan program in parallel by distributing the scanning task on several processing units. 
+- matrix_scan_parallel.py  Run the matrix_scan program in parallel by distributing the scanning task on several processing units.
                            It requires a multi-core processor.
 
 NOTE:

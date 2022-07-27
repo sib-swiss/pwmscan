@@ -255,8 +255,8 @@ echo "PWM file length : $file_len lines" >&2
 
 echo "========               Calculating PWM score               ========" >&2
 matrix_score=$($bin_dir/matrix_prob -e $p_value --bg "$bg_freq" $matrix_file \
-	| grep SCORE | sed 's/:/\ /'\
-	| awk -F " " '{print $2}')
+    | grep SCORE | sed 's/:/\ /' \
+    | awk -F " " '{print $2}')
 
 echo "PWM score: $matrix_score" >&2
 
@@ -302,7 +302,7 @@ fi
 if [ $w_flag == 1 ]
 then
   echo "List of matches (BED format) : $pwmout_bed" >&2
-  nb_hits=`cat $pwmout_bed|wc -l`
+  nb_hits=`cat $pwmout_bed | wc -l`
   echo "Total number of PWM matches  : $nb_hits" >&2
 fi
 

@@ -294,20 +294,20 @@ then
 else
   if [ $non_overlapping == 0 ]
   then
-    echo "python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chr*.fa|grep -v chrMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
+    echo "python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chr*.fa | grep -v chrMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
     echo "..." >&2
-    python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chr*.fa|grep -v chrMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
+    python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chr*.fa | grep -v chrMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
   else
-    echo "python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chr*.fa|grep -v chrMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
+    echo "python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s \"\$(ls $assembly_dir/chr*.fa | grep -v chrMt)\" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk 'BEGIN { while((getline line < \"$pwmScore_tab\") > 0 ) {split(line,f,\" \"); pvalue[f[1]]=f[2]} close(\"$pwmScore_tab\")} {print \$1\"\t\"\$2\"\t\"\$3\"\t\"\$4\"\t\"\$5\"\t\"\$6\"\t\"\"$matrix_name\"\"\t\"\"P-value=\"pvalue[\$5]}' >$pwmout_bed" >&2
     echo "..." >&2
-    python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chr*.fa|grep -v chrMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
+    python2 $bin_dir/matrix_scan_parallel.py -m $matrix_file -s "$(ls $assembly_dir/chr*.fa | grep -v chrMt)" -c $matrix_score $fwd_flag $widx_size -p 15 | sort -s -k1,1 -k2,2n | $bin_dir/mscan2bed -s $assembly -i $chrNC_dir | $bin_dir/filterOverlaps -l$matrix_len | awk -v scoretab="$pwmScore_tab" -v pwmname="$matrix_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >$pwmout_bed
   fi
 fi
 
 if [ $w_flag == 1 ]
 then
   echo "List of matches (BED format) : $pwmout_bed" >&2
-  nb_hits=`cat $pwmout_bed|wc -l`
+  nb_hits=`cat $pwmout_bed | wc -l`
   echo "Total number of PWM matches  : $nb_hits" >&2
 fi
 

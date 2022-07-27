@@ -17,7 +17,7 @@
 #  The <genome-root-dir> is the root directory of the genome files.
 #
 #  The program writes the output to STDOUT, unless the -w option is specified, in which
-#  case results are written to file. BED filenames include the matrix name, the cut-off, 
+#  case results are written to file. BED filenames include the matrix name, the cut-off,
 #  and, should it be case, the forward scanning flag (fwd).
 #
 #  The <genome-root-dir> is the root directory of the genome files.
@@ -183,7 +183,7 @@ BOWTIEIDX[danRer10]=d_rerio_danRer10
 BOWTIEIDX[sacCer2]=s_cerevisiae_sacCer2
 BOWTIEIDX[sacCer3]=s_cerevisiae_sacCer3
 
-#echo ${BOWTIEIDX[$assembly]} 
+#echo ${BOWTIEIDX[$assembly]}
 genome_idx_file=${BOWTIEIDX[$assembly]}
 
 # Declare associative array for background base composition

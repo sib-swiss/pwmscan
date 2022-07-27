@@ -34,8 +34,8 @@ function usage()
   echo -e "\t-b=<bg-freq-file>   bg nucleotide composition file"
   echo -e "\t-c=<pseudo-cnt>     pseudo-count fraction [def=$pseudocnt]"
   echo -e "\t-m=<minscore>       minimal score value [def=$minscore]"
-  echo -e "\t-n=<log-scaling>    log scaling factor [def=$logscl]" 
-  echo -e "\t-s=<mult>           matrix multiplication factor (for real PWMs) [def=$mult]" 
+  echo -e "\t-n=<log-scaling>    log scaling factor [def=$logscl]"
+  echo -e "\t-s=<mult>           matrix multiplication factor (for real PWMs) [def=$mult]"
   echo -e ""
   echo -e "\tConvert JASPAR, TRANSFAC, PFM, LPM and real PWM formats to integer log likelihoods (log-odds) format."
   echo ""
@@ -128,10 +128,10 @@ then
   if [ $(echo "$pseudocnt > 0" | bc) -eq 1 ]
   then
     echo "$bin_dir/jasparconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/jasparconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/jasparconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   else
     echo "$bin_dir/jasparconvert.pl -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/jasparconvert.pl -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/jasparconvert.pl -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   fi
 fi
 
@@ -140,10 +140,10 @@ then
   if [ $(echo "$pseudocnt > 0" | bc) -eq 1 ]
   then
     echo "$bin_dir/transfaconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/transfaconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/transfaconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   else
     echo "$bin_dir/transfaconvert.pl -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/transfaconvert.pl -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/transfaconvert.pl -m $minscore -n $logscl -bg $bg_freq -w l -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   fi
 fi
 
@@ -152,10 +152,10 @@ then
   if [ $(echo "$pseudocnt > 0" | bc) -eq 1 ]
   then
     echo "$bin_dir/pfmconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/pfmconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/pfmconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   else
     echo "$bin_dir/pfmconvert.pl -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/pfmconvert.pl -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/pfmconvert.pl -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   fi
 fi
 
@@ -164,10 +164,10 @@ then
   if [ $(echo "$pseudocnt > 0" | bc) -eq 1 ]
   then
     echo "$bin_dir/lpmconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/lpmconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/lpmconvert.pl -c $pseudocnt -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   else
     echo "$bin_dir/lpmconvert.pl -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null" >&2
-    $bin_dir/lpmconvert.pl -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp    
+    $bin_dir/lpmconvert.pl -m $minscore -n $logscl -bg $bg_freq -noheader -o $matrix_file_tmp $matrix_file 1>/dev/null 2>/dev/null; cat $matrix_file_tmp
   fi
 fi
 

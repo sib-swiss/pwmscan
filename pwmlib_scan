@@ -2,7 +2,7 @@
 
 #  pwmlib_scan: Scan a genome with a collection of PWMs (using either bowtie or matrix_scan)
 #  arguments:
-#              pwm-collection 
+#              pwm-collection
 #              pwm-format
 #              p-value
 #              assembly
@@ -20,7 +20,7 @@
 #
 #  Three PWM library formats are accepted: meme, integer log-odds (default),
 #  and letter-probability matrix (lpm).
-# 
+#
 #  If specified (via the -p option), matrix_scan can be run in parallel.
 #  This is only possible if the machine has enough CPU power (multi-core processor).
 #
@@ -28,7 +28,7 @@
 #
 #  The <genome-root-dir> is the root directory of the genome files (the bowtie index
 #  files, and the FASTA chromosome files used by matrix_scan, and the genome tables).
-#  The <genome-root-dir> is supposed to have sub-directories for bowtie index files 
+#  The <genome-root-dir> is supposed to have sub-directories for bowtie index files
 #  (/bowtie) and assembly-specific chromosome FASTA files (/assembly).
 #
 #  The variable chrNC_dir (used to define the location of the chr_NC_gi/chr_hdr files)
@@ -38,7 +38,7 @@
 #  The variable bin_dir is set to /home/local/bin
 #
 #  The program writes the output to STDOUT, unless the -w option is specified, in which
-#  case results are written to file. BED filenames include the matrix name, the cut-off, 
+#  case results are written to file. BED filenames include the matrix name, the cut-off,
 #  and, should it be case, the forward scanning flag (fwd).
 #
 #  16.02.2018  Giovanna Ambrosini
@@ -74,9 +74,9 @@ display_usage() {
       echo    "         -w             Write output to file [def=STDOUT]"
       echo -e "         -p             Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]"
       echo -e "         -v             Verbose mode and keep PWM tmp files\n"
-      echo -e "    Scan a genome assembly with a PWM collection. Accepeted PWM library formats are the MEME format"  
-      echo -e "    (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>)."  
-      echo -e "    Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.\n"  
+      echo -e "    Scan a genome assembly with a PWM collection. Accepeted PWM library formats are the MEME format"
+      echo -e "    (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>)."
+      echo -e "    Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.\n"
       echo    "Please report bugs to Giovanna.Ambrosini@epfl.ch"
 }
 # Parse options
@@ -133,11 +133,11 @@ shift $((OPTIND -1))
 
 parsed_args=$((OPTIND -1))
 
-if [ $parsed_args -le 1 ] 
-then 
+if [ $parsed_args -le 1 ]
+then
   display_usage
   exit 1
-fi 
+fi
 
 if [ $verbose == 1 ]
 then
@@ -192,7 +192,7 @@ fi
 bin_dir=$(echo /home/local/bin)
 pwm_scan_cmd_flags=""
 
-if [ $non_overlapping == 0 ] 
+if [ $non_overlapping == 0 ]
 then
   pwm_scan_cmd_flags=" -o";
 fi
@@ -239,7 +239,7 @@ for f in *mat.tmp; do
         echo "Scanning the $assembly genome with $f""2" >&2
         echo "Command: bash $bin_dir/pwm_scan $bg_comp -m $f""2 -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags" >&2
       fi
-      bash $bin_dir/pwm_scan $bg_comp -m $f"2" -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags 
+      bash $bin_dir/pwm_scan $bg_comp -m $f"2" -e $p_value -d $genome_root_dir -s $assembly$pwm_scan_cmd_flags
       if [ $verbose == 0 ]
       then
         rm $f"2"

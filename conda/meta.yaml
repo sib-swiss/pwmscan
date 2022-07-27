@@ -45,30 +45,30 @@ requirements:
 
 test:
   commands:
-    - bowtie2bed                      -h 2>&1 | grep -i usage
-    - filterOverlaps                  -h 2>&1 | grep -i usage
-    - jasparconvert.pl                   2>&1 | grep -i usage
-    - lpmconvert.pl                      2>&1 | grep -i usage
-    - matrix_prob                     -h 2>&1 | grep -i usage
-    - matrix_scan                     -h 2>&1 | grep -i usage
-    - python2 matrix_scan_parallel.py -h 2>&1 | grep -i usage
-    - mba                             -h 2>&1 | grep -i usage
-    - mscan2bed                       -h 2>&1 | grep -i usage
-    - mscan_bed2sga                   -h 2>&1 | grep -i usage
-    - pfmconvert.pl                      2>&1 | grep -i usage
-    - pwm2lpmconvert.pl                  2>&1 | grep -i usage
-    - pwm_bowtie_wrapper              -h 2>&1 | grep -i usage
-    - pwm_convert                     -h 2>&1 | grep -i usage
-    - pwmconvert.pl                      2>&1 | grep -i usage
-    - pwmlib_scan                     -h 2>&1 | grep -i pwmlib_scan
-    - pwmlib_scan_seq                 -h 2>&1 | grep -i pwmlib_scan_seq
-    - pwm_mscan_wrapper               -h 2>&1 | grep -i pwm_mscan_wrapper
-    - pwm_mscan_wrapper_ucsc          -h 2>&1 | grep -i pwm_mscan_wrapper_ucsc
-    - pwm_scan                        -h 2>&1 | grep -i pwm_scan
-    - pwm_scan_ucsc                   -h 2>&1 | grep -i pwm_scan
-    - pwm_scoring                     -h 2>&1 | grep -i usage
-    - seq_extract_bcomp               -h 2>&1 | grep -i usage
-    - transfaconvert.pl                  2>&1 | grep -i usage
+    - bowtie2bed              -h 2>&1 | grep -i usage
+    - filterOverlaps          -h 2>&1 | grep -i usage
+    - jasparconvert.pl           2>&1 | grep -i usage
+    - lpmconvert.pl              2>&1 | grep -i usage
+    - matrix_prob             -h 2>&1 | grep -i usage
+    - matrix_scan             -h 2>&1 | grep -i usage
+    - matrix_scan_parallel.py -h 2>&1 | grep -i usage
+    - mba                     -h 2>&1 | grep -i usage
+    - mscan2bed               -h 2>&1 | grep -i usage
+    - mscan_bed2sga           -h 2>&1 | grep -i usage
+    - pfmconvert.pl              2>&1 | grep -i usage
+    - pwm2lpmconvert.pl          2>&1 | grep -i usage
+    - pwm_bowtie_wrapper      -h 2>&1 | grep -i usage
+    - pwm_convert             -h 2>&1 | grep -i usage
+    - pwmconvert.pl              2>&1 | grep -i usage
+    - pwmlib_scan             -h 2>&1 | grep -i pwmlib_scan
+    - pwmlib_scan_seq         -h 2>&1 | grep -i pwmlib_scan_seq
+    - pwm_mscan_wrapper       -h 2>&1 | grep -i pwm_mscan_wrapper
+    - pwm_mscan_wrapper_ucsc  -h 2>&1 | grep -i pwm_mscan_wrapper_ucsc
+    - pwm_scan                -h 2>&1 | grep -i pwm_scan
+    - pwm_scan_ucsc           -h 2>&1 | grep -i pwm_scan
+    - pwm_scoring             -h 2>&1 | grep -i usage
+    - seq_extract_bcomp       -h 2>&1 | grep -i usage
+    - transfaconvert.pl          2>&1 | grep -i usage
 
 about:
   home: https://sourceforge.net/projects/pwmscan/

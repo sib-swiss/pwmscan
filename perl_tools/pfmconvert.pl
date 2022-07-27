@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # FILE: pfmconvert
 # CREATE DATE: 3/07/2014
 # AUTHOR: Giovanna Ambrosini 
@@ -10,6 +10,7 @@
 
 # DESCRIPTION: Convert a Position Frequency Matrix (PFM) file to a Position Weihgt Matrix (PWM) with log odds weights.
 
+use warnings;
 use Scalar::Util::Numeric qw(isnum isint isfloat);
 use Math::Round;
 

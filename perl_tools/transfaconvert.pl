@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # FILE: transfaconvert
 # CREATE DATE: 8/31/2013
 # AUTHOR: Giovanna Ambrosini 
@@ -13,6 +13,7 @@
 # Add pseudo weight fraction to correct frequencies
 # 
 
+use warnings;
 use Math::Round;
 
 # Set up global variables. Assume uniform.

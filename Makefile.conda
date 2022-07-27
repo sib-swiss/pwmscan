@@ -69,6 +69,7 @@ install : $(PROGS) $(SCRIPTS)
 	sed -i -e 's@bash $$bin_dir/@@g'           $(binDir)/pwmlib_scan*
 	sed -i -e 's@python2 $$bin_dir/@@g'        $(binDir)/pwm_*
 	sed -i -e 's@$$bin_dir/@@g'                $(binDir)/pwmlib_* $(binDir)/pwm_*
+	sed -i -e 's@/usr/bin/python2@$(binDir)/python2@g'  $(binDir)/matrix_scan_parallel.py
 	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/matrix_scan_parallel.py
 	sed -i -e 's@/home/local/python@$(binDir)/../lib/python2.7/site-packages@g' $(binDir)/matrix_scan_parallel.py
 

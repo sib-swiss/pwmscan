@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # FILE: pwmconvert
 # CREATE DATE: 10/07/2015
 # AUTHOR: Giovanna Ambrosini 
@@ -10,6 +10,7 @@
 
 # DESCRIPTION: Convert a SSA-formatted or plain-text PWM to an integer PWM.
 
+use warnings;
 use List::Util qw[min max sum];
 use Scalar::Util::Numeric qw(isnum isint isfloat);
 use Math::Round;

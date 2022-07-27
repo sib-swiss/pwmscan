@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # FILE: pwm2lpmconvert.pl 
 # CREATE DATE: 21/02/2018
 # AUTHOR: Giovanna Ambrosini 
@@ -8,6 +8,7 @@
 #              assuming, for the background model, an independent succession of 
 #              nucleotides (Bernoulli model). Use the natural logarithm.
 
+use warnings;
 use List::Util qw[min max sum];
 use Scalar::Util::Numeric qw(isnum isint isfloat);
 use Math::Round;

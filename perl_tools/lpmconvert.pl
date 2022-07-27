@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # FILE: pfmconvert
 # CREATE DATE: 3/07/2014
 # AUTHOR: Giovanna Ambrosini 
@@ -11,6 +11,7 @@
 #
 # DESCRIPTION: Convert a Letter Probability Matrix (LPM) file to a Position Weihgt Matrix (PWM) with log odds weights.
 
+use warnings;
 use Math::Round;
 
 # Set up global variables. Assume uniform.

@@ -13,7 +13,5 @@ make -f Makefile.conda
 sed -i 's|^binDir = .*|binDir = \$(DESTDIR)/bin|' Makefile.conda
 # Fix Perl bang path
 sed -i 's@#!.*perl@#!/usr/bin/perl@' perl_tools/*.pl
-#FIXME issue with the python/ folder in DESTDIR/bin where a python symlink is already there!
-#FIXME issue with all hardcoded paths done by sed during *make install* (most should be in PATH)
-#FIXME what to do of /home/local/db/ paths???
+#FIXME  what to do of /home/local/db/ paths???
 make install -f Makefile.conda

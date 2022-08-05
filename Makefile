@@ -11,7 +11,7 @@ binDir = $(PWD)/bin
 genomeDir = $(PWD)/genomedb
 
 PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp pwm_scoring
-SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwm2lpmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwm_scan_ucsc pwmlib_scan pwmlib_scan_seq pwm_bowtie_wrapper pwm_mscan_wrapper pwm_mscan_wrapper_ucsc pwm_convert python_tools/matrix_scan_parallel.py python
+SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwm2lpmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwm_scan_ucsc pwmlib_scan pwmlib_scan_seq pwm_bowtie_wrapper pwm_mscan_wrapper pwm_mscan_wrapper_ucsc pwm_convert python_tools/matrix_scan_parallel.py
 
 OBJS = hashtable.o
 
@@ -62,17 +62,31 @@ pwm_scoring : $(PWM_SCORING_SRC)
 install : $(PROGS) $(SCRIPTS)
 	mkdir -p $(binDir)/
 	mv -f $(PROGS) $(binDir)
-	cp -pfr $(SCRIPTS) $(binDir)
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_scan_ucsc
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwmlib_scan
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwmlib_scan_seq
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_mscan_wrapper
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_mscan_wrapper_ucsc
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_bowtie_wrapper
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/pwm_convert
-	sed -i -e 's@/home/local/bin@$(binDir)@g' $(binDir)/matrix_scan_parallel.py
-	sed -i -e 's@/home/local@$(binDir)@g' $(binDir)/matrix_scan_parallel.py
+	cp -pfr $(SCRIPTS) python $(binDir)
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwm_scan
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwm_scan_ucsc
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwmlib_scan
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwmlib_scan_seq
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwm_mscan_wrapper
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwm_mscan_wrapper_ucsc
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwm_bowtie_wrapper
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/pwm_convert
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/matrix_scan_parallel.py
+	sed -i -e 's@/home/local@$(binDir)@g'      $(binDir)/matrix_scan_parallel.py
+
+install-conda : $(PROGS) $(SCRIPTS)
+	mkdir -p $(binDir)/
+	mkdir -p $(binDir)/../lib/python2.7/site-packages/
+	mv -f $(PROGS) $(binDir)
+	install $(SCRIPTS) $(binDir)
+	cp -pfr python/* $(binDir)/../lib/python2.7/site-packages/
+	#All binaries are in the PATH, so remove hardcoded paths for conda deployment
+	sed -i -e 's@bash $$bin_dir/@@g'           $(binDir)/pwmlib_scan*
+	sed -i -e 's@python2 $$bin_dir/@@g'        $(binDir)/pwm_*
+	sed -i -e 's@$$bin_dir/@@g'                $(binDir)/pwmlib_* $(binDir)/pwm_*
+	sed -i -e 's@/usr/bin/python2@$(binDir)/python2@g'  $(binDir)/matrix_scan_parallel.py
+	sed -i -e 's@/home/local/bin@$(binDir)@g'  $(binDir)/matrix_scan_parallel.py
+	sed -i -e 's@/home/local/python@$(binDir)/../lib/python2.7/site-packages@g' $(binDir)/matrix_scan_parallel.py
 
 install-genome :
 	gunzip $(genomeDir)/hg19/chrom*.seq.gz

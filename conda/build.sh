@@ -7,11 +7,9 @@ set -x -e
 
 
 export DESTDIR="${PREFIX}"
-make clean -f Makefile.conda
-make -f Makefile.conda
+make clean
+make
 # Fix binDir path
-sed -i 's|^binDir = .*|binDir = \$(DESTDIR)/bin|' Makefile.conda
-# Fix Perl bang path
-sed -i 's@#!.*perl@#!/usr/bin/perl@' perl_tools/*.pl
-#FIXME  what to do of /home/local/db/ paths???
-make install -f Makefile.conda
+sed -i 's|^binDir = .*|binDir = \$(DESTDIR)/bin|' Makefile
+#FIXME what to do of /home/local/db/ paths???
+make install-conda

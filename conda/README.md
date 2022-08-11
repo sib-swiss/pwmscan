@@ -2,13 +2,13 @@
 https://docs.conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-pkgs.html
 
 
-## Build locally chiseq in conda
+## Build locally pwmscan in conda
 ```bash
 conda build meta.yaml -c sibswiss -c bioconda
 ```
 
 
-## Install locally built chiseq in local conda
+## Install locally built pwmscan in local conda
 ```bash
 conda install --use-local pwmscan
 ```
@@ -46,7 +46,7 @@ anaconda upload -u sibswiss ~/miniconda3/conda-bld/linux-64/pwmscan-*.tar.bz2 ou
 anaconda logout
 ```
 
-## Install the chiseq package from anaconda
+## Install the pwmscan package from anaconda
 ```bash
 conda create --name pwmscan                       # Create an isolated environment
 conda activate pwmscan                            # Use this environment

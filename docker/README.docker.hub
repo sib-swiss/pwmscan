@@ -25,7 +25,12 @@ docker -D push sibswiss/pwmscan:latest
 
 # ALTERNATIVELY to build for different architectures:
 export DOCKER_CONTENT_TRUST=1
-docker buildx create --name mybuilder --use
+# test which architectures are available locally
+docker buildx ls
+# build for multiple architectures
+docker buildx create --use
 docker login
+docker tag pwmscan:$PWMSCAN_VERSION sibswiss/pwmscan:$PWMSCAN_VERSION
 docker buildx build  .  --platform linux/arm64,linux/amd64 --tag sibswiss/pwmscan:$PWMSCAN_VERSION --push
+docker tag pwmscan:$PWMSCAN_VERSION sibswiss/pwmscan:latest
 docker buildx build  .  --platform linux/arm64,linux/amd64 --tag sibswiss/pwmscan:latest           --push

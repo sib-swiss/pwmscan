@@ -23,6 +23,7 @@ for proc in {osx-64,osx-arm64,linux-32,linux-64,linux-ppc64,linux-ppc64le,linux-
     do conda convert --platform $proc ~/miniconda3/conda-bld/linux-64/pwmscan-*.tar.bz2 -o outputdir/;
 done
 #TO DEAL WITH bowtie, grep, perl-scalar-list-utils and perl-scalar-util-numeric requirements only for x84_64 currently
+#ALSO an issue with libgcc-ng (the GCC low-level runtime library) on Mac x86_64. Don't know how to replace it
 for proc in {osx-64,linux-64};
     do conda convert --platform $proc ~/miniconda3/conda-bld/linux-64/pwmscan-*.tar.bz2 -o outputdir/;
 done

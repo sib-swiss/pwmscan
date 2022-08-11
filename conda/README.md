@@ -22,7 +22,7 @@ conda convert --platform all ~/miniconda3/conda-bld/linux-64/pwmscan-*.tar.bz2 -
 for proc in {osx-64,osx-arm64,linux-32,linux-64,linux-ppc64,linux-ppc64le,linux-s390x,linux-armv6l,linux-armv7l,linux-aarch64};
     do conda convert --platform $proc ~/miniconda3/conda-bld/linux-64/pwmscan-*.tar.bz2 -o outputdir/;
 done
-#TO DEAL WITH grep requirement only for x84_64 currently
+#TO DEAL WITH bowtie, grep, perl-scalar-list-utils and perl-scalar-util-numeric requirements only for x84_64 currently
 for proc in {osx-64,linux-64};
     do conda convert --platform $proc ~/miniconda3/conda-bld/linux-64/pwmscan-*.tar.bz2 -o outputdir/;
 done

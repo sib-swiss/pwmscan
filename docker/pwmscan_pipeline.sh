@@ -73,8 +73,8 @@ $DOCKER_CMD mscan_bed2sga -i /bowtie_dir -f MA0137.3-STAT1 -s $ASSEMBLY /work_di
 
 # Generate BED file for UCSC
 #NOTE if not human or mouse (and few others) there is no track at UCSC!
-
-#sed '1s/^/track name=MA0137.3-STAT1 type=bedDetail description="motif matches" color=0,0,102 url=""\n/' $workDir/$pwmscanFile.bed > $workDir/$pwmscanFile_ucsc.bed ; gzip $workDir/$pwmscanFile_ucsc.bed
+#FIXME on the web the description is "motif matches" in the log but description "PWMScan motif matches" is produced!
+$DOCKER_CMD sed '1s/^/track name=MA0137.3-STAT1 type=bedDetail description="PWMScan motif matches" color=0,0,102 url=""\n/' /work_dir/pwmscan_${ASSEMBLY}_${MYPID}.bed > $WORK_DIR/pwmscan_${ASSEMBLY}_${MYPID}_ucsc.bed ; gzip -9 $WORK_DIR/pwmscan_${ASSEMBLY}_${MYPID}_ucsc.bed
 
 exit 0
 

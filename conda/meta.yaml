@@ -28,6 +28,7 @@ requirements:
     - grep
     - gawk
     - sed
+    - parallel
     - python ==2.7.15
     - bowtie ==1.2.2
     - chipseq ==1.5.5
@@ -39,6 +40,7 @@ requirements:
     - grep
     - gawk
     - sed
+    - parallel
     - python ==2.7.15
     - bowtie ==1.2.2
     - chipseq ==1.5.5
@@ -51,7 +53,6 @@ test:
     - lpmconvert.pl              2>&1 | grep -i usage
     - matrix_prob             -h 2>&1 | grep -i usage
     - matrix_scan             -h 2>&1 | grep -i usage
-    - matrix_scan_parallel.py -h 2>&1 | grep -i usage
     - mba                     -h 2>&1 | grep -i usage
     - mscan2bed               -h 2>&1 | grep -i usage
     - mscan_bed2sga           -h 2>&1 | grep -i usage

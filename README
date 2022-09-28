@@ -47,7 +47,7 @@ with a PWM:
 The Bowtie-based approach is more efficient for short PWMs and very low p-values
 (of the order of 10-5 or less).
 The matrix_scan program can be executed in parallel by processing individual
-chromosomes in parallel on multiple CPU-cores via a python script.
+chromosomes in parallel on multiple CPU-cores via GNU parallel.
 
 The Web interface automatically chooses the most suitable method.
 

@@ -25,8 +25,7 @@ NB - The $(binDir) variable is by default set to
      binDir defines the path to all binaries and scripts used by PWMScan.
      Make install changes the bin_dir variable of the installed bash wrapper scripts
      (pwm_scan, pwm_scan_ucsc, pwmlib_scan, pwmlib_scan_seq, pwm_mscan_wrapper,
-     pwm_mscan_wrapper_ucsc, pwm_bowtie_wrapper, and pwm_convert) as well as the
-      matrix_scan_parallel.py python script to point to binDir.
+     pwm_mscan_wrapper_ucsc, pwm_bowtie_wrapper, and pwm_convert) to point to binDir.
 
 - To unzip the genome files in $(PWD)/genomedb (the genome root directory) for assembly hg19:
 

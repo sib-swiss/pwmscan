@@ -41,7 +41,7 @@ RUN echo '# OS update' \
 	&& export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update  -y \
 	&&        echo '# Install OS requirements' \
-	&& apt-get install -y --no-install-recommends wget unzip ca-certificates make gcc libc6-dev man-db perl libmath-round-perl libscalar-util-numeric-perl libscalar-list-utils-perl python2 \
+	&& apt-get install -y --no-install-recommends wget unzip ca-certificates make gcc libc6-dev man-db perl libmath-round-perl libscalar-util-numeric-perl libscalar-list-utils-perl python2 parallel \
 	&&        echo '# Install PWMScan' \
 	&& cd /usr/local/ \
 	&& wget 'https://gitlab.sib.swiss/EPD/pwmscan/-/archive/master/pwmscan-master.tar.gz' \

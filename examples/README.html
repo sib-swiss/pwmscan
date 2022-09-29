@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang='en'>
     <head>
-        <title>README - Examples</TITLE>
+        <title>README - Examples</title>
         <style>
             .tab { margin-left: 40px; }
             .code { color: Teal ;
@@ -242,9 +242,7 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
 
 
         <h3>Analysis Pipeline using two different scanning methods</h3>
-        <ul style='list-style-type: none;'>
-        <li><strong>1) Calculate the matrix score corresponding to p-value=0.00001 (10<sup>-5</sup>)</strong></li>
-        </ul>
+        <h4><strong>1) Calculate the matrix score corresponding to p-value=0.00001 (10<sup>-5</sup>)</strong></h4>
 
         <p class="code">
             ../bin/matrix_prob -e 0.00001 --bg "0.29,0.21,0.21,0.29" chen10_ctcf.mat
@@ -266,22 +264,18 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
             </ul>
            <p>
            If you are interested in using the first approach, you should read <strong>Sections 2), 3) and 4)</strong>, whereas for using matrix_scan please refer to <strong>Sections 2) and 5)</strong>.
-        <p>
-            <li>
-                <strong>2) Generate the PWM Score Cumulative Distribution</strong><p>
+
+            <h4><strong>2) Generate the PWM Score Cumulative Distribution</strong></h4>
                 The cumulative score distribution is used to assign a p-value to a match score.
                 The matrix_prob program is used to compute the cumulative score distribution.
-            </li>
 
             <p class="code">
                 ../bin/matrix_prob --bg "0.29,0.21,0.21,0.29" chen10_ctcf.mat &gt; chen10_ctcf_co1128_scoretab.txt
             </p>
 
-            <li>
-                <strong>3) Generate a list of all tags that represent all possible PWM matches (with minimal score of 1128)</strong><p>
+                <h4><strong>3) Generate a list of all tags that represent all possible PWM matches (with minimal score of 1128)</strong></h4>
                 <span style="color:firebrick">This step is only necessary if fast string-matchig tools, such as Bowtie,
                 are used to scan the genome.</span>
-            </li>
 
             <p class="code">
                 ../bin/mba -c 1128 chen10_ctcf.mat &gt; chen10_ctcf_co1128.dat<br>
@@ -290,16 +284,11 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
             </p>
 
             The reason for generating a match list in FASTA format is that we want to carry the match score over to the next steps (see below).
-           <p>
 
-            <li>
-                <strong>4) Map the tags representing the PWM to hg19</strong>
-           <p>
+                <h4><strong>4) Map the tags representing the PWM to hg19</strong></h4>
                 PWMScan uses the program Bowtie to map all matching tags to the hg19 genome assembly.
-            </li>
 
            <p>
-                <li>
                     <strong style="color:firebrick">1- Bowtie</strong>
                     <p>
                        Let's define GENOME_DIR as the genome root directory:
@@ -307,7 +296,6 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
                             <li style="color:blue">GENOME_DIR = ../genomedb</li>
                             <li style="color:blue">chr_NC_PATH = GENOME_DIR</li>
                         </ul>
-                    <p>
                     <p>
                         Let's define BOWTIE_DIR as the directory containing the Bowtie indexed genomes:
                         The <em style="color:blue">h_sapiens_hg19</em> tag identifies the Bowtie index files linked to the hg19 human assembly.<br>
@@ -342,22 +330,19 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
                             # In such case, you can run the entire pipeline as follows:</span><br>
                              ../bin/mba -c 1128 chen10_ctcf.mat | awk '{print "&gt;"$2"\n"$1}' | bowtie --threads 4 -l 19 -n0 -a ../genomedb/bowtie/h_sapiens_hg19 -f - --un unmapped.dat | sort -s -k3,3 -k4,4n | ../bin/bowtie2bed -s hg19 -l 19 -i ../genomedb | awk 'BEGIN { while((getline line &lt; "chen10_ctcf_co1128_scoretab.txt") &gt; 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close("chen10_ctcf_co1128_scoretab.txt")} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""chen10_ctcf""\t""P-value="pvalue[$5]}' &gt; chen10_ctcf_co1128_bowtie.bed<br>
                         </p>
-                </li>
-        <p>
-        <li><strong>5) Using matrix_scan</strong>
+
+        <h4><strong>5) Using matrix_scan</strong></h4>
         <p>
            Let's define GENOME_DIR as the genome root directory:
-        <p>
-             <ul style='list-style-type:none'>
+           <ul style='list-style-type:none'>
              <li style="color:blue">GENOME_DIR = ../genomedb</li>
              <li style="color:blue">chr_NC_PATH = GENOME_DIR</li>
-             </ul>
-        <p>
-          We define as ASSEMBLY_DIR the sub-directory containing all the hg19 chromosome FASTA files:
-        <p>
-             <ul style='list-style-type:none'>
+           </ul>
+
+           We define as ASSEMBLY_DIR the sub-directory containing all the hg19 chromosome FASTA files:
+           <ul style='list-style-type:none'>
              <li style="color:blue">ASSEMBLY_DIR = GENOME_DIR/hg19</li>
-             </ul>
+           </ul>
         <p>
            The command to scan the hg19 genome against the chen10 CTCF PWM is the following:
         <p>
@@ -374,12 +359,11 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         <p>
            <span style="color:firebrick"># Parallelization of matrix_scan</span><br>
            To improve performance, we can run matrix_scan in parallel (on each chromosome file) using <strong>GNU parallel</strong> that dispatches the jobs to available CPU-cores. In this way, matrix_scan competes with the Bowtie-based approach.
-        <p>
-           <p class="code">
+         <p class="code">
            <span style="color:firebrick"># Example:</span><br>
            <em>cat ../genomedb/hg19/chrom*.seq | ../bin/matrix_scan -m chen10_ctcf.mat -c 1128 | sort -s -k1,1 -k2,2n -k6,6 &gt; chen10_ctcf_co1128_matrix_scan.out</em>
         <br>
-           <span style="color:firebrick"># To use GNU parallel, type the following command:</span><br> 
+           <span style="color:firebrick"># To use GNU parallel, type the following command:</span><br>
            <em>find ../genomedb/hg19/ -name chrom\*.seq -exec echo "../bin/matrix_scan -m chen10_ctcf.mat -c 1128" {} \; | grep -v chromMt | parallel -P 15 | sort -s -k1,1 -k2,2n -k6,6 &gt; chen10_ctcf_co1128_matrix_scan.out</em>
         <br><br>
            <span style="color:firebrick"># The -P option is used to set the maximum number of parallel processes for execution of matrix_scan. The above example takes only about 20 seconds to complete the task in agreement with Bowtie.</span><br><br>
@@ -405,7 +389,6 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         </p>
            </li></ul>
 
-        <p>
         <h3> Shell (bash) Wrappers to execute the analysis pipeline</h3>
          <p class="tab">
          These shell wrapper scripts have been written to make it easier to run the whole pwmscan pipeline, irrespecitve of what method one chooses.
@@ -445,11 +428,11 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         <br>
          <ul style='list-style-type: none;'>
          <li><strong style="color:firebrick">1) Bowtie (pwm_bowtie_wrapper)</strong> script
-        <div class="code">
+        <p class="code">
            # Usage: <br>pwm_bowtie_wrapper -m &lt;matrix-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
         - version 1.1.6<br>
         where options are:<br>
-             -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
+             -b &lt;bg_comp&gt; &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
              -f  &nbsp;&nbsp;&nbsp; Scan sequences in forward direction [def=bidirectional]<br>
              -o  &nbsp;&nbsp;&nbsp; Allow for overlapping matches [def=non-overlapping matches]<br>
@@ -467,14 +450,14 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         <br>
            <span style="color:firebrick"># Total number of PWM matches  : 143597</span>
         <br>
-        </div>
+        </p>
 
         </li><li><strong style="color:firebrick">2) Matrix Scan (pwm_mscan_wrapper)</strong> script
         <p class="code">
            # Usage:<br> pwm_mscan_wrapper -m &lt;matrix-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
         - version 1.1.6<br>
         where options are:<br>
-             -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
+             -b &lt;bg_comp&gt; &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
              -f  &nbsp;&nbsp;&nbsp; Scan sequences in forward direction [def=bidirectional]<br>
              -o  &nbsp;&nbsp;&nbsp; Allow for overlapping matches [def=non-overlapping matches]<br>
@@ -500,7 +483,7 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
            # Usage:<br> pwm_scan -m &lt;matrix-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
         - version 1.1.6<br>
         where options are:<br>
-             -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
+             -b &lt;bg_comp&gt; &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
              -f  &nbsp;&nbsp;&nbsp; Scan sequences in forward direction [def=bidirectional]<br>
              -o  &nbsp;&nbsp;&nbsp; Allow for overlapping matches [def=non-overlapping matches]<br>
@@ -542,7 +525,7 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
            # Usage:<br> pwmlib_scan -l &lt;pwmlib-file&gt; -e &lt;p-value&gt; -d &lt;genome-root-dir&gt; -s &lt;assembly[hg19|mm9|..]&gt; [options]<br>
         - version 1.1.6<br>
         where options are:<br>
-             -b <bg_comp> &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
+             -b &lt;bg_comp&gt; &nbsp;&nbsp; Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[def=predefined for some common genome assemblies, else set to uniform]<br>
              -g  &nbsp;&nbsp;&nbsp; PWM format. Accepted formats are : meme, logodds [def], and lpm<br>
              -f  &nbsp;&nbsp;&nbsp; Scan sequences in forward direction [def=bidirectional]<br>
@@ -569,7 +552,6 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         <h3> Shell (bash) Wrapper for matrix conversion</h3>
          <p class="tab">
          The pwm_convert bash script is used to convert JASPAR, TRANSFAC, PFM, LPM and real PWM formats to integer log-odds format.
-         <ul style='list-style-type:none'>
         <div class="code">
            # Usage: pwm_convert &lt;matrix-file&gt; -f=&lt;format [jaspar|transfac|lpm|pfm|real]&gt;
              <br>
@@ -577,15 +559,15 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
              <br>
 &nbsp;&nbsp;&nbsp;&nbsp;  -h                  show help message
              <br>
-&nbsp;&nbsp;&nbsp;&nbsp;  -b=<bg-freq-file>   bg nucleotide composition file
+&nbsp;&nbsp;&nbsp;&nbsp;  -b=&lt;bg-freq-file&gt;   bg nucleotide composition file
              <br>
-&nbsp;&nbsp;&nbsp;&nbsp;  -c=<pseudo-cnt>     pseudo-count fraction [def=0]
+&nbsp;&nbsp;&nbsp;&nbsp;  -c=&lt;pseudo-cnt&gt;     pseudo-count fraction [def=0]
              <br>
-&nbsp;&nbsp;&nbsp;&nbsp;  -m=<minscore>       minimal score value [def=-10000]
+&nbsp;&nbsp;&nbsp;&nbsp;  -m=&lt;minscore&gt;       minimal score value [def=-10000]
              <br>
-&nbsp;&nbsp;&nbsp;&nbsp;  -n=<log-scaling>    log scaling factor [def=100]
+&nbsp;&nbsp;&nbsp;&nbsp;  -n=&lt;log-scaling&gt;    log scaling factor [def=100]
              <br>
-&nbsp;&nbsp;&nbsp;&nbsp;  -s=<mult>           matrix multiplication factor (for real PWMs) [def=100]
+&nbsp;&nbsp;&nbsp;&nbsp;  -s=&lt;mult&gt;           matrix multiplication factor (for real PWMs) [def=100]
              <br>
 &nbsp;&nbsp;&nbsp;&nbsp;  Convert JASPAR, TRANSFAC, PFM, LPM and real PWM formats to integer log likelihoods (log-odds) format.
         <br>
@@ -616,24 +598,21 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         <br>
              <em>bash ../bin/pwm_convert stat1_pfm.mat -f=pfm 2&gt;/dev/null</em><br>
         <br>
-		</div>
-        </ul>
+        </div>
 
-        <p>
         <h3> How to compute the background base composition of a set of DNA sequences</h3>
         <p class="tab">
-         <ul style='list-style-type:none'>
         The program <em style="color:blue">seq_extract_bcomp</em> can be used to extract BED regions from a set of FASTA-formatted sequences or, optionally, compute the base composition of a set of DNA sequences. When computing the base composition, the seq_extract_bcomp program can either extract BED-defined regions or use the FASTA input as a whole (if the BED file is not given).<br><br>
 
-        <em># Usage: seq_extract_bcomp [options] [-f <bed_file>] [-s <species>] [<] [<fasta_file>|stdin]<br><br>
+        <em># Usage: seq_extract_bcomp [options] [-f &lt;bed_file&gt;] [-s &lt;species&gt;] [&lt;] [&lt;fasta_file&gt;|stdin]<br><br>
      where options are:<br>
 &nbsp;&nbsp; -d          &nbsp;&nbsp;&nbsp;&nbsp;Print debug information<br>
 &nbsp;&nbsp; -h          &nbsp;&nbsp;&nbsp;&nbsp;Show this help text<br>
 &nbsp;&nbsp; -c          &nbsp;&nbsp;&nbsp;&nbsp;Compute base composition [def=on forward strand]<br>
 &nbsp;&nbsp; -b          &nbsp;&nbsp;&nbsp;&nbsp;Compute base composition on both strand [-c is required]<br>
 &nbsp;&nbsp; -r          &nbsp;&nbsp;&nbsp;&nbsp;Compute base composition on reverse strand [-c is required]<br>
-&nbsp;&nbsp; -i <int>    &nbsp;&nbsp;&nbsp;&nbsp;AC index (after how many pipes |) for FASTA header [2]<br>
-&nbsp;&nbsp; -p <path>   &nbsp;&nbsp;&nbsp;&nbsp;Use <path> to locate the chr_NC_gi file [if BED file is given]<br>
+&nbsp;&nbsp; -i &lt;int&gt;    &nbsp;&nbsp;&nbsp;&nbsp;AC index (after how many pipes |) for FASTA header [2]<br>
+&nbsp;&nbsp; -p &lt;path&gt;   &nbsp;&nbsp;&nbsp;&nbsp;Use &lt;path&gt; to locate the chr_NC_gi file [if BED file is given]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[default is: $HOME/db/genome]<br><br>
 
         Extract BED regions from a set of FASTA-formatted sequences.<br>
@@ -641,7 +620,7 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
         Optionally (-c), the program computes and only outputs the base composition,<br>
         in which case sequences can be extracted directly from the FASTA input or,<br>
         as for the extraction mode, specified in a BED file. If the BED file is not<br>
-        given, the <species> argument is not required. If base composition mode is set<br>
+        given, the &lt;species&gt; argument is not required. If base composition mode is set<br>
         (-c option), the program can optionally compute it on both strands (-b option)<br>
         for strand-symmetric base composition or on the reverse strand only (-r).</em><br><br>
         <p class="code">
@@ -660,24 +639,24 @@ Upon installation, all PWMScan-specific binary files are located in the bin sub-
            <em> ../bin/seq_extract_bcomp -cb seq_extract_stat1_peaks.fa</em><br><br>
             Total Sequence length: 4863558<br>
             0.24,0.26,0.26,0.24<br><br>
-        </ul>
 
-        <p>
         <h3> How to build Bowtie index files</h3>
         <p class="tab">
-         <ul style='list-style-type:none'>
           Let's define BOWTIE_DIR as as the directory containing the bowtie indices and ASSEMBLY_DIR as the one where the FASTA chromosome files for a specific assembly (e.g. hg19) are stored.<br>
           Go to the BOWTIE_DIR directory, and concatenate all chromosome files into a sequence file <em style="color:blue">h_sapiens_hg19.fa</em> that includes the entire hg19 genome assembly:
-        <p class="tab">
-          ls -1 -v ASSEMBLY_DIR/chrom*.seq | xargs cat &gt; h_sapiens_hg19.fa
+          <br><br>
+            ls -1 -v ASSEMBLY_DIR/chrom*.seq | xargs cat &gt; h_sapiens_hg19.fa
+        </p>
         <p class="code">
           <span style="color:firebrick"># Example:</span><br>
           <em> cd ../genomedb/bowtie</em><br>
           <em> ls -1 -v ../hg19/chrom*.seq | xargs cat &gt; h_sapiens_hg19.fa</em><br><br>
         </p>
+        <p class="tab">
           You then execute the following command:
+        </p>
         <p class="code">
           bowtie-build -f h_sapiens_hg19.fa h_sapiens_hg19
-        </ul>
+        </p>
     </body>
 </html>

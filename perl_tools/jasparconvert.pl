@@ -1,16 +1,16 @@
 #!/usr/bin/env perl
 # FILE: jasparconvert
 # CREATE DATE: 8/27/2013
-# AUTHOR: Giovanna Ambrosini 
+# AUTHOR: Giovanna Ambrosini
 #
 # Part of the code is based on an implemetation by
 # William Stafford Noble and Timothy L. Bailey
 # Created in 1999
 # ORIG: transfac2meme.pl
 
-# Giovanna Ambrosini 18/10/2017 
+# Giovanna Ambrosini 18/10/2017
 # Add pseudo weight fraction to correct frequencies
-# 
+#
 
 use warnings;
 use Math::Round;
@@ -23,25 +23,25 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $c = 0;				# default pseudocount fraction
+my $c = 0;  # default pseudocount fraction
 my $logscl = 100;
 my $minscore = -10000;
 
-my $usage = "USAGE: jasparconvert.pl [options] <matrix file>
+my $usage = "USAGE: $0 [options] <matrix file>
 
-  Options: -species <name>              not used yet
-	   -bg <background file>	set of f_a
-	   -c <pseudo weight>	        add an arbitrary pseudo weight fraction <c> to each freq
-					default: $c
-           -m <low value score>         set low value score
+  Options: -species <name>          not used yet
+       -bg <background file>        set of f_a
+       -c <pseudo weight>           add an arbitrary pseudo weight fraction <c> to each freq
+                                        default: $c
+       -m <low value score>         set low value score
                                         default: $minscore
-           -n <log scaling factor>      set log scaling factor (int)
+       -n <log scaling factor>      set log scaling factor (int)
                                         default: 100
-           -noheader                    write raw matrix (without header)
-           -o <outfile>                 output file name
+       -noheader                    write raw matrix (without header)
+       -o <outfile>                 output file name
                                         default: no output file
-	   -w <l>|<p>                   <l> select log-odds matrix format for written output
-	                                <p> select letter-probability matrix format for written output
+       -w <l>|<p>                   <l> select log-odds matrix format for written output
+                                    <p> select letter-probability matrix format for written output
                                         default format: original JASPAR frequency matrix
 
   Convert a JASPAR matrix file to MEME format (i.e. integer log likelihoods or letter-probability matrix).
@@ -106,19 +106,19 @@ if (defined($bg_file)) {
   open($bg_file, "<$bg_file") || die("Can't open $bg_file.\n");
   $total_bg = 0;
   while (<$bg_file>) {
-    next if (/^#/);			# skip comments
+    next if (/^#/);  # skip comments
     ($a, $f) = split;
     if ($a eq "A" || $a eq "a") {
-      $bg{"A"} = $f; 
+      $bg{"A"} = $f;
       $total_bg += $f;
     } elsif ($a eq "C" || $a eq "c") {
-      $bg{"C"} = $f; 
+      $bg{"C"} = $f;
       $total_bg += $f;
     } elsif ($a eq "G" || $a eq "g") {
-      $bg{"G"} = $f; 
+      $bg{"G"} = $f;
       $total_bg += $f;
     } elsif ($a eq "T" || $a eq "t") {
-      $bg{"T"} = $f; 
+      $bg{"T"} = $f;
       $total_bg += $f;
     }
   }
@@ -154,7 +154,7 @@ my $prev_curspos = 0;
 while ($line = <MF>) {
   $i_motif = 0;
   $i_base = 0;
-  
+
   #print $line;
 
   # Check header (new matrix)
@@ -182,10 +182,10 @@ while ($line = <MF>) {
       $line = <MF>;
       $curspos = tell(MF);
       #print "CURSOR POS : $curspos\n";
-      
+
       if (! defined $line ) {
         print "\n";
-	last;
+        last;
       }
       print $line;
 
@@ -194,15 +194,15 @@ while ($line = <MF>) {
       }
 
       if ($line =~ />/) {
-        seek(MF, $prev_curspos, 0);  
+        seek(MF, $prev_curspos, 0);
         #print("Moving cursor to POS $prev_curspos\n");
-	last;
+        last;
       }
       $width = scalar(@counts);
 
       # Store the contents of this row.
       for ($i_motif = 0; $i_motif < $width;  $i_motif++) {
-	$motif{$i_base, $i_motif} = shift(@counts);
+        $motif{$i_base, $i_motif} = shift(@counts);
         #print "  motif{$i_base, $i_motif} : $motif{$i_base, $i_motif}";
       }
       #print "\n";
@@ -212,13 +212,13 @@ while ($line = <MF>) {
        #print "PREV CURSOR POS : $prev_curspos\n";
       }
     } # END OF WHILE ON SINGLE MATRIX
-    if ($defout) { 
+    if ($defout) {
       print OF ">MOTIF $matrix_id $matrix_name len=$width\n";
     }
     print "MOTIF $matrix_id $matrix_name len=$width\n";
     for ($i_motif = 0; $i_motif < $width; $i_motif++) {
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-        if ($defout) { 
+        if ($defout) {
           printf (OF "%7d ",  $motif{$i_base, $i_motif});
         }
         printf ("%7d ",  $motif{$i_base, $i_motif});
@@ -251,8 +251,8 @@ while ($line = <MF>) {
 #       $num_seqs += $motif{$i_base, $i_motif};
 #     }
 #     for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-#	$motif{$i_base, $i_motif} = 
-#          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
+#        $motif{$i_base, $i_motif} =
+#          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) /
 #          ($num_seqs + $b);
 #     }
 #   }
@@ -266,7 +266,7 @@ while ($line = <MF>) {
       # is this the right species?
       $print_it = ($this_species =~ m/$species/);
       if ($this_species eq "") {
-	print(STDERR "Warning: No species given for $matrix_name.\n");
+        print(STDERR "Warning: No species given for $matrix_name.\n");
       }
     }
 
@@ -283,24 +283,24 @@ while ($line = <MF>) {
       }
       print("log-odds matrix $matrix_id $matrix_name: alength= $num_bases w= $width n= 0 bayes= 0 E= 0\n");
       for ($i_motif = 0; $i_motif < $width; $i_motif++) {
-	for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+        for ($i_base = 0; $i_base < $num_bases; $i_base++) {
           if ($logodds) {
             if ($motif{$i_base, $i_motif}) {
-	      printf(OF "%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
+              printf(OF "%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
             } else {
               printf(OF "%7d ", $minscore);
             }
           }
           if ($motif{$i_base, $i_motif}) { #log2
-	    printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
+            printf("%7d ", round((log( $motif{$i_base, $i_motif} / $bg{$bases[$i_base]} )/log(2.0))*$logscl) );
           } else {
             printf("%7d ", $minscore);
           }
-	}
+    }
         if ($logodds) {
-	  print(OF "\n");
+            print(OF "\n");
         }
-	print("\n");
+        print("\n");
       }
       print("\n");
 
@@ -314,16 +314,16 @@ while ($line = <MF>) {
       print("letter-probability matrix $matrix_id $matrix_name: ");
       print("alength= $num_bases w= $width nsites= $num_seqs E= 0\n");
       for ($i_motif = 0; $i_motif < $width; $i_motif++) {
-	for ($i_base = 0; $i_base < $num_bases; $i_base++) {
+        for ($i_base = 0; $i_base < $num_bases; $i_base++) {
           if ($letprob) {
-	    printf(OF "  %8.6f\t", $motif{$i_base, $i_motif});
+            printf(OF "  %8.6f\t", $motif{$i_base, $i_motif});
           }
-	  printf("  %8.6f\t", $motif{$i_base, $i_motif});
-	}
-        if ($letprob) {
-	  print(OF "\n");
+          printf("  %8.6f\t", $motif{$i_base, $i_motif});
         }
-	print("\n");
+        if ($letprob) {
+          print(OF "\n");
+        }
+        print("\n");
       }
       print("\n");
     } else {
@@ -339,3 +339,4 @@ close(MF);
 if ($ofile) {
   close(OF);
 }
+

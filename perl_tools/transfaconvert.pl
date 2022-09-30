@@ -17,23 +17,23 @@ use warnings;
 use Math::Round;
 
 # Set up global variables. Assume uniform.
-my @bases = ("A", "C", "G", "T");
+my @bases = ('A', 'C', 'G', 'T');
 my $num_bases = 4;
 my %bg = ();
 $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-my $c = 0;				# default total pseudocounts
+my $c = 0;  # default total pseudocounts
 my $logscl = 100;
 my $minscore = -10000;
 
-my $usage = "USAGE: transfaconvert.pl [options] <matrix file>
+my $usage = "USAGE: $0 [options] <matrix file>
 
   Options: -species <name>
            -skip <transfac ID> (may be repeated)
            -ids <file containing list of transfac IDs>
-	   -bg <background file>	set of f_a
+           -bg <background file>        set of f_a
            -c <pseudo weight>           add an arbitrary pseudo weight fraction <c> to each freq
                                         default: $c
            -m <low value score>         set low value score
@@ -118,7 +118,7 @@ if (defined($bg_file)) {
   open($bg_file, "<$bg_file") || die("Can't open $bg_file.\n");
   $total_bg = 0;
   while (<$bg_file>) {
-    next if (/^#/);			# skip comments
+    next if (/^#/);  # skip comments
     ($a, $f) = split;
     if ($a eq "A" || $a eq "a") {
       $bg{"A"} = $f; 
@@ -178,13 +178,13 @@ while ($line = <MF>) {
       $line = <MF>;
 
       if (! defined($line)) {
-	die ("Can't find PO line for TRANSFAC matrix $matrix_name.\n");
+        die ("Can't find PO line for TRANSFAC matrix $matrix_name.\n");
       }
       ($id, @data) = split(' ', $line);
 
       # Store the species line.
       if ($id eq "BF") {
-	$this_species .= $line;
+        $this_species .= $line;
       }
     }
 
@@ -194,18 +194,18 @@ while ($line = <MF>) {
       $line = <MF>;
 
       if (! defined $line ) {
-	die ("Can't find `XX' line for TRANSFAC matrix $matrix_name.\n");
+        die ("Can't find `XX' line for TRANSFAC matrix $matrix_name.\n");
       }
 
       ($id, @counts) = split(' ', $line);
 
       if ($id eq "XX") {
-	last;
+        last;
       }
 
       # Store the contents of this row.
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	$motif{$i_base, $i_motif} = shift(@counts);
+        $motif{$i_base, $i_motif} = shift(@counts);
       }
       
       $i_motif++;
@@ -261,10 +261,10 @@ while ($line = <MF>) {
 #      # motif columns may have different counts
 #      $num_seqs = 0;
 #      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-#	$num_seqs += $motif{$i_base, $i_motif};
+#        $num_seqs += $motif{$i_base, $i_motif};
 #      }
 #      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-#	$motif{$i_base, $i_motif} = 
+#        $motif{$i_base, $i_motif} = 
 #          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
 #          ($num_seqs + $b);
 #      }
@@ -286,7 +286,7 @@ while ($line = <MF>) {
       # is this the right species?
       $print_it = ($this_species =~ m/$species/);
       if ($this_species eq "") {
-	print(STDERR "Warning: No species given for $matrix_name.\n");
+        print(STDERR "Warning: No species given for $matrix_name.\n");
       }
     }
 

@@ -16,10 +16,15 @@ use Scalar::Util::Numeric qw(isnum isint isfloat);
 use Math::Round;
 
 # Set up global variables. Assume uniform.
-my @bases = ("A", "C", "G", "T");
+my @bases = ('A', 'C', 'G', 'T');
 my $num_bases = 4;
+my %bg = ();
+$bg{"A"} = 0.25;
+$bg{"C"} = 0.25;
+$bg{"G"} = 0.25;
+$bg{"T"} = 0.25;
 
-my $usage = "USAGE: pwmconvert.pl [options] <matrix file>
+my $usage = "USAGE: $0 [options] <matrix file>
 
   Options: 
            -c                           check format : check whether PWM scores are Real or Integer 
@@ -83,9 +88,11 @@ if ($ofile) {
   open(OF, ">$out_file") || die("Can't open $out_file.\n");
 }
 
-# Print the MEME-like header.
+# Print the MEME header.
 print("ALPHABET= ACGT\n\n");
 print("strands: + -\n\n");
+print("Background letter frequencies (from dataset with add-one prior applied):\n");
+printf("A %f C %f G %f T %f\n\n",  $bg{"A"}, $bg{"C"}, $bg{"G"}, $bg{"T"});
 
 # Read the input file.
 $num_motifs = 0;
@@ -253,7 +260,7 @@ while ($line = <MF>) {
         $line = <MF>;
 
         if (! defined($line)) {
-  	  die ("Can't find second XX line for SSA matrix $matrix_name.\n");
+            die ("Can't find second XX line for SSA matrix $matrix_name.\n");
         }
         ($id, @data) = split(' ', $line);
         # Store the coff line.
@@ -267,18 +274,18 @@ while ($line = <MF>) {
         $line = <MF>;
 
         if (! defined $line ) {
-  	  die ("Can't find `//' line for SSA matrix $matrix_name.\n");
+            die ("Can't find `//' line for SSA matrix $matrix_name.\n");
         }
 
         ($id, @counts) = split(' ', $line);
 
         if ($id eq "//") {
-  	  last;
+            last;
         }
         # Store the contents of this row.
         $pos{$i_motif} = shift(@counts);
         for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	  $motif{$i_base, $i_motif} = shift(@counts);
+          $motif{$i_base, $i_motif} = shift(@counts);
           $mat[$k][$i_base] = $motif{$i_base, $i_motif};
           if (($mat[$k][$i_base] != 0) and isint($mat[$k][$i_base])) {
             $float_flag = 0;
@@ -339,7 +346,7 @@ while ($line = <MF>) {
       for ($i_motif = 0; $i_motif < $width; $i_motif++) {
         # motif columns may have different counts
         for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-  	  printf ("%7d ", round($motif{$i_base, $i_motif} * $scale)); 
+            printf ("%7d ", round($motif{$i_base, $i_motif} * $scale)); 
         }
         print("\n");
       }

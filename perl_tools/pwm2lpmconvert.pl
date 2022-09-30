@@ -14,12 +14,12 @@ use Scalar::Util::Numeric qw(isnum isint isfloat);
 use Math::Round;
 
 # Set up global variables. Assume uniform.
-my @bases = ("A", "C", "G", "T");
+my @bases = ('A', 'C', 'G', 'T');
 my $num_bases = 4;
 
 my $logscl = 1;
 
-my $usage = "USAGE: pwm2pfmconvert.pl [options] <matrix file>
+my $usage = "USAGE: $0 [options] <matrix file>
 
   Options:
            -n <log scaling factor>      set log scaling factor (int) default: 1
@@ -97,7 +97,11 @@ while ($line = <MF>) {
     $i_motif = 0;
     if ($line  =~ /^#/ or $line  =~ /^>/) {
       # Have we reached a new matrix?
-      ($matrix_name) = $line =~/^[\#\>]\s*(\S+).*/;
+      if ($line =~ /log-odds matrix/) {
+        ($matrix_name) = $line =~/^[\#\>]\s*log-odds matrix (\S+\s\S+):.*/;
+      } else {
+        ($matrix_name) = $line =~/^[\#\>]\s*(\S+).*/;
+      }
       # Read the motif.
       while (<MF>) {
         last if (/\/\//);
@@ -219,7 +223,7 @@ while ($line = <MF>) {
         $line = <MF>;
 
         if (! defined($line)) {
-  	  die ("Can't find second XX line for SSA matrix $matrix_name.\n");
+            die ("Can't find second XX line for SSA matrix $matrix_name.\n");
         }
         ($id, @data) = split(' ', $line);
         # Store the coff line.
@@ -233,18 +237,18 @@ while ($line = <MF>) {
         $line = <MF>;
 
         if (! defined $line ) {
-  	  die ("Can't find `//' line for SSA matrix $matrix_name.\n");
+            die ("Can't find `//' line for SSA matrix $matrix_name.\n");
         }
 
         ($id, @counts) = split(' ', $line);
 
         if ($id eq "//") {
-  	  last;
+            last;
         }
         # Store the contents of this row.
         $pos{$i_motif} = shift(@counts);
         for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	  $motif{$i_base, $i_motif} = shift(@counts);
+          $motif{$i_base, $i_motif} = shift(@counts);
           $mat[$k][$i_base] = $motif{$i_base, $i_motif};
           if (($mat[$k][$i_base] != 0) and isint($mat[$k][$i_base])) {
             $float_flag = 0;
@@ -286,7 +290,7 @@ while ($line = <MF>) {
       for ($i_motif = 0; $i_motif < $width; $i_motif++) {
         # motif columns may have different counts
         for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-  	  printf ("%8.6f ", $motif{$i_base, $i_motif}/$norm_sum[$i_motif]); 
+            printf ("%8.6f ", $motif{$i_base, $i_motif}/$norm_sum[$i_motif]); 
         }
         print("\n");
       }

@@ -22,24 +22,24 @@ $bg{"A"} = 0.25;
 $bg{"C"} = 0.25;
 $bg{"G"} = 0.25;
 $bg{"T"} = 0.25;
-#my $c = 0.0001;			# default pseudo-weight
-my $c = 0;				# default pseudo-weight
+#my $c = 0.0001;   # default pseudo-weight
+my $c = 0;        # default pseudo-weight
 my $logscl = 100;
 my $minscore = -10000;
 
-my $usage = "USAGE: lpmconvert.pl [options] <matrix file>
+my $usage = "USAGE: $0 [options] <matrix file>
 
   Options: 
-	   -bg <background file>	set of f_a
-	   -c <pseudo weight>		add pseudo weight fraction <c> distributed according to residue priors
-					default: $c
+           -bg <background file>        set of f_a
+           -c <pseudo weight>           add pseudo weight fraction <c> distributed according to residue priors
+                                            default: $c
            -m <low value score>         set lowest value score (if set, default pseudo-weight=0)
-                                        default: $minscore
+                                            default: $minscore
            -n <log scaling factor>      set log scaling factor (int)
-                                        default: 100
+                                            default: 100
            -noheader                    write raw matrix (without header)
            -o <outfile>                 output file name
-                                        default: no output file
+                                            default: no output file
   
   Convert a Letter Probability Matrix (LPM) file to a Position Weihgt Matrix (PWM) with integer log odds weights.
   A letter probability matrix (LPM) records the position-dependent probability normalized to 1 of each residue or nucleotide.\n\n";
@@ -84,7 +84,7 @@ if (defined($bg_file)) {
   open($bg_file, "<$bg_file") || die("Can't open $bg_file.\n");
   $total_bg = 0;
   while (<$bg_file>) {
-    next if (/^#/);			# skip comments
+    next if (/^#/);  # skip comments
     ($a, $f) = split;
     if ($a eq "A" || $a eq "a") {
       $bg{"A"} = $f; 
@@ -175,7 +175,7 @@ while ($line = <MF>) {
       
       # Store the contents of this row.
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-	$motif{$i_base, $i_motif} = shift(@counts);
+        $motif{$i_base, $i_motif} = shift(@counts);
         chomp $motif{$i_base, $i_motif};
       }
       $i_motif++;

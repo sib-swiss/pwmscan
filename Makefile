@@ -2,7 +2,7 @@
 # Makefile for PWMScan project
 #
 CC = gcc
-LDFLAGS = -fPIC -lm
+LDFLAGS = -O3 -fPIC -lm
 
 CFLAGS = -O3 -std=gnu99 -W -Wall -pedantic
 CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall

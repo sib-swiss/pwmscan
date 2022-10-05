@@ -42,7 +42,6 @@ DOCKER_CMD="docker run --rm -i --mount type=bind,source=`realpath $WORK_DIR`,tar
 #TODO what to log in $WORK_DIR/pwmscan_${MYPID}.log???
 
 # Matrix conversion
-#FIXME web part contains extra lines: *Background letter frequencies (from dataset with add-one prior applied)*
 $DOCKER_CMD pwmconvert.pl -c /work_dir/$INPUT_MATRIX 1>$WORK_DIR/pwmscan_${MYPID}_pwmconvert.log 2>/dev/null
 echo 'FORMAT:' `tail -1 $WORK_DIR/pwmscan_${MYPID}_pwmconvert.log`
 

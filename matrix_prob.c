@@ -1,6 +1,6 @@
 /*
 
-  Compute the cumulative score distribution of a Position Weight Matrix (PWM) 
+  Compute the cumulative score distribution of a Position Weight Matrix (PWM)
 
   PWMs elements are integer numbers that are calculated as log-likelihoods.
 
@@ -10,7 +10,7 @@
             the corresponding score and e-value are computed.
   - If the cut-off score is set:
             the corresponding cut-off percentage and e-value are computed.
-  
+
   Giovanna Ambrosini, EPFL/SV, giovanna.ambrosini@epfl.ch
 
   Copyright (c) 2014
@@ -78,7 +78,7 @@ float Pvalue;
 float Percentage;
 int Score;
 
-static int 
+static int
 read_pwm(FILE *input, char *iFile)
 {
   FILE *f = input;
@@ -270,7 +270,7 @@ process_pwm()
 {
   int i;  /* Nucleoitide code  */
   int k;  /* PWM row           */
-  int j;  /* PWM Score array   */ 
+  int j;  /* PWM Score array   */
   int max = 0;
   int tmp_max = 0;
   int min = 0;
@@ -287,7 +287,7 @@ process_pwm()
   /* Rescale PWM to set min=0 for each pwm position/row */
   /* Save nex max score and offset */
   for (k = 0; k < pwmLen; k++) {
-    min = min_score(k); 
+    min = min_score(k);
     tmp_max = max_score(k);
     for (i = 0; i < NUCL; i++)
       pwm[k][i] -= min;
@@ -308,13 +308,13 @@ process_pwm()
   /* Score range/space goes now from 0 to max */
   /* Score/Probability array                  */
   // printf("PWM MAX = %d\n", max);
-  p = (double *)calloc(max + 1, sizeof(double)); 
+  p = (double *)calloc(max + 1, sizeof(double));
   if (p == NULL) {
     fprintf(stderr, "Out of memory\n");
     return 1;
   }
   /* Temp Score/Probability array             */
-  q = (double *)calloc(max + 1, sizeof(double)); 
+  q = (double *)calloc(max + 1, sizeof(double));
   if (q == NULL) {
     fprintf(stderr, "Out of memory\n");
     return 1;
@@ -325,7 +325,7 @@ process_pwm()
   }
   max = 0;
   /* Treat first row (first position)      */
-  for (i = 0; i < NUCL; i++) { 
+  for (i = 0; i < NUCL; i++) {
     p[pwm[0][i]] += bg[i];
     // printf ("p[%d] = %f\n", pwm[0][i], p[pwm[0][i]]);
   }
@@ -335,7 +335,7 @@ process_pwm()
   /* Loop on sub-sequent rows/positions    */
   for (k = 1; k < pwmLen; k++) {
     for (j = 0; j <= max;  j++) {
-      if (p[j] != 0) {    /* Only consider PWM scores     */
+      if (p[j] != 0) {    /* Only consider PWM scores for which the probability is not NULL  */
         for (i = 0; i < NUCL; i++) {
             /* Update PWM score for position k and base i */
             // printf ("Update prob p[%d] = %.2e    %15.14f\n", j, p[j], p[j]);
@@ -343,7 +343,7 @@ process_pwm()
             // printf ("q[%d] = %.2e\n", j + pwm[k][i], q[j+pwm[k][i]]);
         }
       }
-    } 
+    }
     max +=  max_score(k); /* Update score range adding max score of row k  */
     // printf("PWM MAX[%d] = %d\n", k, max);
     for (j = 0; j <= max;  j++) {
@@ -358,10 +358,10 @@ process_pwm()
   perc_prev = 100;
   rscore_prev = max - offset;
   for (j = max; j >= 0; j--) {
-    if (p[j] != 0) {    /* Only consider PWM scores     */
-      prob += p[j];
+    if (p[j] != 0) {    /* Only consider PWM scores for which the probability is not NULL  */
+      prob += p[j];     /* Compute Cumulative probability  */
       rscore = j - offset;
-      perc = (double)j/(double)max * 100; 
+      perc = (double)j/(double)max * 100;
       //printf ("PERC: %6.2f\n", perc);
       if (options.p_value) {
         if (prob > Pvalue) {
@@ -389,7 +389,7 @@ process_pwm()
       rscore_prev = rscore;
       perc_prev = perc;
     }
-  } 
+  }
   return 0;
 }
 
@@ -455,7 +455,7 @@ main(int argc, char *argv[])
           {"score",   required_argument, 0, 's'},
           {0, 0, 0, 0}
       };
-  
+
 #ifdef DEBUG
   mcheck(NULL);
   mtrace();
@@ -568,7 +568,7 @@ main(int argc, char *argv[])
   if (options.debug != 0) {
     if (pwm_in != stdin) {
       fprintf(stderr, "PWM File : %s\n", argv[optind]);
-    } 
+    }
     fprintf(stderr, "PWM length: %d\n", pwmLen);
     fprintf(stderr, "Weight Matrix: \n\n");
     for (j = 0; j < pwmLen; j++) {
@@ -579,10 +579,10 @@ main(int argc, char *argv[])
       fprintf(stderr, "\n");
     }
     fprintf(stderr, "\n");
-    if (bgProb != NULL) 
-      fprintf(stderr, "Background nucleotide frequencies:[%s]\n", bgProb); 
+    if (bgProb != NULL)
+      fprintf(stderr, "Background nucleotide frequencies:[%s]\n", bgProb);
     else
-      fprintf(stderr, "Background nucleotide frequencies:\n"); 
+      fprintf(stderr, "Background nucleotide frequencies:\n");
     for (i = 0; i < NUCL; i++) {
       fprintf(stderr, "bg[%i] = %f ", i, bg[i]);
     }
@@ -598,10 +598,10 @@ main(int argc, char *argv[])
     }
     fprintf(stderr, "\n");
   }
-  
+
   if (process_pwm() != 0)
     return 1;
-  
+
   for (i = 0; i < pwmLen; i++)
     free(pwm[i]);
   free(pwm);

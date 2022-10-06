@@ -68,6 +68,8 @@ test:
     - pwm_scan                -h 2>&1 | grep -i pwm_scan
     - pwm_scan_ucsc           -h 2>&1 | grep -i pwm_scan
     - pwm_scoring             -h 2>&1 | grep -i usage
+    - scan_genome_with_lib    -h 2>&1 | grep -i scan_genome_with_lib
+    - scan_seq_with_lib       -h 2>&1 | grep -i scan_seq_with_lib
     - seq_extract_bcomp       -h 2>&1 | grep -i usage
     - transfaconvert.pl          2>&1 | grep -i usage
 

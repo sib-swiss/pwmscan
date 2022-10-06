@@ -1,0 +1,105 @@
+#!/bin/bash
+
+pwmlib_file=""
+pwm_format="logodds";
+p_value=""
+seq=""
+bg_comp="0.29,0.21,0.21,0.29"
+
+display_usage() {
+      echo "Usage:"
+      echo    "    scan_seq_with_lib -l <pwmlib> -e <p-value> -s <seq_file>"
+      echo    "    - version 1.1.9"
+      echo    "    where options are:"
+      echo -e "         -h             Display usage\n"
+      echo -e "    Scan a sequence with a PWM collection. Accepeted PWM library formats are the MEME format"
+      echo -e "    (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>)."
+      echo -e "    Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.\n"
+      echo    "Please report bugs to Giovanna.Ambrosini@epfl.ch"
+}
+
+# Parse options
+while getopts ":hl:e:s:" opt; do
+  case ${opt} in
+    h )
+      display_usage
+      exit 0
+      ;;
+    l )
+      pwmlib_file=$OPTARG
+      ;;
+    e )
+      p_value=$OPTARG
+      ;;
+    s )
+      seq_file=$OPTARG
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+    \? )
+     echo "Invalid OPTION: -$OPTARG" 1>&2
+     exit 1
+     ;;
+  esac
+done
+shift $((OPTIND -1))
+
+parsed_args=$((OPTIND -1))
+
+if [ $parsed_args -le 1 ]
+then
+  display_usage
+  exit 1
+fi
+
+echo "PWM lib file   : $pwmlib_file" >&2
+echo "PWM format     : $pwm_format" >&2
+echo "P-value        : $p_value" >&2
+echo "Sequence file  : $seq_file" >&2
+
+if [ -z "$pwmlib_file" ]
+then
+  echo "Please specify the PWM file (-l)" >&2
+  exit 1
+fi
+if [ -z "$p_value" ]
+then
+  echo "Please specify the p-value (-e)" >&2
+  exit 1
+fi
+if [ -z "$seq_file" ]
+then
+  echo "Please specify the sequence file (-s)" >&2
+  exit 1
+fi
+
+# Extract the matrices from the PWM library file (MEME-like format)
+#
+if [ "$pwm_format" = "logodds" ]
+then
+  less $pwmlib_file | perl -ane 'chomp; if (/^>log-odds matrix (.*):/) {$header=$_; $id=$1; $id=~s/\s/_/g; $FNAME=$id; close(MAT); open (MAT, ">$FNAME.mat.tmp"); print MAT "$header\n";} else { print MAT "$_\n";}'
+fi
+
+
+#loop on PWM files
+#
+for f in *mat.tmp; do
+  echo "Processing PWM $f file.." >&2
+  pwm_name=${f::-8}
+  echo "========               Calculating PWM score               ========" >&2
+  m_score=$(matrix_prob -e $p_value --bg "$bg_comp" $f \
+        | grep SCORE | sed 's/:/\ /'\
+        | awk -F " " '{print $2}')
+
+  echo "PWM score ($pwm_name): $m_score" >&2
+  # Generate the Matrix Score Cumulative Table
+  pwmScore_tab=${pwm_name}_co${m_score}_scoretab.txt
+  matrix_prob --bg "$bg_comp" $f 2>/dev/null > $pwmScore_tab
+  echo "========               Executing matrix_scan               ========" >&2
+  #echo "$pwm_name:"
+  echo "matrix_scan -m $f -c $m_score $seq_file" | awk -v scoretab="$pwmScore_tab" -v pwmname="$pwm_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}' >&2
+  matrix_scan -m $f -c $m_score $seq_file | awk -v scoretab="$pwmScore_tab" -v pwmname="$pwm_name" 'BEGIN { while((getline line < scoretab) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(scoretab)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"pwmname"\t""P-value="pvalue[$5]}'
+  rm $f $pwmScore_tab
+done

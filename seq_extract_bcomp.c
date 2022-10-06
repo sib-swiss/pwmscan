@@ -5,13 +5,13 @@
   Optionally, the program computes and ouputs the nucleotide composition,
   in which case sequences can be extracted directly from the FASTA input or,
   as before, specified in a BED file.
-  
+
   # Arguments:
   #   BED File [optional if -c option is set]
   #   Species  (e.g. hg19) [optional if -c optiom is set]
   # Options:
   #   -c Compute base composition [forward strand]
-  #   -b Compute base composition for both strands  [-c mode set] 
+  #   -b Compute base composition for both strands  [-c mode set]
   #   -r Compute base composition on reverse strand [-c mode set]
 
   Giovanna Ambrosini, EPFL/SV, giovanna.ambrosini@epfl.ch
@@ -58,13 +58,13 @@
 #define FOUR_MEG 4000000
 #define LINE_SIZE 1024
 #define AC_MAX 18
-#define CHR_NB 10
+#define CHR_NB 18
 #define CHR_MAX 30
 #define POS_MAX 16
 #define INDEL_MAX 105
 #define NUCL  5
 #define LMAX  100
-#define HDR_MAX 132
+#define HDR_MAX 256
 #define BED_RECORDS 1000
 #define NB_OF_CHRS 40
 
@@ -211,264 +211,274 @@ process_ac()
   return 0;
 }
 
-static void 
+static void
 change_chrnb(char *chrnb)
 {
   if ( (strcmp(Species, "hg18") == 0) || (strcmp(Species, "hg19") == 0) || (strcmp(Species, "hg38") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "23"); 
+      strcpy(chrnb, "23");
     if (strcmp(chrnb, "Y") == 0)
-      strcpy(chrnb, "24"); 
+      strcpy(chrnb, "24");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "25"); 
+      strcpy(chrnb, "25");
   } else if ( (strcmp(Species, "mm8") == 0) || (strcmp(Species, "mm9") == 0) || (strcmp(Species, "mm10") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "20"); 
+      strcpy(chrnb, "20");
     if (strcmp(chrnb, "Y") == 0)
-      strcpy(chrnb, "21"); 
+      strcpy(chrnb, "21");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "22"); 
+      strcpy(chrnb, "22");
   } else if ( (strcmp(Species, "bosTau3") == 0) || (strcmp(Species, "bosTau8") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "30"); 
+      strcpy(chrnb, "30");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "31"); 
+      strcpy(chrnb, "31");
   } else if ( (strcmp(Species, "canFam2") == 0) || (strcmp(Species, "canFam3") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "39"); 
+      strcpy(chrnb, "39");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "40"); 
+      strcpy(chrnb, "40");
+  } else if ( (strcmp(Species, "cavPor3") == 0) ) {
+    if (strcmp(chrnb, "M") == 0)
+      strcpy(chrnb, "11");
   } else if ( (strcmp(Species, "panTro2") == 0) || (strcmp(Species, "panTro5") == 0) ) {
     if (strcmp(chrnb, "2A") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "2B") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "3") == 0)
-      strcpy(chrnb, "23"); 
+      strcpy(chrnb, "23");
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "24"); 
+      strcpy(chrnb, "24");
     if (strcmp(chrnb, "Y") == 0)
-      strcpy(chrnb, "25"); 
+      strcpy(chrnb, "25");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "26"); 
+      strcpy(chrnb, "26");
+  } else if ( (strcmp(Species, "rheMac8") == 0) || (strcmp(Species, "rheMac10") == 0) ) {
+    if (strcmp(chrnb, "X") == 0)
+      strcpy(chrnb, "21");
+    if (strcmp(chrnb, "Y") == 0)
+      strcpy(chrnb, "22");
+    if (strcmp(chrnb, "M") == 0)
+      strcpy(chrnb, "23");
   } else if ( (strcmp(Species, "rn5") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "21"); 
+      strcpy(chrnb, "21");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "22"); 
+      strcpy(chrnb, "22");
   } else if ( (strcmp(Species, "rn6") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "21"); 
+      strcpy(chrnb, "21");
     if (strcmp(chrnb, "Y") == 0)
-      strcpy(chrnb, "22"); 
+      strcpy(chrnb, "22");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "23"); 
+      strcpy(chrnb, "23");
   } else if ( (strcmp(Species, "amel5") == 0) ) {
     if (strcmp(chrnb, "LG1") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "LG2") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "LG3") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "LG4") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
     if (strcmp(chrnb, "LG5") == 0)
-      strcpy(chrnb, "5"); 
+      strcpy(chrnb, "5");
     if (strcmp(chrnb, "LG6") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
     if (strcmp(chrnb, "LG7") == 0)
-      strcpy(chrnb, "7"); 
+      strcpy(chrnb, "7");
     if (strcmp(chrnb, "LG8-24") == 0)
-      strcpy(chrnb, "8"); 
+      strcpy(chrnb, "8");
     if (strcmp(chrnb, "LG9") == 0)
-      strcpy(chrnb, "9"); 
+      strcpy(chrnb, "9");
     if (strcmp(chrnb, "LG10") == 0)
-      strcpy(chrnb, "10"); 
+      strcpy(chrnb, "10");
     if (strcmp(chrnb, "LG11") == 0)
-      strcpy(chrnb, "11"); 
+      strcpy(chrnb, "11");
     if (strcmp(chrnb, "LG12") == 0)
-      strcpy(chrnb, "12"); 
+      strcpy(chrnb, "12");
     if (strcmp(chrnb, "LG13") == 0)
-      strcpy(chrnb, "13"); 
+      strcpy(chrnb, "13");
     if (strcmp(chrnb, "LG14") == 0)
-      strcpy(chrnb, "14"); 
+      strcpy(chrnb, "14");
     if (strcmp(chrnb, "LG15") == 0)
-      strcpy(chrnb, "15"); 
+      strcpy(chrnb, "15");
     if (strcmp(chrnb, "LG16") == 0)
-      strcpy(chrnb, "16"); 
+      strcpy(chrnb, "16");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "17"); 
+      strcpy(chrnb, "17");
   } else if ( (strcmp(Species, "dm3") == 0) ) {
     if (strcmp(chrnb, "2L") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "2R") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "3L") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "3R") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
     if (strcmp(chrnb, "4") == 0)
-      strcpy(chrnb, "5"); 
+      strcpy(chrnb, "5");
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
   } else if ( (strcmp(Species, "dm6") == 0) ) {
     if (strcmp(chrnb, "2L") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "2R") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "3L") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "3R") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
     if (strcmp(chrnb, "4") == 0)
-      strcpy(chrnb, "5"); 
+      strcpy(chrnb, "5");
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
     if (strcmp(chrnb, "Y") == 0)
-      strcpy(chrnb, "7"); 
+      strcpy(chrnb, "7");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "8"); 
+      strcpy(chrnb, "8");
   } else if ( (strcmp(Species, "danRer7") == 0) || (strcmp(Species, "danRer10") == 0) ) {
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "26"); 
+      strcpy(chrnb, "26");
   } else if ( (strcmp(Species, "susScr3") == 0) ) {
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "19"); 
+      strcpy(chrnb, "19");
     if (strcmp(chrnb, "Y") == 0)
-      strcpy(chrnb, "20"); 
+      strcpy(chrnb, "20");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "21"); 
+      strcpy(chrnb, "21");
   } else if ( (strcmp(Species, "ce6") == 0) || (strcmp(Species, "ce10") == 0) || (strcmp(Species, "ce11") == 0) ) {
     if (strcmp(chrnb, "I") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "II") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "III") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "IV") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
     if (strcmp(chrnb, "V") == 0)
-      strcpy(chrnb, "5"); 
+      strcpy(chrnb, "5");
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "7"); 
+      strcpy(chrnb, "7");
   } else if ( (strcmp(Species, "spo2") == 0) ) {
     if (strcmp(chrnb, "I") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "II") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "III") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
   } else if ( (strcmp(Species, "oryLat") == 0) ) {
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "25"); 
+      strcpy(chrnb, "25");
   } else if ( (strcmp(Species, "oreNil2") == 0) ) {
     if (strcmp(chrnb, "LG1") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "LG2") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "LG3") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "LG4") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
     if (strcmp(chrnb, "LG5") == 0)
-      strcpy(chrnb, "5"); 
+      strcpy(chrnb, "5");
     if (strcmp(chrnb, "LG6") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
     if (strcmp(chrnb, "LG7") == 0)
-      strcpy(chrnb, "7"); 
+      strcpy(chrnb, "7");
     if (strcmp(chrnb, "LG8-24") == 0)
-      strcpy(chrnb, "8"); 
+      strcpy(chrnb, "8");
     if (strcmp(chrnb, "LG9") == 0)
-      strcpy(chrnb, "9"); 
+      strcpy(chrnb, "9");
     if (strcmp(chrnb, "LG10") == 0)
-      strcpy(chrnb, "10"); 
+      strcpy(chrnb, "10");
     if (strcmp(chrnb, "LG11") == 0)
-      strcpy(chrnb, "11"); 
+      strcpy(chrnb, "11");
     if (strcmp(chrnb, "LG12") == 0)
-      strcpy(chrnb, "12"); 
+      strcpy(chrnb, "12");
     if (strcmp(chrnb, "LG13") == 0)
-      strcpy(chrnb, "13"); 
+      strcpy(chrnb, "13");
     if (strcmp(chrnb, "LG14") == 0)
-      strcpy(chrnb, "14"); 
+      strcpy(chrnb, "14");
     if (strcmp(chrnb, "LG15") == 0)
-      strcpy(chrnb, "15"); 
+      strcpy(chrnb, "15");
     if (strcmp(chrnb, "LG16-21") == 0)
-      strcpy(chrnb, "16"); 
+      strcpy(chrnb, "16");
     if (strcmp(chrnb, "LG17") == 0)
-      strcpy(chrnb, "17"); 
+      strcpy(chrnb, "17");
     if (strcmp(chrnb, "LG18") == 0)
-      strcpy(chrnb, "18"); 
+      strcpy(chrnb, "18");
     if (strcmp(chrnb, "LG19") == 0)
-      strcpy(chrnb, "19"); 
+      strcpy(chrnb, "19");
     if (strcmp(chrnb, "LG20") == 0)
-      strcpy(chrnb, "20"); 
+      strcpy(chrnb, "20");
     if (strcmp(chrnb, "LG21") == 0)
-      strcpy(chrnb, "21"); 
+      strcpy(chrnb, "21");
     if (strcmp(chrnb, "LG22") == 0)
-      strcpy(chrnb, "22"); 
+      strcpy(chrnb, "22");
     if (strcmp(chrnb, "LG23") == 0)
-      strcpy(chrnb, "23"); 
+      strcpy(chrnb, "23");
     if (strcmp(chrnb, "MT") == 0)
-      strcpy(chrnb, "24"); 
+      strcpy(chrnb, "24");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "24"); 
+      strcpy(chrnb, "24");
   } else if ( (strcmp(Species, "xenTro9") == 0) ) {
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "11"); 
+      strcpy(chrnb, "11");
   } else if ( (strcmp(Species, "sacCer2") == 0) || (strcmp(Species, "sacCer3") == 0) ) {
     if (strcmp(chrnb, "I") == 0)
-      strcpy(chrnb, "1"); 
+      strcpy(chrnb, "1");
     if (strcmp(chrnb, "II") == 0)
-      strcpy(chrnb, "2"); 
+      strcpy(chrnb, "2");
     if (strcmp(chrnb, "III") == 0)
-      strcpy(chrnb, "3"); 
+      strcpy(chrnb, "3");
     if (strcmp(chrnb, "IV") == 0)
-      strcpy(chrnb, "4"); 
+      strcpy(chrnb, "4");
     if (strcmp(chrnb, "V") == 0)
-      strcpy(chrnb, "5"); 
+      strcpy(chrnb, "5");
     if (strcmp(chrnb, "VI") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
     if (strcmp(chrnb, "VII") == 0)
-      strcpy(chrnb, "7"); 
+      strcpy(chrnb, "7");
     if (strcmp(chrnb, "VIII") == 0)
-      strcpy(chrnb, "8"); 
+      strcpy(chrnb, "8");
     if (strcmp(chrnb, "IX") == 0)
-      strcpy(chrnb, "9"); 
+      strcpy(chrnb, "9");
     if (strcmp(chrnb, "X") == 0)
-      strcpy(chrnb, "10"); 
+      strcpy(chrnb, "10");
     if (strcmp(chrnb, "XI") == 0)
-      strcpy(chrnb, "11"); 
+      strcpy(chrnb, "11");
     if (strcmp(chrnb, "XII") == 0)
-      strcpy(chrnb, "12"); 
+      strcpy(chrnb, "12");
     if (strcmp(chrnb, "XIII") == 0)
-      strcpy(chrnb, "13"); 
+      strcpy(chrnb, "13");
     if (strcmp(chrnb, "XIV") == 0)
-      strcpy(chrnb, "14"); 
+      strcpy(chrnb, "14");
     if (strcmp(chrnb, "XV") == 0)
-      strcpy(chrnb, "15"); 
+      strcpy(chrnb, "15");
     if (strcmp(chrnb, "XVI") == 0)
-      strcpy(chrnb, "16"); 
+      strcpy(chrnb, "16");
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "17"); 
+      strcpy(chrnb, "17");
   } else if ( (strcmp(Species, "araTha1") == 0) ) {
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "6"); 
+      strcpy(chrnb, "6");
   } else if ( (strcmp(Species, "orySat") == 0) ) {
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "13"); 
+      strcpy(chrnb, "13");
     if (strcmp(chrnb, "Pltd") == 0)
-      strcpy(chrnb, "14"); 
+      strcpy(chrnb, "14");
     if (strcmp(chrnb, "B1") == 0)
-      strcpy(chrnb, "15"); 
+      strcpy(chrnb, "15");
   } else if ( (strcmp(Species, "zm3") == 0) ) {
     if (strcmp(chrnb, "M") == 0)
-      strcpy(chrnb, "11"); 
+      strcpy(chrnb, "11");
     if (strcmp(chrnb, "Pltd") == 0)
-      strcpy(chrnb, "12"); 
+      strcpy(chrnb, "12");
   } else {
     fprintf (stderr, "Invalid Species\n");
     exit(1);
@@ -577,7 +587,7 @@ load_bed(const char *file)
           exit(1);
         }
       }
-      //printf ("Copying START POS %d END POS %d STRAND %c to BED REC #%d of CHROM NB %d\n", atoi(start_p), atoi(end_p), strand, bed_rec_cnt[chr-1], chr); 
+      //printf ("Copying START POS %d END POS %d STRAND %c to BED REC #%d of CHROM NB %d\n", atoi(start_p), atoi(end_p), strand, bed_rec_cnt[chr-1], chr);
       chr_record[chr-1].bed_array[bed_rec_cnt[chr-1]].start = atoi(start_p);
       chr_record[chr-1].bed_array[bed_rec_cnt[chr-1]].end = atoi(end_p);
       chr_record[chr-1].bed_array[bed_rec_cnt[chr-1]].strand = strand;
@@ -588,7 +598,7 @@ load_bed(const char *file)
   fclose(f);
 }
 
-void 
+void
 dump_bed()
 {
   for (int i = 1; i <= NB_OF_CHRS; i++) {
@@ -613,7 +623,7 @@ process_seqs(FILE *input, const char *iFile)
     FILE *f = fopen(iFile, "r");
     if (f == NULL) {
       fprintf(stderr, "Could not open file %s: %s(%d)\n",
-  	    iFile, strerror(errno), errno);
+        iFile, strerror(errno), errno);
       return -1;
     }
     input = f;
@@ -622,7 +632,7 @@ process_seqs(FILE *input, const char *iFile)
     fprintf(stderr, "Processing file %s\n", iFile);
 
   while ((res = fgets(buf, BUF_SIZE, input)) != NULL
-	 && buf[0] != '>')
+    && buf[0] != '>')
     ;
   if (res == NULL || buf[0] != '>') {
     fprintf(stderr, "Could not find a sequence in file %s\n", iFile);
@@ -673,7 +683,7 @@ process_seqs(FILE *input, const char *iFile)
     seq.len = 0;
     while (*s && *s != '|' && *s != ';' && !isspace(*s)) {
       if (seq.len >= AC_MAX) {
-        fprintf(stderr, "AC too long \"%s\" in file %s\n", res, iFile);
+        fprintf(stderr, "process_seqs: AC from Header too long \"%s\" in file %s\n", res, iFile);
         fclose(input);
         return 1;
       }
@@ -681,7 +691,7 @@ process_seqs(FILE *input, const char *iFile)
     }
     if (seq.len < AC_MAX)
       seq.ac[seq.len] = 0;
-    /* Gobble sequence  */ 
+    /* Gobble sequence  */
     seq.len = 0;
     while ((res = fgets(buf, BUF_SIZE, input)) != NULL && buf[0] != '>') {
       char c;
@@ -727,7 +737,7 @@ process_seqs(FILE *input, const char *iFile)
     if (seq.len != 0) {
       /* Process BED file  */
       /* Get Chromosome number */
-      ac_len = (int)strlen(seq.ac) + 1; 
+      ac_len = (int)strlen(seq.ac) + 1;
       chr_nb = hash_table_lookup(ac_table, seq.ac, (size_t)ac_len);
       if (chr_nb == NULL)
         continue;
@@ -786,7 +796,7 @@ compute_bcomp_r(FILE *input, const char *iFile)
     FILE *f = fopen(iFile, "r");
     if (f == NULL) {
       fprintf(stderr, "Could not open file %s: %s(%d)\n",
-  	    iFile, strerror(errno), errno);
+        iFile, strerror(errno), errno);
       return -1;
     }
     input = f;
@@ -795,7 +805,7 @@ compute_bcomp_r(FILE *input, const char *iFile)
     fprintf(stderr, "Processing file %s\n", iFile);
 
   while ((res = fgets(buf, BUF_SIZE, input)) != NULL
-	 && buf[0] != '>')
+     && buf[0] != '>')
     ;
   if (res == NULL || buf[0] != '>') {
     fprintf(stderr, "Could not find a sequence in file %s\n", iFile);
@@ -845,16 +855,17 @@ compute_bcomp_r(FILE *input, const char *iFile)
       s = seq.hdr;
     seq.len = 0;
     while (*s && *s != '|' && *s != ';' && !isspace(*s)) {
-      if (seq.len >= AC_MAX) {
-        fprintf(stderr, "AC too long \"%s\" in file %s\n", res, iFile);
-        fclose(input);
-        return 1;
-      }
+      //if (seq.len >= AC_MAX) {
+      //  fprintf(stderr, "compute_bcomp_r:AC from Header too long \"%s\" in file %s\n", res, iFile);
+      //  fclose(input);
+      //  return 1;
+      //}
       seq.ac[seq.len++] = *s++;
     }
-    if (seq.len < AC_MAX)
+    //if (seq.len < AC_MAX)
+    if (seq.len < HDR_MAX)
       seq.ac[seq.len] = 0;
-    /* Gobble sequence  */ 
+    /* Gobble sequence  */
     seq.len = 0;
     while ((res = fgets(buf, BUF_SIZE, input)) != NULL && buf[0] != '>') {
       char c;
@@ -901,7 +912,7 @@ compute_bcomp_r(FILE *input, const char *iFile)
       if (bedFile != NULL) {
         /* Process BED file  */
         /* Get Chromosome number */
-        ac_len = (int)strlen(seq.ac) + 1; 
+        ac_len = (int)strlen(seq.ac) + 1;
         chr_nb = hash_table_lookup(ac_table, seq.ac, (size_t)ac_len);
         if (chr_nb == NULL)
           continue;
@@ -935,9 +946,9 @@ compute_bcomp_r(FILE *input, const char *iFile)
         //printf("Seq lenght: %lu\n", seq.len);
         for (unsigned int i = 0; i < seq.len; i++) {
           if (seq.seq[i] < 4)
-            bcomp[3-seq.seq[i]]++; 
+            bcomp[3-seq.seq[i]]++;
           else
-            bcomp[seq.seq[i]]++; 
+            bcomp[seq.seq[i]]++;
         }
         tot_len +=seq.len;
       }
@@ -945,7 +956,7 @@ compute_bcomp_r(FILE *input, const char *iFile)
   }
   //printf("A:%d , C:%d , G:%d , T:%d , N:%d\n", bcomp[0], bcomp[1], bcomp[2], bcomp[3], bcomp[4]);
   fprintf(stderr, "Total Sequence length: %lu\n", tot_len);
-  printf("%.4f,%.4f,%.4f,%.4f\n", (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[1]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[2]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[3]+bcomp[4]/4)/tot_len)); 
+  printf("%.4f,%.4f,%.4f,%.4f\n", (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[1]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[2]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[3]+bcomp[4]/4)/tot_len));
   free(seq.seq);
   fclose(input);
   return 0;
@@ -967,7 +978,7 @@ compute_bcomp(FILE *input, const char *iFile)
     FILE *f = fopen(iFile, "r");
     if (f == NULL) {
       fprintf(stderr, "Could not open file %s: %s(%d)\n",
-  	    iFile, strerror(errno), errno);
+        iFile, strerror(errno), errno);
       return -1;
     }
     input = f;
@@ -976,7 +987,7 @@ compute_bcomp(FILE *input, const char *iFile)
     fprintf(stderr, "Processing file %s\n", iFile);
 
   while ((res = fgets(buf, BUF_SIZE, input)) != NULL
-	 && buf[0] != '>')
+     && buf[0] != '>')
     ;
   if (res == NULL || buf[0] != '>') {
     fprintf(stderr, "Could not find a sequence in file %s\n", iFile);
@@ -1026,16 +1037,17 @@ compute_bcomp(FILE *input, const char *iFile)
       s = seq.hdr;
     seq.len = 0;
     while (*s && *s != '|' && *s != ';' && !isspace(*s)) {
-      if (seq.len >= AC_MAX) {
-        fprintf(stderr, "AC too long \"%s\" in file %s\n", res, iFile);
-        fclose(input);
-        return 1;
-      }
+      //if (seq.len >= HDR_MAX) {
+      //  fprintf(stderr, "compute_bcomp: AC from Header too long \"%s\" in file %s\n", res, iFile);
+      //  fclose(input);
+      //  return 1;
+      //}
       seq.ac[seq.len++] = *s++;
     }
-    if (seq.len < AC_MAX)
+    //if (seq.len < AC_MAX)
+    if (seq.len < HDR_MAX)
       seq.ac[seq.len] = 0;
-    /* Gobble sequence  */ 
+    /* Gobble sequence  */
     seq.len = 0;
     while ((res = fgets(buf, BUF_SIZE, input)) != NULL && buf[0] != '>') {
       char c;
@@ -1082,7 +1094,7 @@ compute_bcomp(FILE *input, const char *iFile)
       if (bedFile != NULL) {
         /* Process BED file  */
         /* Get Chromosome number */
-        ac_len = (int)strlen(seq.ac) + 1; 
+        ac_len = (int)strlen(seq.ac) + 1;
         chr_nb = hash_table_lookup(ac_table, seq.ac, (size_t)ac_len);
         if (chr_nb == NULL)
           continue;
@@ -1100,7 +1112,7 @@ compute_bcomp(FILE *input, const char *iFile)
           if (chr_record[chr-1].bed_array[k].strand == '-') {
             for (unsigned int i = start-1; i < end; i++) {
               if (seq.seq[i] < 4)
-                bcomp[3-seq.seq[i]]++; 
+                bcomp[3-seq.seq[i]]++;
               else
                 bcomp[seq.seq[i]]++;
               tot_len++;
@@ -1126,9 +1138,9 @@ compute_bcomp(FILE *input, const char *iFile)
   if (options.both) {
     double bcomp_at = (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len);
     double bcomp_cg = (double) 0.5 - bcomp_at;
-    printf("%.2f,%.2f,%.2f,%.2f\n", bcomp_at, bcomp_cg, bcomp_cg, bcomp_at); 
+    printf("%.2f,%.2f,%.2f,%.2f\n", bcomp_at, bcomp_cg, bcomp_cg, bcomp_at);
   } else {
-    printf("%.4f,%.4f,%.4f,%.4f\n", (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[1]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[2]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[3]+bcomp[4]/4)/tot_len)); 
+    printf("%.4f,%.4f,%.4f,%.4f\n", (double)((double)(bcomp[0]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[1]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[2]+bcomp[4]/4)/tot_len), (double)((double)(bcomp[3]+bcomp[4]/4)/tot_len));
   }
   free(seq.seq);
   fclose(input);
@@ -1184,25 +1196,25 @@ main(int argc, char *argv[])
   }
   if (optind > argc || options.help == 1 || (bedFile == NULL && options.bcomp == 0) || (Species == NULL && options.bcomp == 0)) {
     fprintf(stderr,
-	    "Usage: %s [options] [-f <bed_file>] [-s <species>] [<] [<fasta_file>|stdin]\n"
-	    "      where options are:\n"
-	    "        -d          Print debug information\n"
-	    "        -h          Show this help text\n"
-            "        -c          Compute base composition [def=on forward strand]\n"
-            "        -b          Compute base composition on both strand [-c is required]\n"
-            "        -r          Compute base composition on reverse strand [-c is required]\n"
-            "        -i <int>    AC index (after how many pipes |) for FASTA header [%d]\n"
-            "        -p <path>   Use <path> to locate the chr_NC_gi file [if BED file is given]\n"
-            "                    [default is: $HOME/db/genome]\n"
-	    "\n\tExtract BED regions from a set of FASTA-formatted sequences.\n"
-            "\tThe extracted sequences are written to standard output.\n"
-            "\tOptionally (-c), the program computes and only outputs the base composition,\n"
-            "\tin which case sequences can be extracted directly from the FASTA input or,\n"
-            "\tas for the extraction mode, specified in a BED file. If the BED file is not\n"
-            "\tgiven, the <species> argument is not required. If base composition mode is set\n"
-            "\t(-c option), the program can optionally compute it on both strands (-b option)\n"
-            "\tfor strand-symmetric base composition or on the reverse strand only (-r).\n\n",
-	    argv[0], options.acPipe);
+        "Usage: %s [options] [-f <bed_file>] [-s <species>] [<] [<fasta_file>|stdin]\n"
+        "      where options are:\n"
+        "        -d          Print debug information\n"
+        "        -h          Show this help text\n"
+        "        -c          Compute base composition [def=on forward strand]\n"
+        "        -b          Compute base composition on both strand [-c is required]\n"
+        "        -r          Compute base composition on reverse strand [-c is required]\n"
+        "        -i <int>    AC index (after how many pipes |) for FASTA header [%d]\n"
+        "        -p <path>   Use <path> to locate the chr_NC_gi file [if BED file is given]\n"
+        "                    [default is: $HOME/db/genome]\n"
+        "\n\tExtract BED regions from a set of FASTA-formatted sequences.\n"
+        "\tThe extracted sequences are written to standard output.\n"
+        "\tOptionally (-c), the program computes and only outputs the base composition,\n"
+        "\tin which case sequences can be extracted directly from the FASTA input or,\n"
+        "\tas for the extraction mode, specified in a BED file. If the BED file is not\n"
+        "\tgiven, the <species> argument is not required. If base composition mode is set\n"
+        "\t(-c option), the program can optionally compute it on both strands (-b option)\n"
+        "\tfor strand-symmetric base composition or on the reverse strand only (-r).\n\n",
+        argv[0], options.acPipe);
     return 1;
   }
   if (argc > optind) {
@@ -1244,7 +1256,7 @@ main(int argc, char *argv[])
       return 1;
     }
   }
-  if (options.bcomp) { 
+  if (options.bcomp) {
     if (options.rev) {
       if (compute_bcomp_r(fasta_in, argv[optind++]) != 0)
         return 1;

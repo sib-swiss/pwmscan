@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Directories and Files
+#e.g. ../pwmscan_pipeline.sh -i pwmfile_hg38_37886_39604 -b $PWD/db_bowtie -g h_sapiens_hg38 -o .
 usage() { echo -e "Usage: $0 [-i input_matrix] [-b bowtie_dir] [-g genome_assembly] [-o output_dir]\n" 1>&2; exit 1; }
 while getopts ":i:b:g:o:" option; do
     case "${option}" in
@@ -54,11 +55,10 @@ $DOCKER_CMD matrix_prob            -b 0.29,0.21,0.21,0.29 /work_dir/$INPUT_MATRI
 
 
 # Command pipeline
-#FIXME where this *unmapped.dat* file comes from?
 #FIXME bowtie2bed needs the chr_hdr file related to the genome assembly
 #FIXME server and local/container do NOT give the same filterOverlaps output!!!
 #FIXME what is "MA0137.3 STAT1" -> "Motif Name" ?
-$DOCKER_CMD mba -c 1475 /work_dir/$INPUT_MATRIX | $DOCKER_CMD awk '{print ">"$2"\n"$1}' | $DOCKER_CMD bowtie --threads 4 -l11 -n0 -a /bowtie_dir/$GENOME -f - --un /work_dir/unmapped.dat | sort --parallel=5 -T $LOCAL_TMP -s -k3,3V -k4,4n -k2,2 | $DOCKER_CMD bowtie2bed -s $ASSEMBLY -l 11 -i /bowtie_dir | $DOCKER_CMD filterOverlaps -l11 | $DOCKER_CMD awk -v matrix="/work_dir/matrixScore_tab_${MYPID}.txt" 'BEGIN { while((getline line < matrix) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(matrix)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""MA0137.3 STAT1""\t""P-value="pvalue[$5]}' > $WORK_DIR/pwmscan_${ASSEMBLY}_${MYPID}.bed
+$DOCKER_CMD mba -c 1475 /work_dir/$INPUT_MATRIX | $DOCKER_CMD awk '{print ">"$2"\n"$1}' | $DOCKER_CMD bowtie --threads 4 -l11 -n0 -a /bowtie_dir/$GENOME -f - --un /work_dir/unmapped-${MYPID}.dat | sort --parallel=5 -T $LOCAL_TMP -s -k3,3V -k4,4n -k2,2 | $DOCKER_CMD bowtie2bed -s $ASSEMBLY -l 11 -i /bowtie_dir | $DOCKER_CMD filterOverlaps -l11 | $DOCKER_CMD awk -v matrix="/work_dir/matrixScore_tab_${MYPID}.txt" 'BEGIN { while((getline line < matrix) > 0 ) {split(line,f," "); pvalue[f[1]]=f[2]} close(matrix)} {print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t""MA0137.3 STAT1""\t""P-value="pvalue[$5]}' > $WORK_DIR/pwmscan_${ASSEMBLY}_${MYPID}.bed
 
 
 # Convert to other formats (SGA/FPS)

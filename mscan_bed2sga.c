@@ -2,7 +2,7 @@
   mscan_bed2sga.c
 
   Convert BED file from PWMScan to SGA format.
-  
+
   # Arguments:
   # species
   # feature name (e.g. matrix name)
@@ -26,7 +26,7 @@
 
 */
 /*
-#define DEBUG 
+#define DEBUG
 */
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -156,7 +156,7 @@ process_ac()
     strcpy(chrom, "chr");
     strcat(chrom, chr_nb);
     nb_len = (int)strlen(chrom) + 1;
-    //printf("adding key %s (len = %d) value %s (ac) (len = %d) to hash table\n", chrom, nb_len, ncbi_ac, ac_len); 
+    //printf("adding key %s (len = %d) value %s (ac) (len = %d) to hash table\n", chrom, nb_len, ncbi_ac, ac_len);
     hash_table_add(ac_table, chrom, (size_t)nb_len, ncbi_ac, (size_t)ac_len);
     if (options.debug) {
       char *ac = hash_table_lookup(ac_table, chrom, (size_t)nb_len);
@@ -167,7 +167,7 @@ process_ac()
 }
 
 int
-process_bed(FILE *input, char *iFile) 
+process_bed(FILE *input, char *iFile)
 {
   unsigned long start, end;
   int score;
@@ -209,15 +209,15 @@ process_bed(FILE *input, char *iFile)
     exit(1);
   }
 #ifdef DEBUG
-  int c = 1; 
+  int c = 1;
 #endif
   while ((res = fgets(s, (int) bLen, input)) != NULL) {
     size_t cLen = strlen(s);
     char seq_id[AC_MAX] = "";
-    char tag[TAG_MAX] = ""; 
-    char s_pos[POS_MAX] = ""; 
-    char e_pos[POS_MAX] = ""; 
-    char sc[SCORE_MAX] = ""; 
+    char tag[TAG_MAX] = "";
+    char s_pos[POS_MAX] = "";
+    char e_pos[POS_MAX] = "";
+    char sc[SCORE_MAX] = "";
     char strand = '\0';
     unsigned int i = 0;
 
@@ -260,7 +260,7 @@ process_bed(FILE *input, char *iFile)
       buf++;
     /* End Position */
     i = 0;
-    while (isdigit(*buf)) { 
+    while (isdigit(*buf)) {
       if (i >= POS_MAX) {
         fprintf(stderr, "End position too large \"%s\" \n", buf);
         exit(1);
@@ -286,7 +286,7 @@ process_bed(FILE *input, char *iFile)
       buf++;
     /* Score */
     i = 0;
-    while (isdigit(*buf) || *buf == '+' || *buf == '-') { 
+    while (isdigit(*buf) || *buf == '+' || *buf == '-') {
       if (i >= SCORE_MAX) {
         fprintf(stderr, "Score too large \"%s\" \n", buf);
         exit(1);
@@ -305,19 +305,19 @@ process_bed(FILE *input, char *iFile)
 #ifdef DEBUG
     printf(" [%d] Chr nb: %s   Start: %lu  End: %lu  Tag: %s  Score: %d Strand: %c\n", c++, seq_id, start, end, tag, score, strand);
 #endif
-    
+
     unsigned long pos = 0;
     if (strand == '+') {
-      pos = start + 1; 
+      pos = start + 1;
     } else {
-      pos = end; 
+      pos = end;
     }
     int id_len = (int)strlen(seq_id) + 1;
     char *ac = hash_table_lookup(ac_table, seq_id, (size_t)id_len);
     //fprintf (stderr, "Hash table value for %s is %s\n", seq_id, ac);
     printf("%s\t%s\t%lu\t%c\t1\t%s\t%d\n", ac, Feature, pos, strand, tag, score);
   } /* End of While */
-  /* Filter overlapping regions for last chromosome */ 
+  /* Filter overlapping regions for last chromosome */
   if (input != stdin) {
     fclose(input);
   }
@@ -350,7 +350,7 @@ main(int argc, char *argv[])
         break;
       case 'f':
         Feature = optarg;
-	break;
+        break;
       case 's':
         Species = optarg;
         break;
@@ -361,14 +361,14 @@ main(int argc, char *argv[])
   if (optind > argc || options.help == 1 || Species == NULL) {
     fprintf(stderr, "Usage: %s [options] [-f <feature name>] -s <s_assembly (e.g. hg18)> [<] <BED file|stdin>\n"
              "      where options are:\n"
-	     "  \t\t -d     Produce debug information\n"
-	     "  \t\t -h     Show this help text\n"
+             "  \t\t -d     Produce debug information\n"
+             "  \t\t -h     Show this help text\n"
              "  \t\t -i <path> Use <path> to locate the chr_NC_gi file (default is /home/local/db/genome)\n"
-	     "\n\tConvert BED format (from PWM scan or sequence scan applications) into extended SGA format.\n"
-	     "\n\tBED lines have the following format:\n"
-	     "\t\t chr1	28940	28955	GGCTTCCCAGAACCC	1330	+\n"
-	     "\n\t representing the genomic position of a sequence tag match.\n\n",
-	     argv[0]);
+             "\n\tConvert BED format (from PWM scan or sequence scan applications) into extended SGA format.\n"
+             "\n\tBED lines have the following format:\n"
+             "\t\t chr1\t28940\t28955\tGGCTTCCCAGAACCC\t1330\t+\n"
+             "\n\t representing the genomic position of a sequence tag match.\n\n",
+             argv[0]);
       return 1;
   }
   if (argc > optind) {

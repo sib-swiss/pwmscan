@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # FILE: pfmconvert
 # CREATE DATE: 3/07/2014
-# AUTHOR: Giovanna Ambrosini 
+# AUTHOR: Giovanna Ambrosini
 #
 # Part of the code is based on an implemetation by
 # William Stafford Noble and Timothy L. Bailey
@@ -30,7 +30,7 @@ my $minscore = -10000;
 
 my $usage = "USAGE: $0 [options] <matrix file>
 
-  Options: 
+  Options:
            -bg <background file>        set of f_a
            -c <pseudo weight>           add an arbitrary pseudo weight fraction <c> to each freq
                                             default: $c
@@ -46,7 +46,7 @@ my $usage = "USAGE: $0 [options] <matrix file>
            -w <l>|<p>                   <l> select log-odds matrix format for written output
                                         <p> select letter-probability matrix format for written output
                                             default format: log-odds matrix
-  
+
   Convert a Position Frequency Matrix (PFM) file to a Position Weihgt Matrix (PWM) with either integer log odds weights or letter probabilities.
   A position frequency matrix (PFM) records the position-dependent frequency (or counts) of each residue or nucleotide.\n\n";
 
@@ -106,16 +106,16 @@ if (defined($bg_file)) {
     next if (/^#/);  # skip comments
     ($a, $f) = split;
     if ($a eq "A" || $a eq "a") {
-      $bg{"A"} = $f; 
+      $bg{"A"} = $f;
       $total_bg += $f;
     } elsif ($a eq "C" || $a eq "c") {
-      $bg{"C"} = $f; 
+      $bg{"C"} = $f;
       $total_bg += $f;
     } elsif ($a eq "G" || $a eq "g") {
-      $bg{"G"} = $f; 
+      $bg{"G"} = $f;
       $total_bg += $f;
     } elsif ($a eq "T" || $a eq "t") {
-      $bg{"T"} = $f; 
+      $bg{"T"} = $f;
       $total_bg += $f;
     }
   }
@@ -207,7 +207,7 @@ while ($line = <MF>) {
         #print("Moving cursor to POS $prev_curspos\n");
         last;
       }
-      
+
       if ($m_swap) {  # Raws are nucleotides ACGT, colums are positions
         $i_motif = scalar(@counts);
         # Store the contents of this row.
@@ -256,8 +256,8 @@ while ($line = <MF>) {
         $num_seqs += $motif{$i_base, $i_motif};
       }
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-         $motif{$i_base, $i_motif} = 
-         ($motif{$i_base, $i_motif} + ($bg{$bases[$i_base]} * $num_seqs * $c) ) / 
+         $motif{$i_base, $i_motif} =
+         ($motif{$i_base, $i_motif} + ($bg{$bases[$i_base]} * $num_seqs * $c) ) /
          ($num_seqs * (1 + $c));
       }
     }

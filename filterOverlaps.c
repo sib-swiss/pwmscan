@@ -4,7 +4,7 @@
   Filter overlapping matches.
   The program locates and filters out for regions or matches that overlap
   in BED-formatted genomic regions.
-  
+
   # Arguments:
   # BED region length (rLen)
 
@@ -27,7 +27,7 @@
 
 */
 /*
-#define DEBUG 
+#define DEBUG
 */
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -70,7 +70,7 @@ bedline_t bed_reg;
 
 int rLen = 0;
 
-void 
+void
 filter_regions(int len)
 {
   int max_score = 0;
@@ -100,16 +100,16 @@ filter_regions(int len)
   /* Print out non-overlapping regions (pflag = 1) */
   for (i = 0; i < len; i++) {
 #ifdef DEBUG
-    fprintf(stderr,"dbg: %s\t%lu\t%lu\t%s\t%d\t%c\n", bed_reg.seq_id, bed_reg.start[i], bed_reg.end[i], bed_reg.tag[i], bed_reg.score[i], bed_reg.strand[i]); 
+    fprintf(stderr,"dbg: %s\t%lu\t%lu\t%s\t%d\t%c\n", bed_reg.seq_id, bed_reg.start[i], bed_reg.end[i], bed_reg.tag[i], bed_reg.score[i], bed_reg.strand[i]);
 #endif
     if (bed_reg.pflag[i]) {
-      printf("%s\t%lu\t%lu\t%s\t%d\t%c\n", bed_reg.seq_id, bed_reg.start[i], bed_reg.end[i], bed_reg.tag[i], bed_reg.score[i], bed_reg.strand[i]); 
+      printf("%s\t%lu\t%lu\t%s\t%d\t%c\n", bed_reg.seq_id, bed_reg.start[i], bed_reg.end[i], bed_reg.tag[i], bed_reg.score[i], bed_reg.strand[i]);
     }
   }
 }
 
 int
-process_bed(FILE *input, char *iFile) 
+process_bed(FILE *input, char *iFile)
 {
   char seq_id_prev[SEQ_ID] = "";
   unsigned long start, end;
@@ -177,15 +177,15 @@ process_bed(FILE *input, char *iFile)
     exit(1);
   }
 #ifdef DEBUG
-  int c = 1; 
+  int c = 1;
 #endif
   while ((res = fgets(s, (int) bLen, input)) != NULL) {
     size_t cLen = strlen(s);
     char seq_id[SEQ_ID] = "";
-    char tag[TAG_MAX] = ""; 
-    char s_pos[POS_MAX] = ""; 
-    char e_pos[POS_MAX] = ""; 
-    char sc[SCORE_MAX] = ""; 
+    char tag[TAG_MAX] = "";
+    char s_pos[POS_MAX] = "";
+    char e_pos[POS_MAX] = "";
+    char sc[SCORE_MAX] = "";
     char strand = '\0';
     unsigned int i = 0;
 
@@ -228,7 +228,7 @@ process_bed(FILE *input, char *iFile)
       buf++;
     /* End Position */
     i = 0;
-    while (isdigit(*buf)) { 
+    while (isdigit(*buf)) {
       if (i >= POS_MAX) {
         fprintf(stderr, "End position too large \"%s\" \n", buf);
         exit(1);
@@ -254,7 +254,7 @@ process_bed(FILE *input, char *iFile)
       buf++;
     /* Score */
     i = 0;
-    while (isdigit(*buf) || *buf == '+' || *buf == '-') { 
+    while (isdigit(*buf) || *buf == '+' || *buf == '-') {
       if (i >= SCORE_MAX) {
         fprintf(stderr, "Score too large \"%s\" \n", buf);
         exit(1);
@@ -279,33 +279,33 @@ process_bed(FILE *input, char *iFile)
       fprintf(stderr, "reallocating memory for bed_reg.start bed_reg.end bed_reg.tag bed_reg.score (k=%d, size=%d)\n", k, (int)mLen);
 #endif
       if ((bed_reg.start = (unsigned long *)realloc(bed_reg.start, mLen * sizeof(unsigned long))) == NULL) {
-    	perror("process_bed: realloc");
-    	exit(1);
+        perror("process_bed: realloc");
+        exit(1);
       }
       if ((bed_reg.end = (unsigned long *)realloc(bed_reg.end, mLen * sizeof(unsigned long))) == NULL) {
-    	perror("process_bed: realloc");
-    	exit(1);
+        perror("process_bed: realloc");
+        exit(1);
       }
       if ((bed_reg.score = (int *)realloc(bed_reg.score, mLen * sizeof(int))) == NULL) {
-    	perror("process_bed: realloc");
-    	exit(1);
+        perror("process_bed: realloc");
+        exit(1);
       }
       if ((bed_reg.tag = (char**)realloc(bed_reg.tag, mLen * sizeof(*(bed_reg.tag)))) == NULL) {
         perror("process_bed: malloc");
         exit(1);
       }
       if ((bed_reg.strand = (char *)realloc(bed_reg.strand, mLen * sizeof(int))) == NULL) {
-    	perror("process_bed: realloc");
-    	exit(1);
+        perror("process_bed: realloc");
+        exit(1);
       }
       if ((bed_reg.pflag = (int *)realloc(bed_reg.pflag, mLen * sizeof(int))) == NULL) {
-    	perror("process_bed: realloc");
-    	exit(1);
+        perror("process_bed: realloc");
+        exit(1);
       }
     }
     /* Check Chromosome/Sequence BEGINNING, process previous chromosomal region and printout results*/
     if (strcmp(seq_id, seq_id_prev) != 0) {
-      filter_regions((int)k); 
+      filter_regions((int)k);
       strcpy(seq_id_prev, seq_id);
       k = 0;
     }
@@ -319,8 +319,8 @@ process_bed(FILE *input, char *iFile)
     bed_reg.pflag[k] = 1;
     k++;
   } /* End of While */
-  /* Filter overlapping regions for last chromosome/sequence */ 
-  filter_regions((int)k); 
+  /* Filter overlapping regions for last chromosome/sequence */
+  filter_regions((int)k);
   if (input != stdin) {
     fclose(input);
   }
@@ -349,7 +349,7 @@ main(int argc, char *argv[])
         break;
       case 'l':
         rLen = atoi(optarg);
-	break;
+        break;
       default:
         printf ("?? getopt returned character code 0%o ??\n", c);
     }
@@ -357,17 +357,17 @@ main(int argc, char *argv[])
   if (optind > argc || options.help == 1) {
     fprintf(stderr, "Usage: %s [options] [-l <len>] [<] <BED file>\n"
              "      where options are:\n"
-	     "  \t\t -d     Produce debug information and check BED file\n"
-	     "  \t\t -h     Show this help text\n"
-	     "  \t\t -l     BED Region length (default is %d)\n"
-	     "\n\tFilters out overlapping matches or regions represented in BED or BED-like format.\n"
-	     "\n\tIf regions are of fixed size, their length must be set via the -l <len> option.\n"
-	     "\tThe BED input file MUST BE sorted by sequence name (or chromosome id), position, and strand.\n"
-	     "\tOne should check the input BED file with the following command:\n"
-	     "\tsort -s -c -k1,1 -k2,2n -k6,6 <BED file>.\n\n"
-	     "\tIn debug mode (-d), the program performs the sorting order check.\n\n"
+             "  \t\t -d     Produce debug information and check BED file\n"
+             "  \t\t -h     Show this help text\n"
+             "  \t\t -l     BED Region length (default is %d)\n"
+             "\n\tFilters out overlapping matches or regions represented in BED or BED-like format.\n"
+             "\n\tIf regions are of fixed size, their length must be set via the -l <len> option.\n"
+             "\tThe BED input file MUST BE sorted by sequence name (or chromosome id), position, and strand.\n"
+             "\tOne should check the input BED file with the following command:\n"
+             "\tsort -s -c -k1,1 -k2,2n -k6,6 <BED file>.\n\n"
+             "\tIn debug mode (-d), the program performs the sorting order check.\n\n"
              "\tThe output is a BED-formatted list of non-overlapping matches.\n\n",
-	     argv[0], rLen);
+             argv[0], rLen);
       return 1;
   }
   if (argc > optind) {

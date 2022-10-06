@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # FILE: transfaconvert
 # CREATE DATE: 8/31/2013
-# AUTHOR: Giovanna Ambrosini 
+# AUTHOR: Giovanna Ambrosini
 #
 # Part of the code is based on an implemetation by
 # William Stafford Noble and Timothy L. Bailey
@@ -9,9 +9,9 @@
 # ORIG: transfac2meme.pl
 # DESCRIPTION: Convert a Transfac matrix file to MEME output format.
 
-# Giovanna Ambrosini 18/10/2017 
+# Giovanna Ambrosini 18/10/2017
 # Add pseudo weight fraction to correct frequencies
-# 
+#
 
 use warnings;
 use Math::Round;
@@ -46,8 +46,8 @@ my $usage = "USAGE: $0 [options] <matrix file>
            -w <l>|<p>                   <l> select log-odds matrix format for written output
                                         <p> select letter-probability matrix format for written output
                                         default format: original TRANSFAC frequency matrix
-  
-  Convert a Transfac matrix file to MEME output format (i.e. integer log likelihoods or letter-probability matrix). 
+
+  Convert a Transfac matrix file to MEME output format (i.e. integer log likelihoods or letter-probability matrix).
   N.B. Dollar signs in TRANSFAC IDs are converted to underscores.\n";
 
 
@@ -121,16 +121,16 @@ if (defined($bg_file)) {
     next if (/^#/);  # skip comments
     ($a, $f) = split;
     if ($a eq "A" || $a eq "a") {
-      $bg{"A"} = $f; 
+      $bg{"A"} = $f;
       $total_bg += $f;
     } elsif ($a eq "C" || $a eq "c") {
-      $bg{"C"} = $f; 
+      $bg{"C"} = $f;
       $total_bg += $f;
     } elsif ($a eq "G" || $a eq "g") {
-      $bg{"G"} = $f; 
+      $bg{"G"} = $f;
       $total_bg += $f;
     } elsif ($a eq "T" || $a eq "t") {
-      $bg{"T"} = $f; 
+      $bg{"T"} = $f;
       $total_bg += $f;
     }
   }
@@ -207,7 +207,7 @@ while ($line = <MF>) {
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
         $motif{$i_base, $i_motif} = shift(@counts);
       }
-      
+
       $i_motif++;
     } # END OF WHILE ON SINGLE MATRIX
     $width = $i_motif;
@@ -224,12 +224,12 @@ while ($line = <MF>) {
         if ($defout) {
           if ($i_base == 0) {
             printf (OF "%02d", $i_motif);
-          } 
+          }
           printf (OF "%7d ", $motif{$i_base, $i_motif});
         }
         if ($i_base == 0) {
           printf ("%02d", $i_motif);
-        } 
+        }
         printf ("%7d ", $motif{$i_base, $i_motif});
       }
       if ($defout) {
@@ -264,8 +264,8 @@ while ($line = <MF>) {
 #        $num_seqs += $motif{$i_base, $i_motif};
 #      }
 #      for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-#        $motif{$i_base, $i_motif} = 
-#          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) / 
+#        $motif{$i_base, $i_motif} =
+#          ($motif{$i_base, $i_motif} + ($b * $bg{$bases[$i_base]}) ) /
 #          ($num_seqs + $b);
 #      }
 #    }
@@ -293,8 +293,8 @@ while ($line = <MF>) {
     # Were we explicitly asked to skip this one?
     if (defined($skips{$matrix_name})) {
       $print_it = 0;
-    } 
-    
+    }
+
     # Print the motif.
     if ($print_it) {
       $num_motifs++;

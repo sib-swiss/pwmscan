@@ -1,9 +1,9 @@
 /*
 
   Score a set of nucloetide sequences in FASTA format based
-  on matches to a sequence motif represented by a position 
+  on matches to a sequence motif represented by a position
   weight matrix (PWM) or a base probability matrix (LPM)
-  
+
   Giovanna Ambrosini, EPFL/SV, giovanna.ambrosini@epfl.ch
 
   Copyright (c) 2014
@@ -86,9 +86,9 @@ double **lpm;                /* Letter Probability Matrix  */
 int   **pwm;                 /* Position Weight Matrix     */
 int matLen = 10;             /* Matrix Length              */
 
-double pseudo_weight = 0.0;  /* Optional pseudo-weight for Letter Probability Matrix */ 
+double pseudo_weight = 0.0;  /* Optional pseudo-weight for Letter Probability Matrix */
 
-static int 
+static int
 read_profile(char *iFile)
 {
   FILE *f = fopen(iFile, "r");
@@ -115,7 +115,7 @@ read_profile(char *iFile)
     /* Read Matrix file line by line */
     while ((res = fgets(s, (int) bLen, f)) != NULL) {
       size_t cLen = strlen(s);
-  
+
       while (cLen + 1 == bLen && s[cLen - 1] != '\n') {
         bLen *= 2;
         if ((s = realloc(s, bLen)) == NULL) {
@@ -127,10 +127,10 @@ read_profile(char *iFile)
       }
       if (s[cLen - 1] == '\n')
         s[cLen - 1] = 0;
-  
+
       if (s[cLen - 2] == '\r')
         s[cLen - 2] = 0;
-  
+
       buf = s;
       /* Get PWM fields */
       /* Get first character: if # or > skip line */
@@ -224,7 +224,7 @@ read_profile(char *iFile)
     /* Read Matrix file line by line */
     while ((res = fgets(s, (int) bLen, f)) != NULL) {
       size_t cLen = strlen(s);
-  
+
       while (cLen + 1 == bLen && s[cLen - 1] != '\n') {
         bLen *= 2;
         if ((s = realloc(s, bLen)) == NULL) {
@@ -236,10 +236,10 @@ read_profile(char *iFile)
       }
       if (s[cLen - 1] == '\n')
         s[cLen - 1] = 0;
-  
+
       if (s[cLen - 2] == '\r')
         s[cLen - 2] = 0;
-  
+
       buf = s;
       /* Get PWM fields */
       /* Get first character: if # or > skip line */
@@ -360,7 +360,7 @@ process_seq_lpm(seq_p_t seq, FILE *out)
     if (options.forward) {
       for (i = 0; i < NUCL-1; i++) {
         if (options.debug != 0)
-          fprintf(stderr, "nucl_cnt[%d] = %d ; seq LEN = %d\n", i, nucl_cnt[i], seq->len); 
+          fprintf(stderr, "nucl_cnt[%d] = %d ; seq LEN = %d\n", i, nucl_cnt[i], seq->len);
         bg[i] = (double)nucl_cnt[i]/(double)seq->len;
       }
     } else {
@@ -387,9 +387,9 @@ process_seq_lpm(seq_p_t seq, FILE *out)
       double prod = 1.0;
       double prod_rcomp = 1.0;
       for (j = 0; j < matLen; j++) {
-        //printf ("i=%d , PWM[%d] [%d] = %.10f\n", i, seq->seq[i+j], j, lpm[seq->seq[i+j]][j]); 
+        //printf ("i=%d , PWM[%d] [%d] = %.10f\n", i, seq->seq[i+j], j, lpm[seq->seq[i+j]][j]);
         prod = prod * lpm[seq->seq[i+j]][j]/bg[seq->seq[i+j]];
-        //printf ("PROD=%.10f\n", prod); 
+        //printf ("PROD=%.10f\n", prod);
         if (!options.forward) {
           int idx = 0;
           if (seq->seq[i+j] == 4) {
@@ -397,16 +397,16 @@ process_seq_lpm(seq_p_t seq, FILE *out)
           } else {
             idx = 3-seq->seq[i+j];
           }
-          //printf ("i=%d , RCPWM[%d] [%d] = %.10f\n", i, idx, matLen-j-1, lpm[idx][matLen-j-1]); 
+          //printf ("i=%d , RCPWM[%d] [%d] = %.10f\n", i, idx, matLen-j-1, lpm[idx][matLen-j-1]);
           prod_rcomp = prod_rcomp * lpm[idx][matLen-j-1]/bg[idx];
-          //printf ("RCProd=%.10f\n", prod_rcomp); 
+          //printf ("RCProd=%.10f\n", prod_rcomp);
         }
       }
       //printf ("prod: %g \t rev prod : %g\n", prod, prod_rcomp);
       double max = 0.0;
       if (options.forward)
         max = prod;
-      else 
+      else
         max = prod > prod_rcomp ? prod : prod_rcomp;
       //printf ("MAX: %g (pos=%d, strand=%c, BEST: %g)\n", max, i, strand, best_score);
       if (max > best_score) {
@@ -459,7 +459,7 @@ process_seq_lpm(seq_p_t seq, FILE *out)
           prod_rcomp = prod_rcomp * lpm[idx][matLen-j-1]/bg[idx];
         }
       }
-      if (options.forward) 
+      if (options.forward)
         sum = sum + prod;
       else
         sum = sum + prod + prod_rcomp;
@@ -535,7 +535,7 @@ process_seq_pwm(seq_p_t seq, FILE *out)
     int k = 0;
     if (options.forward) {
       max = score;
-    } else { 
+    } else {
       int c = score - rev_score;
       k = (c >> 31) & 0x1;   /* check highest bit of integer c : 0 = positive, 1 = negative */
       max = score - k * c;
@@ -583,7 +583,7 @@ process_file(FILE *input, char *iFile, FILE *out)
     FILE *f = fopen(iFile, "r");
     if (f == NULL) {
       fprintf(stderr, "Could not open file %s: %s(%d)\n",
-  	    iFile, strerror(errno), errno);
+        iFile, strerror(errno), errno);
       return -1;
     }
     input = f;
@@ -591,7 +591,7 @@ process_file(FILE *input, char *iFile, FILE *out)
   if (options.debug != 0)
     fprintf(stderr, "Processing file %s\n", iFile);
   while ((res = fgets(buf, BUF_SIZE, input)) != NULL
-	 && buf[0] != '>')
+     && buf[0] != '>')
     ;
   if (res == NULL || buf[0] != '>') {
     fprintf(stderr, "Could not find a sequence in file %s\n", iFile);
@@ -615,44 +615,44 @@ process_file(FILE *input, char *iFile, FILE *out)
         return -1;
       }
       seq.hdr[i++] = *s++;
-    } 
+    }
     if (i < HDR_MAX)
       seq.hdr[i] = 0;
-    /* Gobble sequence  */ 
+    /* Gobble sequence  */
     seq.len = 0;
     while ((res = fgets(buf, BUF_SIZE, input)) != NULL && buf[0] != '>') {
       char c;
       int n;
       s = buf;
       while ((c = *s++) != 0) {
-	if (isalpha(c)) {
-	  c = (char) toupper(c);
-	  switch (c) {
-	  case 'A':
-            n = 0;
-            break;
-	  case 'C':
-            n = 1;
-            break;
-	  case 'G':
-            n = 2;
-            break;
-	  case 'T':
-            n = 3;
-            break;
-	  case 'N':
-            n = 4;
-	    break;
-	  default:
-            n = 4;
-	    ;
-	  }
-	  if (seq.len >= mLen) {
-	    mLen += BUF_SIZE;
-	    seq.seq = realloc(seq.seq, (size_t)mLen * sizeof(int));
-	  }
-	  seq.seq[seq.len++] = n;
-	}
+        if (isalpha(c)) {
+          c = (char) toupper(c);
+          switch (c) {
+            case 'A':
+              n = 0;
+              break;
+            case 'C':
+              n = 1;
+              break;
+            case 'G':
+              n = 2;
+              break;
+            case 'T':
+              n = 3;
+              break;
+            case 'N':
+              n = 4;
+              break;
+            default:
+              n = 4;
+            ;
+          }
+          if (seq.len >= mLen) {
+            mLen += BUF_SIZE;
+            seq.seq = realloc(seq.seq, (size_t)mLen * sizeof(int));
+          }
+          seq.seq[seq.len++] = n;
+        }
       }
     }
     /* We now have the (not nul terminated) sequence.
@@ -719,7 +719,7 @@ main(int argc, char *argv[])
   char *bgProb = NULL;
   char** tokens;
   int i = 0;
-  double bprob = 0.25; 
+  double bprob = 0.25;
   options.lpm = 1;
   options.pwm = 0;
 
@@ -744,7 +744,7 @@ main(int argc, char *argv[])
       };
 
   int option_index = 0;
-  
+
 #ifdef DEBUG
   mcheck(NULL);
   mtrace();
@@ -798,26 +798,26 @@ main(int argc, char *argv[])
   }
   if (optind > argc || matFile == NULL) {
     fprintf(stderr,
-	    "Usage: %s [options] -m <matrix_file> [<] <fasta_file>\n"
-	    "   where options are:\n"
-	    "     -b[--best]             Compute best single match scores\n"
-	    "     -d[--debug]            Produce debugging output\n"
-	    "     -h[--help]             Show this stuff\n"
-	    "     -f[--forward]          Scan sequences in forward direction [def=bidirectional]\n"
-	    "     -u[--unorm]            Normalize pwm scores by a uniform background base composition (Default=0.25)\n"
-	    "     -p[--prob] <bg freq>   Normalize pwm scores by library-dependent nucleotide frequencies <bg freq>: 0.29,0.21,0.21,0.29\n"
-	    "                            Note that nucleotide frequencies (<bg freq>) MUST BE comma-separated\n"
-	    "     -q[--seqnorm]          Normalize pwm scores by sequence-based nucleotide composition\n"
-	    "     -r[--nohdr]            Output raw scores (with no FASTA header)\n"
-	    "     --lpm                  Input matrix is a letter probability matrix (LPM) [Default]\n"
-	    "     --pwm                  Input matrix is a position weight matrix (PWM)\n"
-	    "     -w[--pweight]          Set a pseudo-weight to re-normalize the frequencies of the letter-probability matrix (LPM)\n"
-	    "                            Recommended value is 0.0001 [Default=0.0]\n"
-	    "\n   Score a set of nucleotide sequences in FASTA format (<fasta_file>), based on matches to a sequence motif\n"
-            "   represented by an INTEGER position weight matrix [--pwm] or a base probability matrix [--lpm] (<matrix_file>).\n"
-            "   Note that the background normalization options (-u, -p, -q) are only valid for base probability matrices.\n"
-            "   For integer PWMs, only the best single match scores are reported, along with the position, strand, and sequence match.\n\n",
-	    argv[0]);
+        "Usage: %s [options] -m <matrix_file> [<] <fasta_file>\n"
+        "   where options are:\n"
+        "     -b[--best]             Compute best single match scores\n"
+        "     -d[--debug]            Produce debugging output\n"
+        "     -h[--help]             Show this stuff\n"
+        "     -f[--forward]          Scan sequences in forward direction [def=bidirectional]\n"
+        "     -u[--unorm]            Normalize pwm scores by a uniform background base composition (Default=0.25)\n"
+        "     -p[--prob] <bg freq>   Normalize pwm scores by library-dependent nucleotide frequencies <bg freq>: 0.29,0.21,0.21,0.29\n"
+        "                            Note that nucleotide frequencies (<bg freq>) MUST BE comma-separated\n"
+        "     -q[--seqnorm]          Normalize pwm scores by sequence-based nucleotide composition\n"
+        "     -r[--nohdr]            Output raw scores (with no FASTA header)\n"
+        "     --lpm                  Input matrix is a letter probability matrix (LPM) [Default]\n"
+        "     --pwm                  Input matrix is a position weight matrix (PWM)\n"
+        "     -w[--pweight]          Set a pseudo-weight to re-normalize the frequencies of the letter-probability matrix (LPM)\n"
+        "                            Recommended value is 0.0001 [Default=0.0]\n"
+        "\n   Score a set of nucleotide sequences in FASTA format (<fasta_file>), based on matches to a sequence motif\n"
+        "   represented by an INTEGER position weight matrix [--pwm] or a base probability matrix [--lpm] (<matrix_file>).\n"
+        "   Note that the background normalization options (-u, -p, -q) are only valid for base probability matrices.\n"
+        "   For integer PWMs, only the best single match scores are reported, along with the position, strand, and sequence match.\n\n",
+        argv[0]);
     return 1;
   }
   if (options.pwm)
@@ -876,7 +876,7 @@ main(int argc, char *argv[])
   } else {
     for (i = 0; i < matLen; i++) {
         pwm[4][i] = INT_MIN;
-    } 
+    }
   }
   /* Treat background nucleotide frequencies */
   if (options.norm) {
@@ -982,10 +982,10 @@ main(int argc, char *argv[])
     }
     fprintf(stderr, "\n");
   }
-  
+
   if (process_file(fasta_in, argv[optind++], stdout) != 0)
     return 1;
-  
+
   if (options.lpm) {
     for (i = 0; i < NUCL; i++)
       free(lpm[i]);

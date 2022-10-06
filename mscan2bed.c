@@ -2,7 +2,7 @@
   mscan2bed.c
 
   Convert matrix_scan output into BED format.
-  
+
   # Arguments:
   # species
   # matrix_scan output file
@@ -26,7 +26,7 @@
 
 */
 /*
-#define DEBUG 
+#define DEBUG
 */
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -161,7 +161,7 @@ process_ac()
 }
 
 int
-process_bed(FILE *input, char *iFile) 
+process_bed(FILE *input, char *iFile)
 {
   unsigned long start, end;
   int score;
@@ -203,15 +203,15 @@ process_bed(FILE *input, char *iFile)
     exit(1);
   }
 #ifdef DEBUG
-  int c = 1; 
+  int c = 1;
 #endif
   while ((res = fgets(s, (int) bLen, input)) != NULL) {
     size_t cLen = strlen(s);
     char seq_id[AC_MAX] = "";
-    char tag[TAG_MAX] = ""; 
-    char s_pos[POS_MAX] = ""; 
-    char e_pos[POS_MAX] = ""; 
-    char sc[SCORE_MAX] = ""; 
+    char tag[TAG_MAX] = "";
+    char s_pos[POS_MAX] = "";
+    char e_pos[POS_MAX] = "";
+    char sc[SCORE_MAX] = "";
     char strand = '\0';
     unsigned int i = 0;
 
@@ -254,7 +254,7 @@ process_bed(FILE *input, char *iFile)
       buf++;
     /* End Position */
     i = 0;
-    while (isdigit(*buf)) { 
+    while (isdigit(*buf)) {
       if (i >= POS_MAX) {
         fprintf(stderr, "End position too large \"%s\" \n", buf);
         exit(1);
@@ -280,7 +280,7 @@ process_bed(FILE *input, char *iFile)
       buf++;
     /* Score */
     i = 0;
-    while (isdigit(*buf) || (*buf) == '-') { 
+    while (isdigit(*buf) || (*buf) == '-') {
       if (i >= SCORE_MAX) {
         fprintf(stderr, "Score too large \"%s\" \n", buf);
         exit(1);
@@ -334,7 +334,7 @@ main(int argc, char *argv[])
       case 'i':
         options.dbPath = optarg;
         options.db = 1;
-	break;
+        break;
       case 's':
         Species = optarg;
         break;
@@ -345,11 +345,11 @@ main(int argc, char *argv[])
   if (optind > argc || options.help == 1 || Species == NULL) {
     fprintf(stderr, "Usage: %s [options] -s <s_assembly (e.g. hg18)> [<] <Matrix Scan File|stdin>\n"
              "      where options are:\n"
-	     "  \t\t -h     Show this help text\n"
-	     "  \t\t -d     Produce debug information\n"
+             "  \t\t -h     Show this help text\n"
+             "  \t\t -d     Produce debug information\n"
              "  \t\t -i <path> Use <path> to locate the chr_NC_gi file (default is /home/local/db/genome)\n"
-	     "\n\tConvert output of matrix_scan program into BED format.\n\n",
-	     argv[0]);
+             "\n\tConvert output of matrix_scan program into BED format.\n\n",
+             argv[0]);
       return 1;
   }
   if (argc > optind) {

@@ -2,11 +2,11 @@
   bowtie2bed.c
 
   Convert Bowtie output into BED format
-  
+
   # Arguments:
   # score file
   # species
-  # Bowtie output file 
+  # Bowtie output file
 
   Giovanna Ambrosini, EPFL, Giovanna.Ambrosini@epfl.ch
 
@@ -27,7 +27,7 @@
 
 */
 /*
-#define DEBUG 
+#define DEBUG
 */
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -70,13 +70,13 @@ static hash_table_t *ac_table = NULL;
 int tagLen = 0;
 int misMatch = 0;
 
-void 
+void
 reverse(char *str)
 {
   char temp;
   int i = 0;
   int j = 0;
- 
+
   j = strlen(str) - 1;
   while (i < j) {
     temp = str[i];
@@ -87,12 +87,12 @@ reverse(char *str)
   }
 }
 
-void 
+void
 complement(char *str)
 {
   int i = 0;
   int j = 0;
- 
+
   j = strlen(str);
   while (i < j) {
     switch (str[i]) {
@@ -199,8 +199,8 @@ complement(char *str)
   }
 }
 
-int 
-process_ac() 
+int
+process_ac()
 {
   FILE *input;
   int c;
@@ -223,9 +223,9 @@ process_ac()
       }
       strcpy(chrFile, "/home/local/db/genome");
   }
-  strcat(chrFile, "/"); 
-  strcat(chrFile, Species); 
-  strcat(chrFile, "/chr_hdr"); 
+  strcat(chrFile, "/");
+  strcat(chrFile, Species);
+  strcat(chrFile, "/chr_hdr");
 
   input = fopen(chrFile, "r");
   if (input == NULL) {
@@ -262,8 +262,8 @@ process_ac()
     //nb_len = strlen(chr_nb) + 1;
     nb_len = i + 1;
     while (isspace(*s))
-    s++; 
-    /* Chromosome AC */ 
+    s++;
+    /* Chromosome AC */
     i = 0;
     while (*s != 0 && !isspace(*s)) {
       if (i >= HDR_MAX) {
@@ -286,18 +286,18 @@ process_ac()
   return 0;
 }
 
-int 
-process_bowtie(FILE *input, char *iFile) 
+int
+process_bowtie(FILE *input, char *iFile)
 {
   char *s, *res, *buf;
   size_t bLen = LINE_SIZE;
   unsigned int k = 0;
 
   if (iFile == NULL) {
-    iFile = malloc(6 * sizeof(char)); 
+    iFile = malloc(6 * sizeof(char));
     strcpy(iFile, "stdin");
   }
-  if (options.debug) 
+  if (options.debug)
     fprintf (stderr, "processing file: %s\n", iFile);
   if ((s = malloc(bLen * sizeof(char))) == NULL) {
     perror("process_bowtie: malloc");
@@ -389,7 +389,7 @@ process_bowtie(FILE *input, char *iFile)
     while (isspace(*buf))
       buf++;
 */
-#ifdef DEBUG   
+#ifdef DEBUG
     printf("%s\t%c\t%s\t%s\t%s\n", sc, strand, ac, start, tag );
 #endif
     if (strand == '-') {
@@ -401,11 +401,11 @@ process_bowtie(FILE *input, char *iFile)
     int end = pos + tagLen;
     char *nb = hash_table_lookup(ac_table, ac, hdr_len);
     //fprintf (stderr, "Hash table value for %s is chr%s\n", ac, nb);
-    /* Convert to BED format */ 
+    /* Convert to BED format */
     if (options.mism) {
       int s = 0;
       s = misMatch;
-      printf("chr%s\t%d\t%d\t%s\t%d\t%c\n", nb, pos, end, tag, s, strand); 
+      printf("chr%s\t%d\t%d\t%s\t%d\t%c\n", nb, pos, end, tag, s, strand);
     } else {
       if (options.norm) {
         int score = atoi(sc)/options.norm;
@@ -501,12 +501,12 @@ int main(int argc, char *argv[])
   if (options.debug) {
     fprintf(stderr, " Arguments:\n");
     if (options.score)
-      fprintf(stderr, "Score file: %s\n", options.scFile); 
+      fprintf(stderr, "Score file: %s\n", options.scFile);
     if (options.mism)
-      fprintf(stderr, "Tag mismatch: %d\n", misMatch); 
-    fprintf(stderr, "Bowtie file: %s\n", argv[optind]); 
+      fprintf(stderr, "Tag mismatch: %d\n", misMatch);
+    fprintf(stderr, "Bowtie file: %s\n", argv[optind]);
     if (options.db)
-      fprintf(stderr, "DB path for locating the chr_NC_gi file: %s\n", options.dbPath); 
+      fprintf(stderr, "DB path for locating the chr_NC_gi file: %s\n", options.dbPath);
     fprintf(stderr, "Species assembly: %s\n", Species);
   }
 

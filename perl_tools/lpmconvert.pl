@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # FILE: pfmconvert
 # CREATE DATE: 3/07/2014
-# AUTHOR: Giovanna Ambrosini 
+# AUTHOR: Giovanna Ambrosini
 #
 #
 # Part of the code is based on an implemetation by
@@ -29,7 +29,7 @@ my $minscore = -10000;
 
 my $usage = "USAGE: $0 [options] <matrix file>
 
-  Options: 
+  Options:
            -bg <background file>        set of f_a
            -c <pseudo weight>           add pseudo weight fraction <c> distributed according to residue priors
                                             default: $c
@@ -40,7 +40,7 @@ my $usage = "USAGE: $0 [options] <matrix file>
            -noheader                    write raw matrix (without header)
            -o <outfile>                 output file name
                                             default: no output file
-  
+
   Convert a Letter Probability Matrix (LPM) file to a Position Weihgt Matrix (PWM) with integer log odds weights.
   A letter probability matrix (LPM) records the position-dependent probability normalized to 1 of each residue or nucleotide.\n\n";
 
@@ -87,16 +87,16 @@ if (defined($bg_file)) {
     next if (/^#/);  # skip comments
     ($a, $f) = split;
     if ($a eq "A" || $a eq "a") {
-      $bg{"A"} = $f; 
+      $bg{"A"} = $f;
       $total_bg += $f;
     } elsif ($a eq "C" || $a eq "c") {
-      $bg{"C"} = $f; 
+      $bg{"C"} = $f;
       $total_bg += $f;
     } elsif ($a eq "G" || $a eq "g") {
-      $bg{"G"} = $f; 
+      $bg{"G"} = $f;
       $total_bg += $f;
     } elsif ($a eq "T" || $a eq "t") {
-      $bg{"T"} = $f; 
+      $bg{"T"} = $f;
       $total_bg += $f;
     }
   }
@@ -172,7 +172,7 @@ while ($line = <MF>) {
         #print("Moving cursor to POS $prev_curspos\n");
         last;
       }
-      
+
       # Store the contents of this row.
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
         $motif{$i_base, $i_motif} = shift(@counts);

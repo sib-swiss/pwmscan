@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
-# FILE: pwm2lpmconvert.pl 
+# FILE: pwm2lpmconvert.pl
 # CREATE DATE: 21/02/2018
-# AUTHOR: Giovanna Ambrosini 
+# AUTHOR: Giovanna Ambrosini
 #
 
 # DESCRIPTION: Convert a position weigh matrix (PWM) to a letter probability matrix
-#              assuming, for the background model, an independent succession of 
+#              assuming, for the background model, an independent succession of
 #              nucleotides (Bernoulli model). Use the natural logarithm.
 
 use warnings;
@@ -26,9 +26,9 @@ my $usage = "USAGE: $0 [options] <matrix file>
            -noheader                    write raw matrix (without header)
            -o <outfile>                 output file name
                                         default: no output file
-           -ssa                         input PWM matrix is in SSA-like format 
+           -ssa                         input PWM matrix is in SSA-like format
 
-  Convert a Position Weight Matrix (PWM) to letter probability format. 
+  Convert a Position Weight Matrix (PWM) to letter probability format.
   The conversion formula assumes, for the background model, an independent
   succession of nucleotides (Bernoulli model), and the natural logarithm base.
   PWM weights can be normalized by a logarithm scaling factor (by default=1).
@@ -93,7 +93,7 @@ my @norm_sum = ();
 while ($line = <MF>) {
   if (!$inp_ssa_flag) {
     # Matrix has only position score columns for each base
-    print STDERR "RAW PWM format.\n"; 
+    print STDERR "RAW PWM format.\n";
     $i_motif = 0;
     if ($line  =~ /^#/ or $line  =~ /^>/) {
       # Have we reached a new matrix?
@@ -172,7 +172,7 @@ while ($line = <MF>) {
     for ($i_motif = 0; $i_motif < $width; $i_motif++) {
       # motif columns may have different counts
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-        printf ("%8.6f ", $motif{$i_base, $i_motif}/$norm_sum[$i_motif]); 
+        printf ("%8.6f ", $motif{$i_base, $i_motif}/$norm_sum[$i_motif]);
       }
       print("\n");
     }
@@ -202,7 +202,7 @@ while ($line = <MF>) {
   } else {
     # SSA format Matrix (inlcuding header and additional columns
     # Split the line into identifier and everything else.
-    print STDERR "Standard SSA PWM format.\n"; 
+    print STDERR "Standard SSA PWM format.\n";
     ($id, @data) = split(' ', $line);
 
     # Have we reached a new matrix?
@@ -217,7 +217,7 @@ while ($line = <MF>) {
           die ("Can't find first XX line for SSA matrix $matrix_name.\n");
         }
         ($id, @data) = split(' ', $line);
-      } 
+      }
       $id = "";
       while (($id ne "XX")) {
         $line = <MF>;
@@ -290,12 +290,12 @@ while ($line = <MF>) {
       for ($i_motif = 0; $i_motif < $width; $i_motif++) {
         # motif columns may have different counts
         for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-            printf ("%8.6f ", $motif{$i_base, $i_motif}/$norm_sum[$i_motif]); 
+            printf ("%8.6f ", $motif{$i_base, $i_motif}/$norm_sum[$i_motif]);
         }
         print("\n");
       }
       print("\n");
-    
+
       # Print the motif to file.
       if ($print_it) {
         $num_motifs++;

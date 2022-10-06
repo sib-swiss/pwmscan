@@ -495,21 +495,21 @@ main(int argc, char *argv[])
   /* printf ("optind: %d  argc:%d\n", optind, argc);  */
   if (optind > argc || options.help) {
     fprintf(stderr,
-	    "Usage: %s [options] [<] <pwm_file>\n"
-	    "   where options are:\n"
-	    "     -d[--debug]             Produce debugging output\n"
-	    "     -h[--help]              Show this stuff\n"
-	    "     -b[--bg] <bg freq>      Set the background nucleotide frequencies <bg freq>: 0.25,0.25,0.25,0.25\n"
-	    "                             Note that nucleotide frequencies (<bg freq>) MUST BE comma-separated.\n"
-	    "     -e[--eval]  <p-value>   Compute raw score and percentage cut-offs corresponding to the given <p-value>\n"
-	    "     -p[--perc]  <perc co>   Compute raw score and p-value cut-offs corresponding to the given <perc co>\n"
-	    "     -s[--score] <score>     Compute p-value and percentage cut-offs corresponding to the given <score>\n"
-	    "\n\tCompute the cumulative score distribution of an integer position weight matrix (<pwm_file>) or PWM.\n"
-	    "\tThe PWM weights are integer numbers calculated as log likelihoods (or log-odds).\n"
-	    "\tIf the p-value threshold is set, the corresponding score and percentage cut-off values are computed.\n"
-	    "\tIf the cut-off percentage is set, the corresponding score and p-value cut-off values are computed.\n"
-	    "\tIf the cut-off score is set, the corresponding p-value and percentage cut-off values are computed.\n\n",
-	    argv[0]);
+        "Usage: %s [options] [<] <pwm_file>\n"
+        "   where options are:\n"
+        "     -d[--debug]             Produce debugging output\n"
+        "     -h[--help]              Show this stuff\n"
+        "     -b[--bg] <bg freq>      Set the background nucleotide frequencies <bg freq>: 0.25,0.25,0.25,0.25\n"
+        "                             Note that nucleotide frequencies (<bg freq>) MUST BE comma-separated.\n"
+        "     -e[--eval]  <p-value>   Compute raw score and percentage cut-offs corresponding to the given <p-value>\n"
+        "     -p[--perc]  <perc co>   Compute raw score and p-value cut-offs corresponding to the given <perc co>\n"
+        "     -s[--score] <score>     Compute p-value and percentage cut-offs corresponding to the given <score>\n"
+        "\n\tCompute the cumulative score distribution of an integer position weight matrix (<pwm_file>) or PWM.\n"
+        "\tThe PWM weights are integer numbers calculated as log likelihoods (or log-odds).\n"
+        "\tIf the p-value threshold is set, the corresponding score and percentage cut-off values are computed.\n"
+        "\tIf the cut-off percentage is set, the corresponding score and p-value cut-off values are computed.\n"
+        "\tIf the cut-off score is set, the corresponding p-value and percentage cut-off values are computed.\n\n",
+        argv[0]);
     return 1;
   }
   if (argc > optind) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # FILE: pwmconvert
 # CREATE DATE: 10/07/2015
-# AUTHOR: Giovanna Ambrosini 
+# AUTHOR: Giovanna Ambrosini
 #
 # Part of the code is based on an implemetation by
 # William Stafford Noble and Timothy L. Bailey
@@ -26,17 +26,17 @@ $bg{"T"} = 0.25;
 
 my $usage = "USAGE: $0 [options] <matrix file>
 
-  Options: 
-           -c                           check format : check whether PWM scores are Real or Integer 
+  Options:
+           -c                           check format : check whether PWM scores are Real or Integer
                                         and print out the corresponding Real/Integer flag
            -n <scaling factor>          set scaling factor (int) for real format only
-                                        If not set, the program estimates its value 
+                                        If not set, the program estimates its value
            -noheader                    write raw matrix (without header)
            -o <outfile>                 output file name
                                         default: no output file
-           -ssa                         input PWM matrix is in SSA-like format 
+           -ssa                         input PWM matrix is in SSA-like format
 
-  Convert a real or SSA-formatted Position Weight Matrix (PWM) to integer plain-text format. 
+  Convert a real or SSA-formatted Position Weight Matrix (PWM) to integer plain-text format.
   Optionally, the program performs a check to see whether the matrix scores are Real or Integer
   numbers, and prints the corresponding Real/Integer flag.
 \n";
@@ -63,7 +63,7 @@ while (scalar(@ARGV) > 1) {
   } elsif ($next_arg eq "-n") {
     $scale = shift(@ARGV);
     if ($scale ne "") {
-       $setscale_flag = 1; 
+       $setscale_flag = 1;
     } else {
        $scale = 1;
     }
@@ -113,12 +113,12 @@ my $float_flag = 1;
 while ($line = <MF>) {
   if (!$inp_ssa_flag) {
     # Matrix has only position score columns for each base
-    print STDERR "RAW PWM format.\n"; 
+    print STDERR "RAW PWM format.\n";
     $i_motif = 0;
     if ($line  =~ /^#/ or $line  =~ /^>/) {
       # Have we reached a new matrix?
       ($matrix_name) = $line =~/^[\#\>]\s*(\S+).*/;
-      
+
       # Read the motif.
       while (<MF>) {
         last if (/\/\//);
@@ -209,7 +209,7 @@ while ($line = <MF>) {
     for ($i_motif = 0; $i_motif < $width; $i_motif++) {
       # motif columns may have different counts
       for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-        printf ("%7d ", round($motif{$i_base, $i_motif} * $scale)); 
+        printf ("%7d ", round($motif{$i_base, $i_motif} * $scale));
       }
       print("\n");
     }
@@ -239,7 +239,7 @@ while ($line = <MF>) {
   } else {
     # SSA format Matrix (inlcuding header and additional columns
     # Split the line into identifier and everything else.
-    print STDERR "Standard SSA PWM format.\n"; 
+    print STDERR "Standard SSA PWM format.\n";
     ($id, @data) = split(' ', $line);
 
     # Have we reached a new matrix?
@@ -254,7 +254,7 @@ while ($line = <MF>) {
           die ("Can't find first XX line for SSA matrix $matrix_name.\n");
         }
         ($id, @data) = split(' ', $line);
-      } 
+      }
       $id = "";
       while (($id ne "XX")) {
         $line = <MF>;
@@ -346,12 +346,12 @@ while ($line = <MF>) {
       for ($i_motif = 0; $i_motif < $width; $i_motif++) {
         # motif columns may have different counts
         for ($i_base = 0; $i_base < $num_bases; $i_base++) {
-            printf ("%7d ", round($motif{$i_base, $i_motif} * $scale)); 
+            printf ("%7d ", round($motif{$i_base, $i_motif} * $scale));
         }
         print("\n");
       }
       print("\n");
-    
+
       # Print the motif to file.
       if ($print_it) {
         $num_motifs++;

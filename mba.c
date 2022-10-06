@@ -1,9 +1,9 @@
 /*
-  mba.c 
+  mba.c
 
   Matrix Branch-and-bound Algorithm for generating sequences
   from a position weight matrix (PWM) and a cut-off value.
-  Optionally, the program computes a probability matrix 
+  Optionally, the program computes a probability matrix
   instead of a list of sequences.
 
   Giovanna Ambrosini, ISREC, Giovanna.Ambrosini@isrec.ch
@@ -28,8 +28,8 @@
 /*
   Modified by Giovanna Ambrosini, 30/11/2017
   - New read_profile funtion (it accepts matrices with a header)
-  - Eliminate the matrix length parameter (-l) 
-    The PWM length is computed by the read_profile routine 
+  - Eliminate the matrix length parameter (-l)
+    The PWM length is computed by the read_profile routine
   - Add a End Of tree Traversal flag (EOT) to control the loop across the tree
 */
 /*
@@ -62,16 +62,16 @@ typedef struct _options_t {
 
 /* We use a tree structure to represent all possible L-mers or
    strings of length L.
-   Each vertex of the tree is represented as the paring of an 
+   Each vertex of the tree is represented as the paring of an
    array s and a level i (s,i).
-   Traversing the complete tree is implemented in the next_vertex 
+   Traversing the complete tree is implemented in the next_vertex
    function. We begin at level 0 (the root) and then consider
    each of its NUCL=4 children in order. For each child, we again
    consider each of its NUCL children and so on.
-   At each vertex we calculate a bound - the partial score and a 
+   At each vertex we calculate a bound - the partial score and a
    drop-off value for the current score - and then decide whether
    or not to branch out further.
-*/   
+*/
 
 static options_t options;
 
@@ -100,13 +100,13 @@ nucleotide_string(int *s, char *string)
   }
 }
 
-int 
+int
 find_max(int *a, int n)
 {
   int i, max;
 
   max = a[0];
-  for (i = 1; i < n; i++) 
+  for (i = 1; i < n; i++)
     if (a[i] > max)
       max = a[i];
   return max;
@@ -135,7 +135,7 @@ drop_off_init(int **p, int len, int *doff)
     fprintf(stderr, "\ndrop_off_init:\n");
   int *max = (int *) calloc(len, sizeof(int));
   if (max == NULL) {
-    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno); 
+    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno);
     exit(1);
   }
   for (i = 0; i < len; i++) {
@@ -164,7 +164,7 @@ drop_off_init(int **p, int len, int *doff)
 }
 
 void
-min_score(int **p, int len, int *min) 
+min_score(int **p, int len, int *min)
 {
   int scores[NUCL] = {0};
   int sum = 0;
@@ -188,13 +188,13 @@ min_score(int **p, int len, int *min)
   *min = sum;
 }
 
-int 
+int
 score(int **p, int *s)
 {
   int *n = s;
   int value = 0;
   int k = 0;
-  
+
   for (; *n ;) {
     value += p[k][(*n)-1];
     n++;
@@ -209,9 +209,9 @@ next_vertex(int *s, int *i, int len, int k)
   /* The integer i indicates the level on which the vertex lies (current vertex)
      the array s represents the vertex at level i, that is the sequence
      of nucleotide codes, from 0 to i-1, being traversed.
-     The function returns the next vertex in the tree as a new pairing 
+     The function returns the next vertex in the tree as a new pairing
      of an array (s) and a level (i).
-     At level len, when the traversal is complete the function will return a 
+     At level len, when the traversal is complete the function will return a
      level number of 0, the root. The k parameter is k=NUCL.
      The function next_vertex is used to navigate vertically through the tree,
      that is to explore a new branch of the tree.
@@ -221,13 +221,13 @@ next_vertex(int *s, int *i, int len, int k)
   if (*i < len) {
     s[*i] = 1;  /* Add nucleotide A, coded by 1 */
     (*i)++;     /* Increment level              */
-    return; 
+    return;
   } else {
     for (j = len -1; j >= 0; j--) {
       if ( s[j] < k ) {  /* if A or C or G and last level  */
-        s[j] += 1;       /* Change base: A->C, C->G, G->T  */ 
-	*i = j + 1;      /* Set level (to last)            */
-	return;
+        s[j] += 1;       /* Change base: A->C, C->G, G->T  */
+        *i = j + 1;      /* Set level (to last)            */
+        return;
       }
       s[j] = 0;     /* If T, reset nucleotide and go to upper level */
     }
@@ -248,7 +248,7 @@ by_pass(int *s, int *i, int k)
      The subroutine allows us to skip the subtree rooted at vertex (s,i).
      If we skip a vertex at level i of the tree, we can just increment s[i-1],
      unless s[i-1]=4 (T), in which case we need to jump up in the tree.
-     At level len=L, when the traversal is complete the function will return a 
+     At level len=L, when the traversal is complete the function will return a
      level number of 0, the root.
      The function by_pass is used to move horizontally, based on the estimate
      of upper and lower bounds (sequence score).
@@ -257,7 +257,7 @@ by_pass(int *s, int *i, int k)
 
   for (j = *i - 1; j >= 0; j--) {
     if ( s[j] < k ) {  /* if A or C or G and last level  */
-      s[j] += 1;       /* Change base: A->C, C->G, G->T  */ 
+      s[j] += 1;       /* Change base: A->C, C->G, G->T  */
       *i = j + 1;      /* (re)Set level (to current)     */
       return;
     }
@@ -270,7 +270,7 @@ by_pass(int *s, int *i, int k)
   *i = 0;
 }
 
-int 
+int
 read_profile(char *iFile)
 {
   FILE *f = fopen(iFile, "r");
@@ -283,7 +283,7 @@ read_profile(char *iFile)
 
   if (f == NULL) {
     fprintf(stderr, "Could not open file %s: %s(%d)\n",
-	    iFile, strerror(errno), errno);
+        iFile, strerror(errno), errno);
     return -1;
   }
   if (options.debug != 0)
@@ -415,7 +415,7 @@ read_profile(char *iFile)
   return l;
 }
 
-int 
+int
 BranchAndBound_motif_search(int **profile, int len)
 {
   int partialScore = 0;
@@ -430,17 +430,17 @@ BranchAndBound_motif_search(int **profile, int len)
   }
   int *s = calloc(len + 1, sizeof(int));
   if (s == NULL) {
-    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno); 
+    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno);
     return 1;
   }
   int *doff = calloc(len, sizeof(int));
   if (doff == NULL) {
-    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno); 
+    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno);
     return 1;
   }
   char *lmer_str = calloc(len + 1, sizeof(char));
   if (lmer_str == NULL) {
-    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno); 
+    fprintf(stderr, "Out of memory: %s(%d)\n",strerror(errno), errno);
     return 1;
   }
   lmer_str[len] = '\0';
@@ -462,11 +462,11 @@ BranchAndBound_motif_search(int **profile, int len)
     if (i < len) {
       partialScore = score(profile, s);
       if (partialScore < (cutOff - doff[i])) {
-	/* Bypass the entire subtree rooted at vertex (s,i) */
+        /* Bypass the entire subtree rooted at vertex (s,i) */
         //printf(">>call by_pass for level %d part score %d\n", i, partialScore);
         by_pass(s, &i, NUCL);
       } else {
-	/* return next vertex in the tree (s, i) */ 
+        /* return next vertex in the tree (s, i) */
         //printf(">>next_vertex for level %d part score %d\n", i, partialScore);
         next_vertex(s, &i, len, NUCL);
       }
@@ -474,15 +474,15 @@ BranchAndBound_motif_search(int **profile, int len)
       partialScore = score(profile, s);
       //printf(">>LEVEL %d score %d: calling next_vertex for LAST LEVEL ...\n", i, partialScore);
       if (partialScore >= cutOff) {
-	lmer_cnt +=1;
-	//printf("cnt%d: first base %c score %d\n", lmer_cnt, nucleotide[*s - 1], partialScore);
+        lmer_cnt +=1;
+        //printf("cnt%d: first base %c score %d\n", lmer_cnt, nucleotide[*s - 1], partialScore);
         //nucleotide_string(s, lmer_str);
-	if ((!options.count) && (!options.matrix)) {
-	  nucleotide_string(s, lmer_str);
-	  printf("%s  %d\n", lmer_str, partialScore);
-	}
+        if ((!options.count) && (!options.matrix)) {
+            nucleotide_string(s, lmer_str);
+            printf("%s  %d\n", lmer_str, partialScore);
+        }
         //printf(">>TAG %llu: %s  %d\n", lmer_cnt, lmer_str, partialScore);
-        if (options.matrix) { 
+        if (options.matrix) {
           for (k = 0; k < len; k++)
             cntmat[s[k]-1][k]++;
         }
@@ -510,7 +510,7 @@ BranchAndBound_motif_search(int **profile, int len)
   return 0;
 }
 
-char** 
+char**
 str_split(char* a_str, const char a_delim)
 {
     char** result = 0;
@@ -591,34 +591,34 @@ main(int argc, char *argv[])
         options.count = 1;
         break;
       case '?':
-	break;
+        break;
       default:
         printf ("?? getopt returned character code 0%o ??\n", c);
       }
-    }   
+    }
   if (optind == argc || options.help == 1 || cutOff == INT_MIN) {
-     fprintf(stderr, 
+     fprintf(stderr,
          "Usage: %s [options] -c <cut-off> [<] <PWM file_in>\n"
-	 "      where options are:\n"
-	 "  \t\t -h	   Show this stuff\n"
-	 "  \t\t -d        Produce debugging output\n"
+         "      where options are:\n"
+         "  \t\t -h    Show this stuff\n"
+         "  \t\t -d        Produce debugging output\n"
          "  \t\t -m        Output a base probability matrix instead of a list of sequences\n"
          "  \t\t -k        Define a pseudo weight distributed according to residue priors\n"
          "  \t\t           (Default is %d)\n"
          "  \t\t -p <bg>   Define residue priors (<bg>), by default : 0.25,0.25,0.25,0.25\n"
          "  \t\t           Note that nucleotide frequencies MUST BE comma-separated\n"
-	 "  \t\t -t	   Count all tags above the cut-off (testing mode)\n\n"
-	 "\n\tThe Matrix Branch-and-bound Algorithm (mba) generates sequences from a given\n"
-	 "\tposition weight matrix (PWM) and a cut-off value.\n"
-	 "\tOptionally, the program computes a probability matrix instead of generating\n"
-	 "\ta list of sequences (-m option).\n"
-	 "\tThe weight matrix that describes the profile must have the following format:\n"
-	 "	\tone line = one motif position, base order A, C, G, T\n\n"
-	 "\tThe PWM is included in the <PWM file_in> file.\n"
-	 "\tA value can be optionally specified as a cut-off for the matrix (default=0).\n" 
-	 "\tIf the option '-t' is given, the program only counts the total number of\n"
-	 "\tsequences that can be generated, given the PWM and the cut-off value.\n\n",
-		argv[0], K);
+         "  \t\t -t        Count all tags above the cut-off (testing mode)\n\n"
+         "\n\tThe Matrix Branch-and-bound Algorithm (mba) generates sequences from a given\n"
+         "\tposition weight matrix (PWM) and a cut-off value.\n"
+         "\tOptionally, the program computes a probability matrix instead of generating\n"
+         "\ta list of sequences (-m option).\n"
+         "\tThe weight matrix that describes the profile must have the following format:\n"
+         "\tone line = one motif position, base order A, C, G, T\n\n"
+         "\tThe PWM is included in the <PWM file_in> file.\n"
+         "\tA value can be optionally specified as a cut-off for the matrix (default=0).\n"
+         "\tIf the option '-t' is given, the program only counts the total number of\n"
+         "\tsequences that can be generated, given the PWM and the cut-off value.\n\n",
+         argv[0], K);
     return 1;
   }
   /* Allocate space for profile (PWM) */
@@ -659,7 +659,7 @@ main(int argc, char *argv[])
     cntmat = (unsigned long **)calloc(NUCL, sizeof(unsigned long *)); /* Allocate rows */
     if (cntmat == NULL) {
       fprintf(stderr, "Could not allocate count matrix array: %s(%d)\n",
-  	strerror(errno), errno);
+        strerror(errno), errno);
       return 1;
     }
     for (i = 0; i < NUCL; i++) {
@@ -672,7 +672,7 @@ main(int argc, char *argv[])
     probmat = (float **)calloc(NUCL, sizeof(float *)); /* Allocate rows */
     if (probmat == NULL) {
       fprintf(stderr, "Could not allocate probability matrix array: %s(%d)\n",
-  	strerror(errno), errno);
+        strerror(errno), errno);
       return 1;
     }
     for (i = 0; i < NUCL; i++) {
@@ -735,6 +735,6 @@ main(int argc, char *argv[])
       free(probmat[i]);
     free(probmat);
   }
-  
+
   return 0;
 }

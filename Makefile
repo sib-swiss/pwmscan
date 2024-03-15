@@ -10,7 +10,7 @@ CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall
 binDir = $(PWD)/bin
 genomeDir = $(PWD)/genomedb
 
-PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp pwm_scoring
+PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp pwm_scoring seqshuffle
 SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwm2lpmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwm_scan_ucsc pwmlib_scan pwmlib_scan_seq pwm_bowtie_wrapper pwm_mscan_wrapper pwm_mscan_wrapper_ucsc pwm_convert scan_genome_with_lib scan_seq_with_lib
 
 OBJS = hashtable.o
@@ -26,6 +26,7 @@ MSCAN_BED2SGA_SRC = mscan_bed2sga.c
 SEQ_EXTRACT_BCOMP_SRC = seq_extract_bcomp.c
 PWM_SCORING_SRC = pwm_scoring.c
 FILTEROVERLAPS_SRC = filterOverlaps.c
+SEQSHUFFLE_SRC = seqshuffle.c
 
 MATRIX_SCAN_SRC =  matrix_scan.c
 
@@ -43,6 +44,9 @@ mscan_bed2sga : $(MSCAN_BED2SGA_SRC) $(OBJS)
 
 filterOverlaps : $(FILTEROVERLAPS_SRC)
 	$(CC) $(CFLAGS) -o filterOverlaps $^
+
+seqshuffle : $(SEQSHUFFLE_SRC)
+	$(CC) $(CFLAGS) -o seqshuffle $^
 
 mba : $(MBA_SRC)
 	$(CC) $(CFLAGS) -o mba $(MBA_SRC)

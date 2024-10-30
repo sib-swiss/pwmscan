@@ -8,3 +8,4 @@ Matrix (File) format conversion utilities
 - pfmconvert.pl            Convert a Position Frequency Matrix (PFM) file to a PWM with either integer log-odds weights
                            or letter probabilities
 - pwm2lpmconvert.pl        Convert a Position Weight Matrix (PWM) to letter probability format (LPM)
+- logo_rescale.pl          Rescale Position Frequency Matrix (PFM) such that it matches target Information Content (IC)

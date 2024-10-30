@@ -12,7 +12,7 @@ my @options = ("help", "h", "t=s", "T", "s=s", "f=s");
 my $target   = 1.0;
 my $totalIC  = 0;
 my $s        = 0.001;
-my $format   = "%6.4f";
+my $format   = '%6.4f';
 
 # get options from command line
 
@@ -121,9 +121,9 @@ sub Usage {
       -t target-IC    Set target IC
       -T              Target IC is total IC, default is average per position IC
       -s step-size    Log step size for changing exponent, use lower values for
-                      more precise IC match (default 0.001)
+                      more precise IC match (default $s)
       -f format       C-style output format for position-specific probability
-                      matrix (PPM) (default %6.4f)
+                      matrix (PPM) (default $format)
 
    Input format and processing: Base frequency (PFMs) or probability matrices
    (PPMs) are acceptable. Numbers must be non-negative integers or decimals.

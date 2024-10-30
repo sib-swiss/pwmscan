@@ -11,7 +11,7 @@ binDir = $(PWD)/bin
 genomeDir = $(PWD)/genomedb
 
 PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp pwm_scoring seqshuffle
-SCRIPTS = perl_tools/jasparconvert.pl perl_tools/lpmconvert.pl perl_tools/pfmconvert.pl perl_tools/pwm2lpmconvert.pl perl_tools/pwmconvert.pl perl_tools/transfaconvert.pl pwm_scan pwm_scan_ucsc pwmlib_scan pwmlib_scan_seq pwm_bowtie_wrapper pwm_mscan_wrapper pwm_mscan_wrapper_ucsc pwm_convert scan_genome_with_lib scan_seq_with_lib
+SCRIPTS = $(wildcard perl_tools/*.pl) pwm_scan pwm_scan_ucsc pwmlib_scan pwmlib_scan_seq pwm_bowtie_wrapper pwm_mscan_wrapper pwm_mscan_wrapper_ucsc pwm_convert scan_genome_with_lib scan_seq_with_lib
 
 OBJS = hashtable.o
 
@@ -88,13 +88,8 @@ install-genome :
 	gunzip $(genomeDir)/hg19/chrom*.seq.gz
 
 clean :
-	rm -rf $(OBJS) $(PROGS)
+	$(RM) $(OBJS) $(PROGS)
 
 cleanbin :
-	rm -rf $(binDir)/mba $(binDir)/bowtie2bed $(binDir)/filterOverlaps $(binDir)/mscan2bed \
-	$(binDir)/mscan_bed2sga $(binDir)/matrix_scan $(binDir)/matrix_prob $(binDir)/seq_extract_bcomp \
-	$(binDir)/pwm_scoring $(binDir)/pwm_scan $(binDir)/pwm_scan_ucsc $(binDir)/pwmlib_scan $(binDir)/pwmlib_scan_seq \
-	$(binDir)/pwm_mscan_wrapper $(binDir)/pwm_mscan_wrapper_ucsc $(binDir)/pwm_bowtie_wrapper \
-	$(binDir)/pwm_convert $(binDir)/jasparconvert.pl $(binDir)/scan_genome_with_lib $(binDir)/scan_seq_with_lib \
-	$(binDir)/lpmconvert.pl $(binDir)/pfmconvert.pl $(binDir)/pwmconvert.pl $(binDir)/transfaconvert.pl $(binDir)/pwm2lpmconvert.pl
+	$(RM) $(addprefix $(binDir)/, $(PROGS) $(notdir $(SCRIPTS)))
 

@@ -120,7 +120,7 @@ sub Usage {
       -h|--help       Show this stuff
       -t target-IC    Set target IC
       -T              Target IC is total IC, default is average per position IC
-      -s (step-size   Log step size for changing exponent, use lower values for
+      -s step-size    Log step size for changing exponent, use lower values for
                       more precise IC match (default 0.001)
       -f format       C-style output format for position-specific probability
                       matrix (PPM) (default %6.4f)
@@ -138,12 +138,12 @@ sub Usage {
    or PPM blocks are considered header or metadata lines and are transferred
    to output as is.
 
-   Probabilites of the output matrix (P) relate to the probabilites of the
+   Probabilities of the output matrix (P) relate to the probabilities of the
    input matrix (p) as follows (R notation)
 
       P[i,j] = = p[i,j]**e/sum(p[i,]**e)
 
-   The program increases or decrease e untill the target IC is reached,
+   The program increases or decrease e until the target IC is reached,
    starting with value exp(s) and incrementing or decrementing step size s
    in each iteration.
    Example: if the target IC is higher than the IC of the input PPM, and

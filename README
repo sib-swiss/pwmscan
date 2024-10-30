@@ -167,8 +167,8 @@ The pwmlib_scan tool is used to scan a genome with a collection of PWMs coming f
 Accepted motif database formats are the MEME libraries as well as the motif libraries (both log-odds
 and letter-probability formats) provided by the PWMScan Web interface.
 
-Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.
-The PWMScan library collections are available at FTP Site: ftp://ccg.vital-it.ch/pwmlib.
+Description of these formats is provided at https://epd.expasy.org/pwmtools/pwmlib.html.
+The PWMScan library collections are available at: https://epd.expasy.org/pwmtools/data/pwmlib/.
 
 As an example, you find the JASPAR CORE 2018 Collection for vertebrates in the pwmlibs sub-directory,
 provided in the three supported formats: meme, log-odds, and letter probability.
@@ -409,8 +409,8 @@ provide detailed step-by-step instructions on how to execute the PWMScan pipelin
 
 The README file is available in both text and html format at:
 
-  http://ccg.vital-it.ch/pwmtools/README.txt
-  http://ccg.vital-it.ch/pwmtools/README.html
+  https://epd.expasy.org/pwmtools/README.txt
+  https://epd.expasy.org/pwmtools/README.html
 
 
 
@@ -419,7 +419,7 @@ Web Interface
 
 PWMScan has a web interface which is freely available at:
 
-   http://ccg.vital-it.ch/pwmtools/pwmscan.php
+   https://epd.expasy.org/pwmtools/pwmscan.php
 
 Key features of the Web interface are the following:
 

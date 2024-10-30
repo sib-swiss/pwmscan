@@ -7,9 +7,9 @@ Except for the Isakova libraires, each library is provided in three formats:
 the original MEME library that has been downloaded from the MEME Suite Web site
 (http://meme-suite.org/doc/download.html?man_type=web), and the two formats,
 integer log-odds and letter-probability respectively, provided by the PWMScan
-Web site (http://ccg.vital-it.ch/pwmtools/pwmscan.php).
+Web site (https://epd.expasy.org/pwmtools/pwmscan.php).
 
-The PWMScan libraries are available at FTP Site: ftp://ccg.vital-it.ch/pwmlib.
+The PWMScan libraries are available at: https://epd.expasy.org/pwmtools/data/pwmlib/.
 
 As an example, to scan the human genome hg19 with the JASPAR CORE 2018 (meme format) and a
 p-value of 10-4 you can execute the following command:
@@ -23,18 +23,20 @@ pwmlib_scan
 ----------------------------------------------------------------------------
 Usage:
     pwmlib_scan -l <pwmlib> -e <p-value> -d <genome-root-dir> -s <assembly[hg19|mm9|..]> [options]
-    - version 1.1.4
+    - version 1.1.10
     where options are:
-         -g  PWM format [def=logodds]. Accepted formats are : meme, logodds, and lpm
-         -f  Scan sequences in forward direction [def=bidirectional]
-         -o  Allow for overlapping matches [def=non-overlapping matches]
-         -w  Write output to file [def=STDOUT]
-         -p  Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
-         -v  Verbose mode and keep PWM tmp files
+         -b <bg_comp>   Background model (residue priors), e.g. : 0.29,0.21,0.21,0.29
+                        [def=predefined for some common genome assemblies, else set to uniform]
+         -g             PWM format [def=logodds]. Accepted formats are : meme, logodds, and lpm
+         -f             Scan sequences in forward direction [def=bidirectional]
+         -o             Allow for overlapping matches [def=non-overlapping matches]
+         -w             Write output to file [def=STDOUT]
+         -p             Distribute matrix_scan on multiple CPU-cores [def=non-parallel processing]
+         -v             Verbose mode and keep PWM tmp files
 
     Scan a genome assembly with a PWM collection. Accepeted PWM library formats are the MEME format
     (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>).
-    Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.
+    Description of these formats is provided at https://epd.expasy.org/pwmtools/pwmlib.html.
 
 Please report bugs to Giovanna.Ambrosini@epfl.ch
 

@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 ARG PWMSCAN_VERSION
 ARG BUILD_DATE
@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.title="A genome-wide Position Weight Matrix (PWM)
 LABEL org.opencontainers.image.version=$PWMSCAN_VERSION
 LABEL org.opencontainers.image.vendor="SIB Swiss Institute of Bioinformatics"
 LABEL org.opencontainers.image.authors="sebastien.moretti@sib.swiss"
-LABEL org.opencontainers.image.url="https://ccg.epfl.ch/pwmtools/"
+LABEL org.opencontainers.image.url="https://epd.expasy.org/pwmtools/"
 LABEL org.opencontainers.image.source="https://sourceforge.net/projects/pwmscan/"
 LABEL org.opencontainers.image.documentation="https://sourceforge.net/projects/pwmscan/"
 LABEL org.opencontainers.image.licenses="GPLv3"
@@ -84,7 +84,7 @@ RUN echo '# OS update' \
 	&& rm -Rf chipseq-master/ \
 	&&        echo '# Install PWMScan requirements: bowtie' \
 	&& cd /usr/local/ \
-	&& echo '#This particular version is used on the https://ccg.epfl.ch/pwmtools/ server. Do not know if more recent versions work' \
+	&& echo '#This particular version is used on the https://epd.expasy.org/pwmtools/ server. Do not know if more recent versions work' \
 	&& wget 'https://github.com/BenLangmead/bowtie/releases/download/v1.2.2_p1/bowtie-1.2.2-linux-x86_64.zip' \
 	&& unzip bowtie-*-linux-x86_64.zip \
 	&& rm -f bowtie-*-linux-x86_64.zip \

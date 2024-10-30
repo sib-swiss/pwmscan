@@ -473,7 +473,7 @@ Shell (bash) Wrappers to execute the analysis pipeline
 
     Scan a genome assembly with a PWM collection. Accepeted PWM library formats are the MEME format
     (<meme>), and the MEME-like log-odds and letter-probability formats (<logodds> and <lpm>).
-    Description of these formats is provided at http://ccg.vital-it.ch/pwmtools/pwmlib.html.
+    Description of these formats is provided at https://epd.expasy.org/pwmtools/pwmlib.html.
 
     # Example:
 

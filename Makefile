@@ -1,14 +1,15 @@
 #
 # Makefile for PWMScan project
 #
+binDir    ?= $(PWD)/bin
+genomeDir ?= $(PWD)/genomedb
+
 CC = gcc
 LDFLAGS = -O3 -fPIC -lm
 
 CFLAGS = -O3 -std=gnu99 -W -Wall -Wextra -pedantic
 CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall -Wextra
 
-binDir = $(PWD)/bin
-genomeDir = $(PWD)/genomedb
 
 PROGS = bowtie2bed mscan_bed2sga mscan2bed filterOverlaps mba matrix_scan matrix_prob seq_extract_bcomp pwm_scoring seqshuffle
 SCRIPTS = $(wildcard perl_tools/*.pl) pwm_scan pwm_scan_ucsc pwmlib_scan pwmlib_scan_seq pwm_bowtie_wrapper pwm_mscan_wrapper pwm_mscan_wrapper_ucsc pwm_convert scan_genome_with_lib scan_seq_with_lib

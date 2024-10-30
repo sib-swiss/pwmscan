@@ -37,7 +37,7 @@ LOCAL_TMP=/tmp
 
 #NOTE Comment to use local (not in container) commands
 #NOTE -i is required for docker to read piped stdin
-DOCKER_CMD="docker run --rm -i --mount type=bind,source=`realpath $WORK_DIR`,target=/work_dir --mount type=bind,source=`realpath $BOWTIE_DIR`,target=/bowtie_dir sibswiss/pwmscan:1.1.9"
+DOCKER_CMD="docker run --rm -i --mount type=bind,source=`realpath $WORK_DIR`,target=/work_dir --mount type=bind,source=`realpath $BOWTIE_DIR`,target=/bowtie_dir sibswiss/pwmscan:1.1.10"
 
 
 #TODO what to log in $WORK_DIR/pwmscan_${MYPID}.log???

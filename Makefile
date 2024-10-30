@@ -4,8 +4,8 @@
 CC = gcc
 LDFLAGS = -O3 -fPIC -lm
 
-CFLAGS = -O3 -std=gnu99 -W -Wall -pedantic
-CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall
+CFLAGS = -O3 -std=gnu99 -W -Wall -Wextra -pedantic
+CFLAGS2 = -fPIC -O3 -std=gnu99 -W -Wall -Wextra
 
 binDir = $(PWD)/bin
 genomeDir = $(PWD)/genomedb

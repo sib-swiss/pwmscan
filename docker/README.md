@@ -1,5 +1,5 @@
 ```bash
-export PWMSCAN_VERSION=1.1.9
+export PWMSCAN_VERSION=1.1.10
 ```
 
 # Run bash in the Docker image

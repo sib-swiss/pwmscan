@@ -4,14 +4,14 @@
 #    https://developers.redhat.com/blog/2016/03/09/more-about-docker-images-size/
 
 
-## pwmscan:1.1.9         is the built image target, usually (lowercase) name:version
+## pwmscan:1.1.10        is the built image target, usually (lowercase) name:version
 ## Dockerfile            is the Dockerfile, the commands used to build the image
 ## Dockerfile example: https://github.com/ElmerCSC/elmerfem/blob/devel/docker/elmerice.dockerfile
 #                      https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/Dockerfile
 #                      https://github.com/ComparativeGenomicsToolkit/Comparative-Annotation-Toolkit/blob/master/Dockerfile
 
 # Build Docker image
-export PWMSCAN_VERSION=1.1.9
+export PWMSCAN_VERSION=1.1.10
 docker build -t pwmscan:$PWMSCAN_VERSION --no-cache=true --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') --build-arg PWMSCAN_VERSION=$PWMSCAN_VERSION  -f Dockerfile . # 2>&1 >PWMScan.Dockerfile.log
 
 # List Docker local images (imported or built)

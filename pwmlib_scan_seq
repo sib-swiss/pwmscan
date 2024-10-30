@@ -43,7 +43,7 @@ bg_comp="0.29,0.21,0.21,0.29"
 display_usage() {
       echo "Usage:"
       echo    "    pwmlib_scan_seq -l <pwmlib> -e <p-value> -s <seq_file>"
-      echo    "    - version 1.1.9"
+      echo    "    - version 1.1.10"
       echo    "    where options are:"
       echo -e "         -h             Display usage\n"
       echo    "         -b <bg_comp>   Background model (residue priors), DEF=0.29,0.21,0.21,0.29"

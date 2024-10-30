@@ -1,5 +1,5 @@
 {% set name = "PWMScan" %}
-{% set version = "1.1.9" %}
+{% set version = "1.1.10" %}
 {% set sha256 = "0ecca0d11d0458b6288a432d4be912103431879b8fbf8f5c77bbf228235ec090" %}
 
 package:

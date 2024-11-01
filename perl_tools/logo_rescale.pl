@@ -174,7 +174,7 @@ sub Usage {
    Note that for each input matrix, there is a maximum IC value that can be
    reached. This value depends on the length of the matrix, but also on whether
    some lines contain identical maximal base frequency values. If the latter
-   is the case then an IC of 2 cannot be reached for that motif position. If
+   is the case, then an IC of 2 cannot be reached for that motif position. If
    the target IC value requested by the user cannot be reached, the program
    issues and error message and skips the matrix.
 

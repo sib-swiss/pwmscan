@@ -19,15 +19,21 @@ my $format   = '%6.4f';
 if( ! GetOptions( \%opt, @options ) ) { &Usage(); }
 &Usage() if defined($opt{'help'}) || defined($opt{'h'});
 
-if($opt{'t'}  ne '') {$target = $opt{'t'}};
-if($opt{'T'}  ne '') {$totalIC = 1};
-if($opt{'s'}  ne '') {$s = $opt{'s'}};
-if($opt{'f'}  ne '') {$format = $opt{'f'}};
-#FIXME if($opt{'nH'} ne '') {$nH_flag = 1};
+if( $opt{'t'} && $opt{'t'}  ne '') {$target = $opt{'t'}};
+if( $opt{'T'} && $opt{'T'}  ne '') {$totalIC = 1};
+if( $opt{'s'} && $opt{'s'}  ne '') {$s = $opt{'s'}};
+if( $opt{'f'} && $opt{'f'}  ne '') {$format = $opt{'f'}};
 
 # major loop over input file
 
-$k=0; my @mat; my $pos_flag = 0; while(<STDIN>) {
+$file = $ARGV[0];
+if ($file && $file ne '') {
+    open ($INP, "$file") || die "can't open $file : $!";
+} else {
+    $INP = "STDIN";
+}
+
+$k=0; my @mat; my $pos_flag = 0; while(<$INP>) {
 
    if   (/^\s*(\d+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)\s+([0-9\.]+)/) {
       $k++; $mat[$k][1]=$2; $mat[$k][2]=$3; $mat[$k][3]=$4; $mat[$k][4]=$5; $pos_flag=1}
@@ -40,7 +46,11 @@ $k=0; my @mat; my $pos_flag = 0; while(<STDIN>) {
    }
 
 if($k > 0) {
-   adjust_ppm()}
+   adjust_ppm()
+}
+
+close $INP  if ($file && $file ne '');
+exit 0;
 
 sub adjust_ppm {
    @mat = normalize_ppm(@mat); $ic = comp_ic(@mat); $ic_max = ic_max(@mat);
@@ -52,14 +62,14 @@ sub adjust_ppm {
    else {
       if($totalIC) {printf STDERR "Initial toal IC %6.4f, ", $ic*$k}
       else         {printf STDERR "Initial per position IC %6.4f, ", $ic}
-      if($T > $ic) {
-         while($ic < $T) {$e += $s;
+      if($T > $ic) {$e  =$s;
+         while($ic < $T) {
             @mat = skew($e, @mat);
             $ic = comp_ic(@mat); # printf "%4.2f %6.4f %6.4f\n", $e, $target, $ic;
             }
          }
-      else {
-         while($ic > $T) {$e -= $s;
+      else {$e = -$s;
+         while($ic > $T) {
             @mat = skew($e, @mat);
             $ic = comp_ic(@mat); # printf "%4.2f %6.4f %6.4f\n", $e, $target, $ic;
             }
@@ -114,16 +124,26 @@ sub skew {my $e = shift @_; @pwm = @_; my $l = @pwm-1; $e = exp($e); # print "sk
 sub Usage {
    print STDERR <<"_USAGE_";
 
-   logo_rescale.pl [options] <stdin>
+   logo_rescale.pl [options] <motif_file|stdin>
 
       where options are:
       -h|--help       Show this stuff
-      -t target-IC    Set target IC
-      -T              Target IC is total IC, default is average per position IC
+      -t target-IC    Set target IC, i.e. average per-position IC (default $target)
+      -T              Flag changes value of -t to total IC across the full motif
       -s step-size    Log step size for changing exponent, use lower values for
                       more precise IC match (default $s)
       -f format       C-style output format for position-specific probability
                       matrix (PPM) (default $format)
+
+   Example usage:
+
+   logo_rescale.pl -t 1.2 < motif.txt
+   logo_rescale.pl -t 24 -T < motif.txt
+
+   Both commands will return the same output for a motif with 20 positions.
+   In the first command, the stopping criteria is an average per-position IC
+   of 1.2. In the second command, the stopping criteria is a total IC of 24
+   across the entire motif. For a motif of length 20, 24/20 = 1.2.
 
    Input format and processing: Base frequency (PFMs) or probability matrices
    (PPMs) are acceptable. Numbers must be non-negative integers or decimals.
